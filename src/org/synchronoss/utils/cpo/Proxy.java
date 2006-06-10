@@ -80,12 +80,11 @@ public class Proxy implements Observer {
   private String databaseName;
   private Properties connProps;
   private boolean classNameToggle = false;
-  private Category OUT;
+  private Category OUT = Category.getInstance(this.getClass());
   private String connectionClassName;
   //org.synchronoss.cpo.JdbcCpoAdapter
   public Proxy(Properties props, String server, CpoBrowserTree cpoTree) throws Exception {
     if (server == null || props == null) throw new Exception("No Server Selected!");
-    OUT = Category.getInstance(this.getClass());
     this.defProps = props;
     this.server = server;
     this.cpoTree = cpoTree;

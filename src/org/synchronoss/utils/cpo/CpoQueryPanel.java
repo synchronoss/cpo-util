@@ -155,7 +155,7 @@ public class CpoQueryPanel extends JPanel {
   }
   private void checkSQLAttributes() {
     if (cpoQPnorth.jTextASQL.getText().length() < 1) return;
-    int index = 0, tokenCount = 0;
+    int index = -1, tokenCount = 0;
     while ((index = cpoQPnorth.jTextASQL.getText().indexOf("?", index+1)) != -1) {
 //      OUT.debug ("index: "+index);
       tokenCount++;
