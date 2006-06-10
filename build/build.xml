@@ -95,6 +95,21 @@
       <target name="clean" depends="init">
             <delete dir="${buildir}"/>
       </target>
+      <target name="run" depends="make" description="Run CPO Util">
+        <java fork="true" classname="org.synchronoss.utils.cpo.CpoUtil">
+          <classpath>
+                <fileset dir="${libdir}">
+                      <exclude name="**/*.so"/>
+                      <exclude name="**/*.dll"/>
+                </fileset>
+            <fileset dir="${buildir}">
+              <include name="utilscpo.jar"/>
+            </fileset>
+                <!--<pathelement path="${build.classpath}"/>
+                <pathelement path="${weblogic-jar}"/>-->
+          </classpath>
+        </java>
+      </target>
       <target name="remake" depends="clean,make" description="Rebuild entire project"/>
       <!--
       <target name="test-wlcon" depends="make" description="Test cursor leak">
