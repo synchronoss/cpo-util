@@ -168,7 +168,10 @@ public class MainFrame extends JFrame {
       CpoUtil.showException(cnfe);
       CpoUtil.setCustomClassPath("Make sure platform-ejb.jar and weblogic.jar is in your custom classpath!");
     } catch (Exception pe) {
-      CpoUtil.showException(pe);
+      if (!pe.getMessage().equals("No Server Selected!"))
+        CpoUtil.showException(pe);
+      else
+        this.statusBar.setText("No Server Selected!");
     }
   }
 
