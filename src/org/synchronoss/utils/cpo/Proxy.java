@@ -898,11 +898,11 @@ public class Proxy implements Observer {
             if (revsEnabled)
               sql = "insert into cpo_attribute_map (attribute_id, class_id, "
                 + "column_name, attribute, column_type, db_table, db_column, userid, transform_class) "
-                + "values (?,?,upper(?),?,?,?,?,'"+CpoUtil.username+"',?)";
+                + "values (?,?,?,?,?,?,?,'"+CpoUtil.username+"',?)";
             else
               sql = "insert into cpo_attribute_map (attribute_id, class_id, "
                 + "column_name, attribute, column_type, db_table, db_column,transform_class) "
-                + "values (?,?,upper(?),?,?,?,?,?)";
+                + "values (?,?,?,?,?,?,?,?)";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1,camn.getAttributeId());
             pstmt.setString(2,camn.getClassId());
@@ -926,11 +926,11 @@ public class Proxy implements Observer {
             String sql;
             if (revsEnabled)
               sql = "update cpo_attribute_map set "
-                + "column_name = upper(?), attribute = ?, column_type = ?, db_table = ?, "
+                + "column_name = ?, attribute = ?, column_type = ?, db_table = ?, "
                 + "db_column = ?, userid = '"+CpoUtil.username+"', transform_class=? where attribute_id = ?";
             else
               sql = "update cpo_attribute_map set "
-                + "column_name = upper(?), attribute = ?, column_type = ?, db_table = ?, "
+                + "column_name = ?, attribute = ?, column_type = ?, db_table = ?, "
                 + "db_column = ?, transform_class=? where attribute_id = ?";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1,camn.getColumnName());
@@ -1456,7 +1456,7 @@ public class Proxy implements Observer {
         Class returnClass = methods[i].getReturnType();
         String columnTypeName = "VARCHAR"; // this needs to be fixed!!!!
         String attributeName = methods[i].getName().substring(3);
-        String columnName = attributeName.toUpperCase();
+        String columnName = attributeName;
         CpoAttributeMapNode camn = new CpoAttributeMapNode(attMapParent,this.getNewGuid(),
             ccn.getClassId(),columnName,attributeName, 
             columnTypeName,null, null,null,"IN");
