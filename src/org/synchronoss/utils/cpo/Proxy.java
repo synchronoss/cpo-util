@@ -395,10 +395,10 @@ public class Proxy implements Observer {
       String sql;
       if (revsEnabled)
         sql = "select group_id, class_id, group_type, name, userid, createdate from cpo_query_group where group_id in "+
-            "(select group_id from cpo_query where text_id = ?)";
+            "(select group_id from cpo_query where text_id = ?) order by group_id";
       else
         sql = "select group_id, class_id, group_type, name from cpo_query_group where group_id in "+
-            "(select group_id from cpo_query where text_id = ?)";
+            "(select group_id from cpo_query where text_id = ?) order by group_id";
       pstmt = conn.prepareStatement(sql);
       pstmt.setString(1,textNode.getTextId());
       rs = pstmt.executeQuery();
@@ -431,9 +431,9 @@ public class Proxy implements Observer {
     try {
       String sql;
       if (revsEnabled)
-        sql = "select group_id, class_id, group_type, name, userid, createdate from cpo_query_group where class_id = ? order by name";
+        sql = "select group_id, class_id, group_type, name, userid, createdate from cpo_query_group where class_id = ? order by group_id";
       else
-        sql = "select group_id, class_id, group_type, name from cpo_query_group where class_id = ? order by name";
+        sql = "select group_id, class_id, group_type, name from cpo_query_group where class_id = ? order by group_id";
       pstmt = conn.prepareStatement(sql);
       pstmt.setString(1,((CpoClassNode)parent.getParent()).getClassId());
       rs = pstmt.executeQuery();
