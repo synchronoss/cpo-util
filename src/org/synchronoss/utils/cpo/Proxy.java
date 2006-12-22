@@ -73,8 +73,8 @@ public class Proxy implements Observer {
 //  private Object cpoMan; //CpoManager
   private CpoAdapter cpoMan;
   private String[] sqlTypes;
-  private Method sqlTypeClassMeth = null;
-  private Method sqlTypeClassMethInt = null;
+//  private Method sqlTypeClassMeth = null;
+//  private Method sqlTypeClassMethInt = null;
 //  private HashMap cpoTypeMap = new HashMap();
   private CpoBrowserTree cpoTree;
   private String databaseName;
@@ -1414,7 +1414,8 @@ public class Proxy implements Observer {
     while (attMapIt.hasNext()) {
       CpoAttributeMapNode atMapNode = (CpoAttributeMapNode)attMapIt.next();
       String attName = makeAttFromColName(atMapNode.getColumnName());
-      Class attClass = (Class) this.sqlTypeClassMeth.invoke(cpoMan,new Object[]{atMapNode.getColumnType()});
+      //Class attClass = (Class) this.sqlTypeClassMeth.invoke(cpoMan,new Object[]{atMapNode.getColumnType()});
+      Class attClass = getSqlTypeClass(atMapNode.getColumnType());
       String attClassName = attClass.getName();
       if (attName.length() > 1)
         sbClass.append("  public void set"+attName.substring(0,1).toUpperCase()+attName.substring(1)+"("+attClassName+" "+attName+") {\n");
