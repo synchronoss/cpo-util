@@ -30,18 +30,16 @@ import java.util.*;
 import java.io.*;
 import java.security.*;
 import javax.swing.JFrame;
-import snoozesoft.systray4j.*;
 //import com.l2fprod.gui.plaf.skin.*;
 //import com.l2fprod.gui.*;
 //import com.l2fprod.util.*;
 
-public class CpoUtil implements SysTrayMenuListener {
+public class CpoUtil {
   static Properties props = new Properties();
   static Properties localProps = new Properties();
   static MainFrame frame;
   static ArrayList files = new ArrayList();
   static String username;
-  static SysTrayMenu sysTray;
   
   public CpoUtil(String propsLocation) {
     loadProps(propsLocation);
@@ -312,33 +310,4 @@ public class CpoUtil implements SysTrayMenuListener {
     }
   }
 
-  private void makeSysTray() {
-    SysTrayMenuIcon icon;
-    if (System.getProperty("os.name").toUpperCase().startsWith("WINDOWS"))
-      icon = new SysTrayMenuIcon(getClass().getResource("/sync-logo-sm.ico"));
-    else
-      icon = new SysTrayMenuIcon(getClass().getResource("/sync-logo-sm.xpm"));
-    icon.addSysTrayMenuListener(this);
-    // create an exit item
-    SysTrayMenuItem itemExit = new SysTrayMenuItem( "Exit", "exit" );
-    itemExit.addSysTrayMenuListener( this );
-    sysTray = new SysTrayMenu(icon,"CPO Utility");
-    sysTray.addItem(itemExit);
-  }
-
-  public void menuItemSelected(SysTrayMenuEvent e) {
-    if( e.getActionCommand().equals( "exit" ) ) {
-      if (CpoUtil.checkUnsavedData("You have unsaved data, are you sure you wish to exit??"))
-        return;
-      System.exit( 0 );
-    }
-  }
-
-  public void iconLeftClicked(SysTrayMenuEvent p0) {
-    if (CpoUtil.frame.isVisible()) CpoUtil.frame.hide();
-    else CpoUtil.frame.show();
-  }
-
-  public void iconLeftDoubleClicked(SysTrayMenuEvent p0) {
-  }
 }
