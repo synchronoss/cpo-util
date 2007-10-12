@@ -78,6 +78,7 @@ public class Proxy implements Observer {
 //  private HashMap cpoTypeMap = new HashMap();
   private CpoBrowserTree cpoTree;
   private String databaseName;
+  private String tablePrefix;
   private Properties connProps;
   private boolean classNameToggle = false;
   private Category OUT = Category.getInstance(this.getClass());
@@ -91,12 +92,18 @@ public class Proxy implements Observer {
     getConnection();
     checkForRevsEnabled();
   }  
+  public String getTablePrefix() {
+	  return this.tablePrefix;
+  }
+  
   void getConnection() throws Exception {
     if (CpoUtil.localProps.containsKey(Statics.PROP_JDBC_DRIVER+server) ||
         CpoUtil.localProps.containsKey(Statics.PROP_WLSURL+server))
       connProps = CpoUtil.localProps;
     else
       connProps = defProps;
+    
+    this.tablePrefix = connProps.getProperty(Statics.PROP_JDBC_TABLE_PREFIX+server);
 
 //    Class cpoSqlTypesClass =  CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass("org.synchronoss.cpo.jdbc.JavaSqlTypes");
     //javaSqlTypes = cpoSqlTypesClass.newInstance();
@@ -232,10 +239,10 @@ public class Proxy implements Observer {
 //    }
   }
   private void checkForRevsEnabled() {
-    String sql = "select distinct userid from cpo_class_rev";
+    StringBuffer sql = new StringBuffer("select distinct userid from {$table.prefix}cpo_class_rev");
     PreparedStatement pstmt = null;
     try {
-      pstmt = conn.prepareStatement(sql);
+      pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
       pstmt.executeQuery();
       revsEnabled = true;
     } catch (Exception e) {
@@ -263,36 +270,6 @@ public class Proxy implements Observer {
    */
   public CpoClassNode getClassNode(String classId) throws Exception {
     return (CpoClassNode)this.classCacheById.get(classId);
-/*
-    CpoClassNode classNode = null;
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
-    String sql;
-    if (revsEnabled)
-      sql = "select class_id, name, userid, createdate from cpo_class where class_id = ?";
-    else
-      sql = "select class_id, name from cpo_class where class_id = ?";
-    try {
-      pstmt = conn.prepareStatement(sql);
-      pstmt.setString(1,classId);
-      rs = pstmt.executeQuery();
-      if (rs.next()) {
-        classNode = new CpoClassNode(rs.getString("name"),rs.getString("class_id"),null);
-        if (revsEnabled) {
-          classNode.setUserName(rs.getString("userid"));
-          classNode.setCreateDate(rs.getTimestamp("createdate"));
-        }
-      }
-    } finally {
-      try {
-        rs.close();
-      } catch (Exception e) {}
-      try {
-        pstmt.close();
-      } catch (Exception e) {}
-    }
-    return classNode;
-*/
   }
   public Hashtable getClassesById() {
     return this.classCacheById;
@@ -305,12 +282,12 @@ public class Proxy implements Observer {
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
-      String sql;
+      StringBuffer sql=new StringBuffer();
       if (revsEnabled)
-        sql = "select class_id, name, userid, createdate from cpo_class order by upper(name)";
+        sql.append("select class_id, name, userid, createdate from {$table.prefix}cpo_class order by upper(name)");
       else
-        sql = "select class_id, name from cpo_class order by upper(name)";
-      pstmt = conn.prepareStatement(sql);
+    	  sql.append("select class_id, name from {$table.prefix}cpo_class order by upper(name)");
+      pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
       rs = pstmt.executeQuery();
       while (rs.next()) {
         CpoClassNode cpoClassNode = new CpoClassNode(rs.getString("name"),rs.getString("class_id"),parent);
@@ -352,13 +329,12 @@ public class Proxy implements Observer {
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
-      String sql;
+      StringBuffer sql=new StringBuffer();
       if (revsEnabled)
-        sql = "select text.text_id, text.sql_text, text.description, (select count(*) from cpo_query where text_id = text.text_id) usagecount, text.userid, text.createdate from cpo_query_text text order by text.description";
+        sql.append("select text.text_id, text.sql_text, text.description, (select count(*) from {$table.prefix}cpo_query where text_id = text.text_id) usagecount, text.userid, text.createdate from {$table.prefix}cpo_query_text text order by text.description");
       else
-        sql = "select text.text_id, text.sql_text, text.description, count(query.text_id) usagecount from cpo_query_text text, cpo_query query WHERE text.text_id = query.text_id GROUP BY text.text_id, text.sql_text, text.description order by text.description";
-//        sql = "select text.text_id, text.sql_text, text.description, (select count(*) from cpo_query where text_id = text.text_id) usagecount from cpo_query_text text order by text.description";
-      pstmt = conn.prepareStatement(sql);
+        sql.append("select text.text_id, text.sql_text, text.description, count(query.text_id) usagecount from {$table.prefix}cpo_query_text text, {$table.prefix}cpo_query query WHERE text.text_id = query.text_id GROUP BY text.text_id, text.sql_text, text.description order by text.description");
+      pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
       rs = pstmt.executeQuery();
       while (rs.next()) {
         CpoQueryTextNode cpoQTNode = new CpoQueryTextNode(rs.getString("text_id"),
@@ -392,14 +368,14 @@ public class Proxy implements Observer {
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
-      String sql;
+    	StringBuffer sql=new StringBuffer();
       if (revsEnabled)
-        sql = "select group_id, class_id, group_type, name, userid, createdate from cpo_query_group where group_id in "+
-            "(select group_id from cpo_query where text_id = ?) order by group_id";
+    	  sql.append("select group_id, class_id, group_type, name, userid, createdate from {$table.prefix}cpo_query_group where group_id in "+
+            "(select group_id from {$table.prefix}cpo_query where text_id = ?) order by group_id");
       else
-        sql = "select group_id, class_id, group_type, name from cpo_query_group where group_id in "+
-            "(select group_id from cpo_query where text_id = ?) order by group_id";
-      pstmt = conn.prepareStatement(sql);
+    	  sql.append("select group_id, class_id, group_type, name from {$table.prefix}cpo_query_group where group_id in "+
+            "(select group_id from {$table.prefix}cpo_query where text_id = ?) order by group_id");
+      pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
       pstmt.setString(1,textNode.getTextId());
       rs = pstmt.executeQuery();
       while (rs.next()) {
@@ -429,12 +405,12 @@ public class Proxy implements Observer {
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
-      String sql;
+    	StringBuffer sql=new StringBuffer();
       if (revsEnabled)
-        sql = "select group_id, class_id, group_type, name, userid, createdate from cpo_query_group where class_id = ? order by group_id";
+    	  sql.append("select group_id, class_id, group_type, name, userid, createdate from {$table.prefix}cpo_query_group where class_id = ? order by group_id");
       else
-        sql = "select group_id, class_id, group_type, name from cpo_query_group where class_id = ? order by group_id";
-      pstmt = conn.prepareStatement(sql);
+    	  sql.append("select group_id, class_id, group_type, name from {$table.prefix}cpo_query_group where class_id = ? order by group_id");
+      pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
       pstmt.setString(1,((CpoClassNode)parent.getParent()).getClassId());
       rs = pstmt.executeQuery();
       while (rs.next()) {
@@ -491,14 +467,14 @@ public class Proxy implements Observer {
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
-      String sql;
+    	StringBuffer sql=new StringBuffer();
       if (revsEnabled)
-        sql = "select q.query_id, q.group_id, q.text_id, q.seq_no, q.userid, q.createdate from "
-          + "cpo_query q where q.group_id = ? order by q.seq_no";
+    	  sql.append("select q.query_id, q.group_id, q.text_id, q.seq_no, q.userid, q.createdate from "
+          + "{$table.prefix}cpo_query q where q.group_id = ? order by q.seq_no");
       else
-        sql = "select q.query_id, q.group_id, q.text_id, q.seq_no from "
-          + "cpo_query q where q.group_id = ? order by q.seq_no";
-      pstmt = conn.prepareStatement(sql);
+    	  sql.append("select q.query_id, q.group_id, q.text_id, q.seq_no from "
+          + "{$table.prefix}cpo_query q where q.group_id = ? order by q.seq_no");
+      pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
       pstmt.setString(1,parent.getGroupId());
       rs = pstmt.executeQuery();
       while (rs.next()) {
@@ -538,16 +514,16 @@ public class Proxy implements Observer {
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
-      String sql;
+    	StringBuffer sql=new StringBuffer();
       if (revsEnabled)
-        sql = "select qp.attribute_id, qp.query_id, qp.seq_no, qp.param_type, qp.userid, qp.createdate "
-          + "from cpo_query_parameter qp "
-          + "where query_id = ? order by qp.seq_no";
+    	  sql.append("select qp.attribute_id, qp.query_id, qp.seq_no, qp.param_type, qp.userid, qp.createdate "
+          + "from {$table.prefix}cpo_query_parameter qp "
+          + "where query_id = ? order by qp.seq_no");
       else
-        sql = "select qp.attribute_id, qp.query_id, qp.seq_no, qp.param_type "
-          + "from cpo_query_parameter qp "
-          + "where query_id = ? order by qp.seq_no";
-      pstmt = conn.prepareStatement(sql);
+    	  sql.append("select qp.attribute_id, qp.query_id, qp.seq_no, qp.param_type "
+          + "from {$table.prefix}cpo_query_parameter qp "
+          + "where query_id = ? order by qp.seq_no");
+      pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
       pstmt.setString(1,qNode.getQueryId());
       rs = pstmt.executeQuery();
 //      OUT.debug ("Parent for "+qNode+": "+qNode.getParent());
@@ -625,18 +601,18 @@ public class Proxy implements Observer {
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
-      String sql;
+    	StringBuffer sql=new StringBuffer();
       if (revsEnabled)
-        sql = "select am.attribute_id, am.class_id, am.column_name, am.attribute, am.column_type, "
+    	  sql.append("select am.attribute_id, am.class_id, am.column_name, am.attribute, am.column_type, "
           + "am.transform_class, am.db_table, am.db_column, am.userid, am.createdate "
-          + "from cpo_attribute_map am "
-          + "where am.class_id = ? order by am.attribute";
+          + "from {$table.prefix}cpo_attribute_map am "
+          + "where am.class_id = ? order by am.attribute");
       else
-        sql = "select am.attribute_id, am.class_id, am.column_name, am.attribute, am.column_type, "
+    	  sql.append("select am.attribute_id, am.class_id, am.column_name, am.attribute, am.column_type, "
           + "am.transform_class, am.db_table, am.db_column "
-          + "from cpo_attribute_map am "
-          + "where am.class_id = ? order by am.attribute";
-      pstmt = conn.prepareStatement(sql);
+          + "from {$table.prefix}cpo_attribute_map am "
+          + "where am.class_id = ? order by am.attribute");
+      pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
       pstmt.setString(1,((CpoClassNode)cpoAttLabNode.getParent()).getClassId());
       rs = pstmt.executeQuery();
       while (rs.next()) {
@@ -672,8 +648,8 @@ public class Proxy implements Observer {
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
-      String sql = "select count(*) from cpo_query where text_id = ?";
-      pstmt = conn.prepareStatement(sql);
+    	StringBuffer sql=new StringBuffer("select count(*) from {$table.prefix}cpo_query where text_id = ?");
+      pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
       pstmt.setString(1,textId);
       rs = pstmt.executeQuery();
       rs.next();
@@ -790,24 +766,6 @@ public class Proxy implements Observer {
    */
   public String getNewGuid() throws Exception {
     return GUID.getGUID();
-/*
-    String guid = null;
-    CallableStatement cstmt = null;
-    try {
-      String sql = "{? = call STI_UTIL.formatGUID(sys_guid)}";
-      cstmt = conn.prepareCall(sql);
-      cstmt.registerOutParameter(1,Types.VARCHAR);
-      cstmt.execute();
-      guid = cstmt.getString(1);
-//    } catch (SQLException se) {
-//      throw new ProxyException("getNewGuid()",se);
-    }
-    finally {
-      try {
-        cstmt.close();
-      } catch (Exception e) {}
-    }
-    return guid;*/
   }
   /**
    * saves all nodes passed to it to the db
@@ -825,55 +783,55 @@ public class Proxy implements Observer {
         if (node instanceof CpoClassNode) {
           CpoClassNode ccn = (CpoClassNode)node;
           if (ccn.isNew()) {
-            String sql;
+        	  StringBuffer sql=new StringBuffer();
             if (revsEnabled)
-              sql = "insert into cpo_class (class_id, name, userid) "
-                + "values (?,?,'"+CpoUtil.username+"')";
+            	sql.append("insert into {$table.prefix}cpo_class (class_id, name, userid) "
+                + "values (?,?,'"+CpoUtil.username+"')");
             else
-              sql = "insert into cpo_class (class_id, name) "
-                + "values (?,?)";
-            pstmt = conn.prepareStatement(sql);
+            	sql.append("insert into {$table.prefix}cpo_class (class_id, name) "
+                + "values (?,?)");
+            pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,ccn.getClassId());
             pstmt.setString(2,ccn.getClassName());
             int result = pstmt.executeUpdate();
 //            OUT.debug("Inserted Class Node: "+ccn.getClassId()+" "+result);
           }
           else if (ccn.isRemove()) {
-            String sqlDelQueryParam = "delete from cpo_query_parameter where query_id in "
-                + "(select query_id from cpo_query where group_id in "
-                + "(select group_id from cpo_query_group where class_id = ?))";
-            String sqlDelAttMap = "delete from cpo_attribute_map where class_id = ?";
-            String sqlDelQuery = "delete from cpo_query where group_id in "
-                + "(select group_id from cpo_query_group where class_id = ?)";
-            String sqlDelQueryGroup = "delete from cpo_query_group where class_id = ?";
-            String sqlDelClass = "delete from cpo_class where class_id = ?";
-            pstmt = conn.prepareStatement(sqlDelQueryParam);
+        	  StringBuffer sqlDelQueryParam=new StringBuffer("delete from {$table.prefix}cpo_query_parameter where query_id in "
+                + "(select query_id from {$table.prefix}cpo_query where group_id in "
+                + "(select group_id from {$table.prefix}cpo_query_group where class_id = ?))");
+        	  StringBuffer sqlDelAttMap=new StringBuffer("delete from {$table.prefix}cpo_attribute_map where class_id = ?");
+        	  StringBuffer sqlDelQuery=new StringBuffer("delete from {$table.prefix}cpo_query where group_id in "
+                + "(select group_id from {$table.prefix}cpo_query_group where class_id = ?)");
+        	  StringBuffer sqlDelQueryGroup=new StringBuffer("delete from {$table.prefix}cpo_query_group where class_id = ?");
+        	  StringBuffer sqlDelClass=new StringBuffer("delete from {$table.prefix}cpo_class where class_id = ?");
+            pstmt = conn.prepareStatement((Statics.replaceMarker(sqlDelQueryParam, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,ccn.getClassId());
             pstmt.execute();
             pstmt.close();
-            pstmt = conn.prepareStatement(sqlDelAttMap);
+            pstmt = conn.prepareStatement((Statics.replaceMarker(sqlDelAttMap, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,ccn.getClassId());
             pstmt.execute();
             pstmt.close();
-            pstmt = conn.prepareStatement(sqlDelQuery);
+            pstmt = conn.prepareStatement((Statics.replaceMarker(sqlDelQuery, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,ccn.getClassId());
             pstmt.execute();
             pstmt.close();
-            pstmt = conn.prepareStatement(sqlDelQueryGroup);
+            pstmt = conn.prepareStatement((Statics.replaceMarker(sqlDelQueryGroup, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,ccn.getClassId());
             pstmt.execute();
             pstmt.close();
-            pstmt = conn.prepareStatement(sqlDelClass);
+            pstmt = conn.prepareStatement((Statics.replaceMarker(sqlDelClass, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,ccn.getClassId());
             pstmt.execute();
           }
           else if (ccn.isDirty()) {
-            String sql;
+        	  StringBuffer sql=new StringBuffer();
             if (revsEnabled)
-              sql = "update cpo_class set name = ?, userid = '"+CpoUtil.username+"' where class_id = ?";
+              sql.append("update {$table.prefix}cpo_class set name = ?, userid = '"+CpoUtil.username+"' where class_id = ?");
             else
-              sql = "update cpo_class set name = ? where class_id = ?";
-            pstmt = conn.prepareStatement(sql);
+              sql.append("update {$table.prefix}cpo_class set name = ? where class_id = ?");
+            pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,ccn.getClassName());
             pstmt.setString(2,ccn.getClassId());
             pstmt.executeUpdate();
@@ -894,16 +852,16 @@ public class Proxy implements Observer {
         if (node instanceof CpoAttributeMapNode) {
           CpoAttributeMapNode camn = (CpoAttributeMapNode)node;
           if (camn.isNew()) {
-            String sql;
+        	  StringBuffer sql=new StringBuffer();
             if (revsEnabled)
-              sql = "insert into cpo_attribute_map (attribute_id, class_id, "
+              sql.append("insert into {$table.prefix}cpo_attribute_map (attribute_id, class_id, "
                 + "column_name, attribute, column_type, db_table, db_column, userid, transform_class) "
-                + "values (?,?,?,?,?,?,?,'"+CpoUtil.username+"',?)";
+                + "values (?,?,?,?,?,?,?,'"+CpoUtil.username+"',?)");
             else
-              sql = "insert into cpo_attribute_map (attribute_id, class_id, "
+              sql.append("insert into {$table.prefix}cpo_attribute_map (attribute_id, class_id, "
                 + "column_name, attribute, column_type, db_table, db_column,transform_class) "
-                + "values (?,?,?,?,?,?,?,?)";
-            pstmt = conn.prepareStatement(sql);
+                + "values (?,?,?,?,?,?,?,?)");
+            pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,camn.getAttributeId());
             pstmt.setString(2,camn.getClassId());
             pstmt.setString(3,camn.getColumnName());
@@ -916,23 +874,23 @@ public class Proxy implements Observer {
 //            OUT.debug("Inserted attribute map node: "+camn.getAttributeId()+" "+result);
           }
           else if (camn.isRemove()) {
-            String sql = "delete from cpo_attribute_map where attribute_id = ?";
-            pstmt = conn.prepareStatement(sql);
+        	  StringBuffer sql=new StringBuffer("delete from {$table.prefix}cpo_attribute_map where attribute_id = ?");
+            pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,camn.getAttributeId());
             pstmt.execute();
           }
           else if (camn.isDirty()) {
             //  update everything except class_id - might want to change this later...
-            String sql;
+        	  StringBuffer sql=new StringBuffer();
             if (revsEnabled)
-              sql = "update cpo_attribute_map set "
+              sql.append("update {$table.prefix}cpo_attribute_map set "
                 + "column_name = ?, attribute = ?, column_type = ?, db_table = ?, "
-                + "db_column = ?, userid = '"+CpoUtil.username+"', transform_class=? where attribute_id = ?";
+                + "db_column = ?, userid = '"+CpoUtil.username+"', transform_class=? where attribute_id = ?");
             else
-              sql = "update cpo_attribute_map set "
+              sql.append("update {$table.prefix}cpo_attribute_map set "
                 + "column_name = ?, attribute = ?, column_type = ?, db_table = ?, "
-                + "db_column = ?, transform_class=? where attribute_id = ?";
-            pstmt = conn.prepareStatement(sql);
+                + "db_column = ?, transform_class=? where attribute_id = ?");
+            pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,camn.getColumnName());
             pstmt.setString(2,camn.getAttribute());
             pstmt.setString(3,camn.getColumnType());
@@ -958,14 +916,14 @@ public class Proxy implements Observer {
         if (node instanceof CpoQueryGroupNode) {
           CpoQueryGroupNode cqgn = (CpoQueryGroupNode)node;
           if (cqgn.isNew()) {
-            String sql;
+        	  StringBuffer sql=new StringBuffer();
             if (revsEnabled)
-              sql = "insert into cpo_query_group (group_id, class_id, group_type, "
-                + "name,userid) values (?,?,?,?,'"+CpoUtil.username+"')";
+              sql.append("insert into {$table.prefix}cpo_query_group (group_id, class_id, group_type, "
+                + "name,userid) values (?,?,?,?,'"+CpoUtil.username+"')");
             else
-              sql = "insert into cpo_query_group (group_id, class_id, group_type, "
-                + "name) values (?,?,?,?)";
-            pstmt = conn.prepareStatement(sql);
+              sql.append("insert into {$table.prefix}cpo_query_group (group_id, class_id, group_type, "
+                + "name) values (?,?,?,?)");
+            pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,cqgn.getGroupId());
             pstmt.setString(2,cqgn.getClassId());
             pstmt.setString(3,cqgn.getType());
@@ -974,31 +932,31 @@ public class Proxy implements Observer {
 //            OUT.debug("Inserted query group: "+cqgn.getGroupId()+" "+result);
           }
           else if (cqgn.isRemove()) {
-            String sqlDelQueryParam = "delete from cpo_query_parameter where query_id in "
-                + "(select query_id from cpo_query where group_id = ?)";
-            String sqlDelQuery = "delete from cpo_query where group_id = ?";
-            String sqlDelQueryGroup = "delete from cpo_query_group where group_id = ?";
-            pstmt = conn.prepareStatement(sqlDelQueryParam);
+        	  StringBuffer sqlDelQueryParam=new StringBuffer("delete from {$table.prefix}cpo_query_parameter where query_id in "
+                + "(select query_id from {$table.prefix}cpo_query where group_id = ?)");
+        	  StringBuffer sqlDelQuery=new StringBuffer("delete from {$table.prefix}cpo_query where group_id = ?");
+        	  StringBuffer sqlDelQueryGroup=new StringBuffer("delete from {$table.prefix}cpo_query_group where group_id = ?");
+            pstmt = conn.prepareStatement((Statics.replaceMarker(sqlDelQueryParam, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,cqgn.getGroupId());
             pstmt.execute();
             pstmt.close();
-            pstmt = conn.prepareStatement(sqlDelQuery);
+            pstmt = conn.prepareStatement((Statics.replaceMarker(sqlDelQuery, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,cqgn.getGroupId());
             pstmt.execute();
             pstmt.close();
-            pstmt = conn.prepareStatement(sqlDelQueryGroup);
-            pstmt.setString(1,cqgn.getGroupId());
+            pstmt = conn.prepareStatement((Statics.replaceMarker(sqlDelQueryGroup, "{$table.prefix}", this.tablePrefix)).toString());
+           pstmt.setString(1,cqgn.getGroupId());
             pstmt.execute();
           }
           else if (cqgn.isDirty()) {
-            String sql;
+        	  StringBuffer sql=new StringBuffer();
             if (revsEnabled)
-              sql = "update cpo_query_group set group_type = ?, name = ?, userid = '"+CpoUtil.username+"' where "
-                + "group_id = ?";
+              sql.append("update {$table.prefix}cpo_query_group set group_type = ?, name = ?, userid = '"+CpoUtil.username+"' where "
+                + "group_id = ?");
             else
-              sql = "update cpo_query_group set group_type = ?, name = ? where "
-                + "group_id = ?";
-            pstmt = conn.prepareStatement(sql);
+              sql.append("update {$table.prefix}cpo_query_group set group_type = ?, name = ? where "
+                + "group_id = ?");
+            pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,cqgn.getType());
             pstmt.setString(2,cqgn.getGroupName());
             pstmt.setString(3,cqgn.getGroupId());
@@ -1032,14 +990,14 @@ public class Proxy implements Observer {
             CpoUtil.showException(ree);
           }
           if (cQTnode.isNew()) {
-            String insertTextId;
+        	  StringBuffer insertTextId=new StringBuffer();
             if (revsEnabled)
-              insertTextId = "insert into cpo_query_text (text_id, sql_text, description,userid) "
-                + "values (?,?,?,'"+CpoUtil.username+"')";
+              insertTextId.append("insert into {$table.prefix}cpo_query_text (text_id, sql_text, description,userid) "
+                + "values (?,?,?,'"+CpoUtil.username+"')");
             else
-              insertTextId = "insert into cpo_query_text (text_id, sql_text, description) "
-                + "values (?,?,?)";
-            pstmt = conn.prepareStatement(insertTextId);
+              insertTextId.append("insert into {$table.prefix}cpo_query_text (text_id, sql_text, description) "
+                + "values (?,?,?)");
+            pstmt = conn.prepareStatement((Statics.replaceMarker(insertTextId, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,cQTnode.getTextId());
             pstmt.setString(2,sqlText);
             pstmt.setString(3,cQTnode.getDesc());
@@ -1047,20 +1005,20 @@ public class Proxy implements Observer {
 //            OUT.debug("Inserted query TEXT node: "+cQTnode.getTextId()+" "+result);
           }
           else if (cQTnode.isRemove()) {
-            String removeTextId = "delete from cpo_query_text where text_id = ?";
-            pstmt = conn.prepareStatement(removeTextId);
+        	  StringBuffer removeTextId=new StringBuffer("delete from {$table.prefix}cpo_query_text where text_id = ?");
+            pstmt = conn.prepareStatement((Statics.replaceMarker(removeTextId, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,cQTnode.getTextId());
             pstmt.execute();
           }
           else if (cQTnode.isDirty()) {
-            String updateTextId;
+        	  StringBuffer updateTextId=new StringBuffer();
             if (revsEnabled)
-              updateTextId = "update cpo_query_text set sql_text = ?, description = ?, userid = '"+CpoUtil.username+"' where "
-                + "text_id = ?";
+              updateTextId.append("update {$table.prefix}cpo_query_text set sql_text = ?, description = ?, userid = '"+CpoUtil.username+"' where "
+                + "text_id = ?");
             else
-              updateTextId = "update cpo_query_text set sql_text = ?, description = ? where "
-                + "text_id = ?";
-            pstmt = conn.prepareStatement(updateTextId);
+              updateTextId.append("update {$table.prefix}cpo_query_text set sql_text = ?, description = ? where "
+                + "text_id = ?");
+            pstmt = conn.prepareStatement((Statics.replaceMarker(updateTextId, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,sqlText);
             pstmt.setString(2,cQTnode.getDesc());
             pstmt.setString(3,cQTnode.getTextId());
@@ -1082,14 +1040,14 @@ public class Proxy implements Observer {
         if (node instanceof CpoQueryNode) {
           CpoQueryNode cqn = (CpoQueryNode)node;
           if (cqn.isNew()) {
-            String sql;
+        	  StringBuffer sql=new StringBuffer();
             if (revsEnabled) 
-              sql = "insert into cpo_query (query_id, group_id, text_id, seq_no, userid) "
-                + "values (?,?,?,?,'"+CpoUtil.username+"')";
+              sql.append("insert into {$table.prefix}cpo_query (query_id, group_id, text_id, seq_no, userid) "
+                + "values (?,?,?,?,'"+CpoUtil.username+"')");
             else
-              sql = "insert into cpo_query (query_id, group_id, text_id, seq_no) "
-                + "values (?,?,?,?)";
-            pstmt = conn.prepareStatement(sql);
+              sql.append("insert into {$table.prefix}cpo_query (query_id, group_id, text_id, seq_no) "
+                + "values (?,?,?,?)");
+            pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,cqn.getQueryId());
             pstmt.setString(2,cqn.getGroupId());
             pstmt.setString(3,cqn.getTextId());
@@ -1098,24 +1056,24 @@ public class Proxy implements Observer {
 //            OUT.debug("Inserted query node: "+cqn.getQueryId()+" "+result);
           }
           else if (cqn.isRemove()) {
-            String sqlDelQueryParam = "delete from cpo_query_parameter where query_id = ?";
-            String sqlDelQuery = "delete from cpo_query where query_id = ?";
-            pstmt = conn.prepareStatement(sqlDelQueryParam);
+        	  StringBuffer sqlDelQueryParam=new StringBuffer("delete from {$table.prefix}cpo_query_parameter where query_id = ?");
+        	  StringBuffer sqlDelQuery=new StringBuffer("delete from {$table.prefix}cpo_query where query_id = ?");
+            pstmt = conn.prepareStatement((Statics.replaceMarker(sqlDelQueryParam, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,cqn.getQueryId());
             pstmt.execute();
             pstmt.close();
-            pstmt = conn.prepareStatement(sqlDelQuery);
+            pstmt = conn.prepareStatement((Statics.replaceMarker(sqlDelQuery, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,cqn.getQueryId());
             pstmt.execute();
           }
           else if (cqn.isDirty()) {
             // not updating group_id ... could change later
-            String sql;
+        	  StringBuffer sql=new StringBuffer();
             if (revsEnabled)
-              sql = "update cpo_query set text_id = ?, seq_no = ?, userid = '"+CpoUtil.username+"' where query_id = ?";
+              sql.append("update {$table.prefix}cpo_query set text_id = ?, seq_no = ?, userid = '"+CpoUtil.username+"' where query_id = ?");
             else
-              sql = "update cpo_query set text_id = ?, seq_no = ? where query_id = ?";
-            pstmt = conn.prepareStatement(sql);
+              sql.append("update {$table.prefix}cpo_query set text_id = ?, seq_no = ? where query_id = ?");
+            pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,cqn.getTextId());
             pstmt.setInt(2,cqn.getSeqNo());
             pstmt.setString(3,cqn.getQueryId());
@@ -1137,14 +1095,14 @@ public class Proxy implements Observer {
         if (node instanceof CpoQueryParameterNode) {
           CpoQueryParameterNode cqpn = (CpoQueryParameterNode)node;
           if (cqpn.isNew()) {
-            String sql;
+        	  StringBuffer sql=new StringBuffer();
             if (revsEnabled)
-              sql = "insert into cpo_query_parameter (attribute_id, query_id, seq_no, userid, param_type) "
-                + "values (?,?,?,'"+CpoUtil.username+"',?)";
+              sql.append("insert into {$table.prefix}cpo_query_parameter (attribute_id, query_id, seq_no, userid, param_type) "
+                + "values (?,?,?,'"+CpoUtil.username+"',?)");
             else
-              sql = "insert into cpo_query_parameter (attribute_id, query_id, seq_no, param_type) "
-                + "values (?,?,?,?)";
-            pstmt = conn.prepareStatement(sql);
+              sql.append("insert into {$table.prefix}cpo_query_parameter (attribute_id, query_id, seq_no, param_type) "
+                + "values (?,?,?,?)");
+            pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,cqpn.getAttributeId());
             pstmt.setString(2,cqpn.getQueryId());
             pstmt.setInt(3,cqpn.getSeqNo());
@@ -1154,19 +1112,19 @@ public class Proxy implements Observer {
 //            OUT.debug("Inserted query attribute parameter: "+cqpn.getSeqNo()+" for query node: "+cqpn.getQueryId()+" and attribute map node: "+cqpn.getAttributeId()+" "+result);
           }
           else if (cqpn.isRemove()) {
-            String sql = "delete from cpo_query_parameter where query_id = ? and seq_no = ?";
-            pstmt = conn.prepareStatement(sql);
+        	  StringBuffer sql=new StringBuffer("delete from {$table.prefix}cpo_query_parameter where query_id = ? and seq_no = ?");
+            pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,cqpn.getQueryId());
             pstmt.setInt(2,cqpn.getSeqNo());
             pstmt.execute();
           }
           else if (cqpn.isDirty()) {
-            String sql;
+        	  StringBuffer sql=new StringBuffer();
             if (revsEnabled)
-              sql = "update cpo_query_parameter set attribute_id = ?, param_type = ?, userid = '"+CpoUtil.username+"' where query_id = ? and seq_no = ? ";
+              sql.append("update {$table.prefix}cpo_query_parameter set attribute_id = ?, param_type = ?, userid = '"+CpoUtil.username+"' where query_id = ? and seq_no = ? ");
             else
-              sql = "update cpo_query_parameter set attribute_id = ?, param_type = ? where query_id = ? and seq_no = ? ";
-            pstmt = conn.prepareStatement(sql);
+              sql.append("update {$table.prefix}cpo_query_parameter set attribute_id = ?, param_type = ? where query_id = ? and seq_no = ? ");
+            pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
             pstmt.setString(1,cqpn.getAttributeId());
             pstmt.setString(2,cqpn.getType());
             pstmt.setString(3,cqpn.getQueryId());
@@ -1355,7 +1313,7 @@ public class Proxy implements Observer {
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
-      pstmt = conn.prepareStatement(sql);
+        pstmt = conn.prepareStatement(sql);
       rs = pstmt.executeQuery();
       ResultSetMetaData rsmd = rs.getMetaData();
       int columns = rsmd.getColumnCount();
@@ -1478,7 +1436,7 @@ public class Proxy implements Observer {
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
-      pstmt = conn.prepareStatement(sql);
+        pstmt = conn.prepareStatement(sql);
       rs = pstmt.executeQuery();
       ResultSetMetaData rsmd = rs.getMetaData();
       int columns = rsmd.getColumnCount();

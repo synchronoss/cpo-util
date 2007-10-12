@@ -20,23 +20,36 @@
  */
 package org.synchronoss.utils.cpo;
 import javax.swing.tree.*;
+
+import org.apache.log4j.Category;
+
 import java.util.Enumeration;
+import java.util.Properties;
+
 import gnu.regexp.*;
 
 public class SQLExporter  {
-  public SQLExporter() {
-  }
-  public static String exportSQL(TreeNode parent, boolean deleteAll) {
+	  private Category OUT = Category.getInstance(this.getClass());
+	private String tablePrefix="";
+	
+	private SQLExporter(){}
+	
+  public SQLExporter(String tablePrefix) {
+	  this.tablePrefix=tablePrefix==null?"":tablePrefix;
+	  OUT.debug("Creating new SQLExporter with tablePrefix=<"+this.tablePrefix+">");
+ }
+  
+  public String exportSQL(TreeNode parent, boolean deleteAll) {
     StringBuffer sqlDeleteAll = new StringBuffer();
     StringBuffer sqlDeleteBuffer = new StringBuffer();
     StringBuffer sqlInsertBuffer = new StringBuffer();
     StringBuffer sqlInsertQueryText = new StringBuffer();
-    sqlDeleteAll.append("delete from CPO_QUERY_PARAMETER;\n");
-    sqlDeleteAll.append("delete from cpo_attribute_map;\n");
-    sqlDeleteAll.append("delete from cpo_query;\n");
-    sqlDeleteAll.append("delete from cpo_query_text;\n");
-    sqlDeleteAll.append("delete from cpo_query_group;\n");
-    sqlDeleteAll.append("delete from cpo_class;\n");
+    sqlDeleteAll.append("delete from {$table.prefix}cpo_query_parameter;\n");
+    sqlDeleteAll.append("delete from {$table.prefix}cpo_attribute_map;\n");
+    sqlDeleteAll.append("delete from {$table.prefix}cpo_query;\n");
+    sqlDeleteAll.append("delete from {$table.prefix}cpo_query_text;\n");
+    sqlDeleteAll.append("delete from {$table.prefix}cpo_query_group;\n");
+    sqlDeleteAll.append("delete from {$table.prefix}cpo_class;\n");
     /**
      * export Class rows
      */
@@ -45,13 +58,13 @@ public class SQLExporter  {
       /**
        * remove cpo_class rows first
        */
-      sqlDeleteBuffer.insert(0,"delete from cpo_class where class_id = '"+classNode.getClassId()
+      sqlDeleteBuffer.insert(0,"delete from {$table.prefix}cpo_class where class_id = '"+classNode.getClassId()
           +"' or name = '"+classNode.getClassName()+"';\n");
       /**
        * remove cpo_query_group rows first
        */
-      sqlDeleteBuffer.insert(0,"delete from cpo_query_group where class_id = '"+classNode.getClassId()+"';\n");
-      sqlInsertBuffer.append("insert into cpo_class (class_id, name) values ('"+classNode.getClassId()
+      sqlDeleteBuffer.insert(0,"delete from {$table.prefix}cpo_query_group where class_id = '"+classNode.getClassId()+"';\n");
+      sqlInsertBuffer.append("insert into {$table.prefix}cpo_class (class_id, name) values ('"+classNode.getClassId()
           +"','"+classNode.getClassName()+"');\n");
       Enumeration enumLabels = classNode.children();
       /**
@@ -67,7 +80,7 @@ public class SQLExporter  {
           /**
            * remove attribute map before insert
            */
-          sqlDeleteBuffer.insert(0,"delete from cpo_attribute_map where class_id = '"+classNode.getClassId()+"';\n");
+          sqlDeleteBuffer.insert(0,"delete from {$table.prefix}cpo_attribute_map where class_id = '"+classNode.getClassId()+"';\n");
           while (enumAtts.hasMoreElements()) {
             Object attMap = enumAtts.nextElement();
             /**
@@ -75,7 +88,7 @@ public class SQLExporter  {
              */
             if (attMap instanceof CpoAttributeMapNode) {
               CpoAttributeMapNode attMapNode = (CpoAttributeMapNode)attMap;
-              sqlInsertBuffer.append("insert into cpo_attribute_map (attribute_id, class_id, column_name, attribute, "
+              sqlInsertBuffer.append("insert into {$table.prefix}cpo_attribute_map (attribute_id, class_id, column_name, attribute, "
                   + "column_type, db_column, db_table,transform_class) values ('"+attMapNode.getAttributeId()+"','"
                   + attMapNode.getClassId() +"','"+attMapNode.getColumnName()+"','"
                   + attMapNode.getAttribute() +"',"
@@ -109,13 +122,13 @@ public class SQLExporter  {
               /**
                * remove cpo_query_group before inserting
                */
-              sqlDeleteBuffer.insert(0,"delete from cpo_query_group where group_id = '"+queryGroupNode.getGroupId()
+              sqlDeleteBuffer.insert(0,"delete from {$table.prefix}cpo_query_group where group_id = '"+queryGroupNode.getGroupId()
                   +"';\n");
               /**
                * remove cpo_query before inserting
                */
-              sqlDeleteBuffer.insert(0,"delete from cpo_query where group_id = '"+queryGroupNode.getGroupId()+"';\n");
-              sqlInsertBuffer.append("insert into cpo_query_group (group_id, class_id, group_type, name) values ('"
+              sqlDeleteBuffer.insert(0,"delete from {$table.prefix}cpo_query where group_id = '"+queryGroupNode.getGroupId()+"';\n");
+              sqlInsertBuffer.append("insert into {$table.prefix}cpo_query_group (group_id, class_id, group_type, name) values ('"
                   + queryGroupNode.getGroupId() + "','" + queryGroupNode.getClassId() + "','"
                   + queryGroupNode.getType() + "',"
                   + (queryGroupNode.getGroupName() == null ? null : "'" + queryGroupNode.getGroupName() + "'")
@@ -131,21 +144,21 @@ public class SQLExporter  {
                   /**
                    * remove cpo_query by query_id before insert
                    */
-                  sqlDeleteBuffer.insert(0,"delete from cpo_query where query_id = '"+queryNode.getQueryId()+"';\n");
+                  sqlDeleteBuffer.insert(0,"delete from {$table.prefix}cpo_query where query_id = '"+queryNode.getQueryId()+"';\n");
                   /**
                    * remove any query parameters before inserting new ones
                    */
-                  sqlDeleteBuffer.insert(0,"delete from cpo_query_parameter where query_id = '"+queryNode.getQueryId()
+                  sqlDeleteBuffer.insert(0,"delete from {$table.prefix}cpo_query_parameter where query_id = '"+queryNode.getQueryId()
                       + "';\n");
 
-                  sqlInsertBuffer.append("insert into cpo_query (query_id, group_id, text_id, seq_no) values ('"
+                  sqlInsertBuffer.append("insert into {$table.prefix}cpo_query (query_id, group_id, text_id, seq_no) values ('"
                       +queryNode.getQueryId()+"','"+queryNode.getGroupId()+"','"+queryNode.getTextId()
                       +"','"+queryNode.getSeqNo()+"');\n");
                   CpoQueryTextNode queryTextNode = queryNode.getQueryText();
                   /**
                    * remove query_text before trying insert
                    */
-                  sqlDeleteBuffer.append("delete from cpo_query_text where text_id = '"+queryTextNode.getTextId()+"';\n");
+                  sqlDeleteBuffer.append("delete from {$table.prefix}cpo_query_text where text_id = '"+queryTextNode.getTextId()+"';\n");
                   /**
                    * export query_text row
                    */
@@ -157,32 +170,20 @@ public class SQLExporter  {
                   String queryTextDesc = queryTextNode.getDesc();
                   try {
                     RE reQuote = new RE("'");
-//                    RE reComma = new RE(",");
-//                    RE reQuestion = new RE("\\?");
-//                    RE reLparen = new RE("\\(");
-//                    RE reRparen = new RE("\\)");
                     if (queryTextSql != null)
                       queryTextSql = reQuote.substituteAll(queryTextSql,"''");
                     if (queryTextDesc != null)
                       queryTextDesc = reQuote.substituteAll(queryTextDesc,"''");
-//                    queryTextSql = reComma.substituteAll(queryTextSql,"^,");
-//                    queryTextDesc = reComma.substituteAll(queryTextDesc,"^,");
-//                    queryTextSql = reQuestion.substituteAll(queryTextSql,"^?");
-//                    queryTextDesc = reQuestion.substituteAll(queryTextDesc,"^?");
-//                    queryTextSql = reLparen.substituteAll(queryTextSql,"^(");
-//                    queryTextDesc = reLparen.substituteAll(queryTextDesc,"^(");
-//                    queryTextSql = reRparen.substituteAll(queryTextSql,"^)");
-//                    queryTextDesc = reRparen.substituteAll(queryTextDesc,"^)");
                     
                   } catch (REException ree) {
                     CpoUtil.showException(ree);
                     return null;
                   }                  
-                  sqlInsertQueryText.append("insert into cpo_query_text (text_id, sql_text, description) values ('"
+                  sqlInsertQueryText.append("insert into {$table.prefix}cpo_query_text (text_id, sql_text, description) values ('"
                       +queryTextNode.getTextId()+"','"+queryTextSql+"',"
                       +(queryTextDesc == null ? null : "'"+queryTextDesc+"'")
                       +");\n");
-                  sqlInsertQueryText.append("update cpo_query_text set sql_text = '"+queryTextSql
+                  sqlInsertQueryText.append("update {$table.prefix}cpo_query_text set sql_text = '"+queryTextSql
                       +"', description = "
                       +(queryTextDesc == null ? null : "'"+queryTextDesc+"'")
                       +" where text_id = '"+queryTextNode.getTextId()+"';\n");
@@ -194,7 +195,7 @@ public class SQLExporter  {
                      */
                     if (queryParam instanceof CpoQueryParameterNode) {
                       CpoQueryParameterNode queryParamNode = (CpoQueryParameterNode)queryParam;
-                      sqlInsertBuffer.append("insert into cpo_query_parameter (attribute_id, query_id, seq_no,param_type) values ('"
+                      sqlInsertBuffer.append("insert into {$table.prefix}cpo_query_parameter (attribute_id, query_id, seq_no,param_type) values ('"
                           +queryParamNode.getAttributeId()+"','"+queryParamNode.getQueryId()+"','"
                           +queryParamNode.getSeqNo()+"','"
                           +queryParamNode.getType()+"');\n");
@@ -207,6 +208,13 @@ public class SQLExporter  {
         }
       }
     }
+    // replace the table prefix marker with the actual prefix
+    
+    sqlDeleteAll = Statics.replaceMarker(sqlDeleteAll, "{$table.prefix}", this.tablePrefix);
+    sqlDeleteBuffer = Statics.replaceMarker(sqlDeleteBuffer, "{$table.prefix}", this.tablePrefix);
+    sqlInsertQueryText = Statics.replaceMarker(sqlInsertQueryText, "{$table.prefix}", this.tablePrefix);
+    sqlInsertBuffer = Statics.replaceMarker(sqlInsertBuffer, "{$table.prefix}", this.tablePrefix);
+    
     if (deleteAll)
       return sqlDeleteAll.toString()+sqlDeleteBuffer.toString()+sqlInsertQueryText.toString()+sqlInsertBuffer.toString();
     else

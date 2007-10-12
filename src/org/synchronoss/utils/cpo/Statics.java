@@ -38,6 +38,7 @@ public class Statics  {
   public static final String PROP_JDBC_URL="cpoutil.jdbc.url.";
   public static final String PROP_JDBC_DRIVER="cpoutil.jdbc.driver.";
   public static final String PROP_JDBC_PARAMS="cpoutil.jdbc.params.";
+  public static final String PROP_JDBC_TABLE_PREFIX="cpoutil.jdbc.tablePrefix.";
 
   public static final String LPROP_CLASSPATH="cpoutil.classpath";
   public static final String LPROP_DEFDIR="cpoutil.defaultdir";
@@ -72,5 +73,24 @@ public class Statics  {
           CpoUtil.showException(ne);
       }
       return value;
+  }
+  
+  public static StringBuffer replaceMarker(StringBuffer source, String marker, String replace){
+      int attrOffset = 0;
+      int fromIndex = 0;
+      int mLength=marker.length();
+      int rLength=replace.length();
+      
+      //OUT.debug("starting string <"+source.toString()+">");
+      if(source!=null && source.length()>0) {
+          while((attrOffset=source.indexOf(marker, fromIndex))!=-1){
+                   source.replace(attrOffset,attrOffset+mLength, replace);
+                   fromIndex=attrOffset+rLength;
+          }
+      }
+      //OUT.debug("ending string <"+source.toString()+">");
+
+      return source;
+
   }
 }

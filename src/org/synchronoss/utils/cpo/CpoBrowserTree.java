@@ -443,7 +443,8 @@ public class CpoBrowserTree extends JTree  {
     StringBuffer sbSql = new StringBuffer();
     Enumeration menuEnum = menuNode.children();
     while (menuEnum.hasMoreElements()) {
-      sbSql.append(SQLExporter.exportSQL((AbstractCpoNode)menuEnum.nextElement(),deleteAll));
+    	SQLExporter sqlEx = new SQLExporter(menuNode.getProxy().getTablePrefix());
+      sbSql.append(sqlEx.exportSQL((AbstractCpoNode)menuEnum.nextElement(),deleteAll));
 //      after the first deleteAll - don't need it again
       deleteAll = false;
     }
@@ -467,7 +468,8 @@ public class CpoBrowserTree extends JTree  {
     CpoUtil.updateStatus("Exported SQL for server: "+menuNode.toString());    
   }
   private void exportSql() {
-    String sql = SQLExporter.exportSQL(menuNode,false);
+  	SQLExporter sqlEx = new SQLExporter(menuNode.getProxy().getTablePrefix());
+    String sql = sqlEx.exportSQL(menuNode,false);
     JFileChooser jFile = new JFileChooser();
     jFile.setDialogTitle("Saving SQL for class: "+menuNode.toString());
     if (CpoUtil.getDefaultDir() != null)

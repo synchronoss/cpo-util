@@ -221,6 +221,7 @@ public class CpoUtil implements SysTrayMenuListener {
       pane.jTextJdbcDriver.setText(localProps.getProperty(Statics.PROP_JDBC_DRIVER+editServer));
       pane.jTextJdbcUrl.setText(localProps.getProperty(Statics.PROP_JDBC_URL+editServer));
       pane.jTextAJDBCParams.setText(localProps.getProperty(Statics.PROP_JDBC_PARAMS+editServer));
+      pane.jTextTablePrefix.setText(localProps.getProperty(Statics.PROP_JDBC_TABLE_PREFIX+editServer));
     }
     int result = 0;
     boolean complete = false;
@@ -235,6 +236,7 @@ public class CpoUtil implements SysTrayMenuListener {
         localProps.setProperty(Statics.PROP_JDBC_DRIVER+server,jdbcdriver);
         localProps.setProperty(Statics.PROP_JDBC_URL+server,jdbcurl);
         localProps.setProperty(Statics.PROP_JDBC_PARAMS+server,jdbcparams);
+        localProps.setProperty(Statics.PROP_JDBC_TABLE_PREFIX+server,pane.jTextTablePrefix.getText());
         complete = true;
         saveLocalProps();
       }    
@@ -280,6 +282,7 @@ public class CpoUtil implements SysTrayMenuListener {
     localProps.remove(Statics.PROP_WLSPASS+server);
     localProps.remove(Statics.PROP_WLSURL+server);
     localProps.remove(Statics.PROP_WLSUSER+server);
+    localProps.remove(Statics.PROP_JDBC_TABLE_PREFIX+server);
     saveLocalProps();
   }
   static boolean checkUnsavedData(String message) {

@@ -40,6 +40,8 @@ public class CpoJDBCPropertyPanel extends JPanel  {
   JTextField jTextJdbcDriver = new JTextField();
   private JLabel jLabCpoUtilName = new JLabel();
   JTextField jTextCpoUtilName = new JTextField();
+  private JLabel jLabTablePrefix = new JLabel();
+  JTextField jTextTablePrefix = new JTextField();
   private JLabel jLabJdbcParams = new JLabel();
   private JScrollPane jScrollParams = new JScrollPane();
   JTextArea jTextAJDBCParams = new JTextArea();
@@ -68,6 +70,10 @@ public class CpoJDBCPropertyPanel extends JPanel  {
     jTextCpoUtilName.setMinimumSize(new Dimension(300, 17));
     jTextCpoUtilName.setPreferredSize(new Dimension(300, 17));
     jLabJdbcParams.setText("JDBC Params");
+    jLabTablePrefix.setText("CPO Table Prefix");
+    jTextTablePrefix.setMinimumSize(new Dimension(300, 17));
+    jTextTablePrefix.setPreferredSize(new Dimension(300, 17));
+    
     jScrollParams.setPreferredSize(new Dimension(300, 100));
     jScrollParams.setMinimumSize(new Dimension(300, 100));
     this.add(jLabJdbcUrl, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
@@ -79,5 +85,7 @@ public class CpoJDBCPropertyPanel extends JPanel  {
     this.add(jLabJdbcParams, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
     jScrollParams.getViewport().add(jTextAJDBCParams, null);
     this.add(jScrollParams, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+    this.add(jLabTablePrefix, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+    this.add(jTextTablePrefix, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
   }
 }
