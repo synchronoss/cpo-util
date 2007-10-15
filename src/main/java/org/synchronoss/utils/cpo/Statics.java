@@ -79,6 +79,7 @@ public class Statics  {
       int attrOffset = 0;
       int fromIndex = 0;
       int mLength=marker.length();
+      replace = replace==null?"":replace;
       int rLength=replace.length();
       
       //OUT.debug("starting string <"+source.toString()+">");
