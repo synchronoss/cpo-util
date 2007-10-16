@@ -17,6 +17,23 @@
  	version 2.1 of the License, or (at your option) any later version.</comments>
   </license>
 </licenses>  
+<distributionManagement>
+  <!-- Site omitted - each project must provide their own -->
+  <repository>
+    <id>sncr-repository</id>
+    <name>SNCR Repository</name>
+    <url>http://mavenrepo.synchronoss.net:8081/artifactory/libs-releases</url>
+  </repository>
+  <snapshotRepository>
+	  <id>sncr-snapshots</id>
+    <name>SNCR Snapshot Repository</name>
+    <url>http://mavenrepo.synchronoss.net:8081/artifactory/libs-snapshots</url>
+	</snapshotRepository>
+  <site>
+    <id>sncr-sites</id>
+    <url>file:///usr/local/apache2/htdocs</url>
+  </site>
+</distributionManagement>
   <issueManagement>
     <system>SourceForge</system>
     <url>http://sourceforge.net/projects/cpo</url>
