@@ -50,11 +50,18 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo</connection>
-    <developerConnection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo</developerConnection>
+    <connection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util</connection>
+    <developerConnection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util</developerConnection>
     <url>https://cpo.svn.sourceforge.net/svnroot/cpo</url>
   </scm>
   <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-webdav</artifactId>
+        <version>1.0-beta-2</version>
+      </extension>
+    </extensions>
     <pluginManagement>
       <plugins>
         <plugin>
