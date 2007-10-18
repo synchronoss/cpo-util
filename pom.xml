@@ -17,18 +17,24 @@
  	version 2.1 of the License, or (at your option) any later version.</comments>
   </license>
 </licenses>  
+<profiles>
+  <profile>
+    <id>DEPLOY</id>
+    <distributionManagement>
+      <repository>
+        <id>sncr-libs-releases</id>
+        <name>SNCR Repository</name>
+        <url>http://mavenrepo.synchronoss.net:8081/artifactory/libs-releases</url>
+      </repository>
+    </distributionManagement>
+  </profile>
+</profiles>
 <distributionManagement>
-  <!-- Site omitted - each project must provide their own -->
-  <repository>
-    <id>internal</id>
-    <name>SNCR Repository</name>
-    <url>http://mavenrepo.synchronoss.net:8080/archiva/repository/internal</url>
-  </repository>
   <snapshotRepository>
-	  <id>internal</id>
+    <id>sncr-libs-snapshots</id>
     <name>SNCR Snapshot Repository</name>
-    <url>http://mavenrepo.synchronoss.net:8080/archiva/repository/internal</url>
-	</snapshotRepository>
+    <url>http://mavenrepo.synchronoss.net:8081/artifactory/libs-snapshots</url>
+  </snapshotRepository>
   <site>
     <id>sncr-sites</id>
     <url>file:///usr/local/apache2/htdocs/cpo-util-sourceforge</url>
@@ -144,7 +150,7 @@
     <dependency>
       <groupId>org.synchronoss</groupId>
       <artifactId>cpo</artifactId>
-      <version>3.0</version>
+      <version>3.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
   <reporting>
