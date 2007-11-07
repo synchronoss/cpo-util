@@ -125,7 +125,7 @@ public class Proxy implements Observer {
 
 
         // Replace the dynamic link with a hard link.
-        cpoMan = new JdbcCpoAdapter(new JdbcDataSourceInfo(connProps.getProperty(Statics.PROP_WLSCONNPOOL+server)));
+        cpoMan = new JdbcCpoAdapter(new JdbcDataSourceInfo(connProps.getProperty(Statics.PROP_WLSCONNPOOL+server),getTablePrefix()));
 //        this.getClass().getClassLoader().loadClass("javax.ejb.EJBHome");
 //        connectionClassName = "org.synchronoss.cpo.CpoManagerHome";
 //  /      Class cpoManHomeClass = CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass(connectionClassName);
@@ -177,7 +177,7 @@ public class Proxy implements Observer {
         conn.setAutoCommit(false);
         databaseName = conn.getMetaData().getURL();
         // Replace the dynamic link with a hard link.
-        cpoMan = new JdbcCpoAdapter(new JdbcDataSourceInfo(connProps.getProperty(Statics.PROP_JDBC_DRIVER+server),connProps.getProperty(Statics.PROP_JDBC_URL+server),connectionProperties,1,1,false));
+        cpoMan = new JdbcCpoAdapter(new JdbcDataSourceInfo(connProps.getProperty(Statics.PROP_JDBC_DRIVER+server),connProps.getProperty(Statics.PROP_JDBC_URL+server),connectionProperties,1,1,false,getTablePrefix()));
 /*  Removed DB060223
          Class jdbcCpoAdapter;
         try {
