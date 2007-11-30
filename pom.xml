@@ -150,7 +150,7 @@
     <dependency>
       <groupId>org.synchronoss</groupId>
       <artifactId>cpo</artifactId>
-      <version>3.0.1-SNAPSHOT</version>
+      <version>3.0.1</version>
     </dependency>
   </dependencies>
   <reporting>
