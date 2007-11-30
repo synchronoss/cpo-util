@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.synchronoss</groupId>
   <artifactId>cpoUtil</artifactId>
   <name>cpoUtil</name>
-  <version>2.1.2-SNAPSHOT</version>
+  <version>2.1.2</version>
   <description>cpoUtil is the utility that configures the metadata for cpo</description>
 <licenses>
   <license>
@@ -56,9 +55,9 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util</connection>
-    <developerConnection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util</developerConnection>
-    <url>https://cpo.svn.sourceforge.net/svnroot/cpo</url>
+    <connection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/tags/cpoUtil-2.1.2</connection>
+    <developerConnection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/tags/cpoUtil-2.1.2</developerConnection>
+    <url>https://cpo.svn.sourceforge.net/svnroot/cpo/tags/cpoUtil-2.1.2</url>
   </scm>
   <build>
     <extensions>
@@ -150,7 +149,7 @@
     <dependency>
       <groupId>org.synchronoss</groupId>
       <artifactId>cpo</artifactId>
-      <version>3.0.1-SNAPSHOT</version>
+      <version>3.0.1</version>
     </dependency>
   </dependencies>
   <reporting>
@@ -200,4 +199,3 @@
     </plugins>
   </reporting>
 </project>
-
