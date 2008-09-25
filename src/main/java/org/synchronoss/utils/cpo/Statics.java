@@ -25,6 +25,8 @@ import java.sql.Types;
 import java.util.HashMap;
 
 import org.apache.log4j.Category;
+import org.synchronoss.cpo.jdbc.JavaSqlType;
+import org.synchronoss.cpo.jdbc.JavaSqlTypes;
 
 public class Statics  {
   public static final String PROP_WLSURL="cpoutil.wls.url.";
@@ -55,24 +57,9 @@ public class Statics  {
   private static Category OUT = Category.getInstance(Statics.class);
   private static HashMap jsqMap = null;
   public static final String getJavaSqlType(int sqlTypeNum) {
-      if (jsqMap == null) {
-          Field[] fields = Types.class.getFields();
-          jsqMap = new HashMap();
-          for (int i = 0; i<fields.length;i++) {
-              Field f = (Field)fields[i];
-              try {
-                  jsqMap.put(new Integer(f.getInt(f)), f.getName());
-                  OUT.debug("added "+new Integer(f.getInt(f))+":"+f.getName()+" to HashMap");
-              } catch (IllegalAccessException ille) { OUT.error(ille.getMessage(), ille);}
-          }         
-      }
-      String value = "";
-      try {
-          value = (String)jsqMap.get(new Integer(sqlTypeNum));
-      } catch (NullPointerException ne) {
-          CpoUtil.showException(ne);
-      }
-      return value;
+	  JavaSqlType jdbcType = JavaSqlTypes.getJavaSqlType(sqlTypeNum);
+	  
+	  return jdbcType.getJavaSqlTypeName();
   }
   
   public static StringBuffer replaceMarker(StringBuffer source, String marker, String replace){

@@ -6,6 +6,8 @@
         <include>org.synchronoss:cpo</include>
         <include>com.oracle:ojdbc14</include>
         <include>mysql:mysql-connector-java</include>
+        <include>postgresql:postgresql</include>
+        <include>hsqldb:hsqldb</include>
         <include>gnu-regexp:gnu-regexp</include>
       </includes>
     </dependencySet>

@@ -331,9 +331,9 @@ public class Proxy implements Observer {
     try {
       StringBuffer sql=new StringBuffer();
       if (revsEnabled)
-        sql.append("select text.text_id, text.sql_text, text.description, (select count(*) from {$table.prefix}cpo_query where text_id = text.text_id) usagecount, text.userid, text.createdate from {$table.prefix}cpo_query_text text order by text.description");
+        sql.append("select text.text_id, text.sql_text, text.description, (select count(*) from {$table.prefix}cpo_query where text_id = text.text_id) as usagecount, text.userid, text.createdate from {$table.prefix}cpo_query_text text order by text.description");
       else
-        sql.append("select text.text_id, text.sql_text, text.description, count(query.text_id) usagecount from {$table.prefix}cpo_query_text text, {$table.prefix}cpo_query query WHERE text.text_id = query.text_id GROUP BY text.text_id, text.sql_text, text.description order by text.description");
+        sql.append("select text.text_id, text.sql_text, text.description, count(query.text_id) as usagecount from {$table.prefix}cpo_query_text text, {$table.prefix}cpo_query query WHERE text.text_id = query.text_id GROUP BY text.text_id, text.sql_text, text.description order by text.description");
       pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
       rs = pstmt.executeQuery();
       while (rs.next()) {
@@ -1320,6 +1320,7 @@ public class Proxy implements Observer {
       for (int i = 1 ; i <= columns ; i++) {
         String attName = makeAttFromColName(rsmd.getColumnName(i));
         //String attClassName = rsmd.getColumnClassName(i);
+        OUT.debug("Column Type = "+rsmd.getColumnType(i));
         String attClassName = getSqlTypeClass(rsmd.getColumnType(i)).getName();
         if ("[B".equals(attClassName)) {
             attClassName = "byte[]";
