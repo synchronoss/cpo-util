@@ -79,6 +79,7 @@ public class Proxy implements Observer {
   private CpoBrowserTree cpoTree;
   private String databaseName;
   private String tablePrefix;
+  private String sqlDelimiter;
   private Properties connProps;
   private boolean classNameToggle = false;
   private Category OUT = Category.getInstance(this.getClass());
@@ -95,7 +96,11 @@ public class Proxy implements Observer {
   public String getTablePrefix() {
 	  return this.tablePrefix;
   }
-  
+
+  public String getSqlDelimiter() {
+	  return this.sqlDelimiter;
+  }
+
   void getConnection() throws Exception {
     if (CpoUtil.localProps.containsKey(Statics.PROP_JDBC_DRIVER+server) ||
         CpoUtil.localProps.containsKey(Statics.PROP_WLSURL+server))
@@ -104,6 +109,7 @@ public class Proxy implements Observer {
       connProps = defProps;
     
     this.tablePrefix = connProps.getProperty(Statics.PROP_JDBC_TABLE_PREFIX+server);
+    this.sqlDelimiter = connProps.getProperty(Statics.PROP_JDBC_SQL_STATEMENT_DELIMITER+server);
 
 //    Class cpoSqlTypesClass =  CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass("org.synchronoss.cpo.jdbc.JavaSqlTypes");
     //javaSqlTypes = cpoSqlTypesClass.newInstance();

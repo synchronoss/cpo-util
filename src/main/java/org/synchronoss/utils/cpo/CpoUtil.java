@@ -220,6 +220,7 @@ public class CpoUtil {
       pane.jTextJdbcUrl.setText(localProps.getProperty(Statics.PROP_JDBC_URL+editServer));
       pane.jTextAJDBCParams.setText(localProps.getProperty(Statics.PROP_JDBC_PARAMS+editServer));
       pane.jTextTablePrefix.setText(localProps.getProperty(Statics.PROP_JDBC_TABLE_PREFIX+editServer));
+      pane.jTextSQLStatementDelimiter.setText(localProps.getProperty(Statics.PROP_JDBC_SQL_STATEMENT_DELIMITER+editServer));
     }
     int result = 0;
     boolean complete = false;
@@ -235,6 +236,7 @@ public class CpoUtil {
         localProps.setProperty(Statics.PROP_JDBC_URL+server,jdbcurl);
         localProps.setProperty(Statics.PROP_JDBC_PARAMS+server,jdbcparams);
         localProps.setProperty(Statics.PROP_JDBC_TABLE_PREFIX+server,pane.jTextTablePrefix.getText());
+        localProps.setProperty(Statics.PROP_JDBC_SQL_STATEMENT_DELIMITER+server, pane.jTextSQLStatementDelimiter.getText());
         complete = true;
         saveLocalProps();
       }    

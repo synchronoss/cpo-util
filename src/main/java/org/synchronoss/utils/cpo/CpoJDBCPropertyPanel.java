@@ -42,6 +42,8 @@ public class CpoJDBCPropertyPanel extends JPanel  {
   JTextField jTextCpoUtilName = new JTextField();
   private JLabel jLabTablePrefix = new JLabel();
   JTextField jTextTablePrefix = new JTextField();
+  private JLabel jLabSQLStatementDelimiter = new JLabel();
+  JTextField jTextSQLStatementDelimiter = new JTextField();
   private JLabel jLabJdbcParams = new JLabel();
   private JScrollPane jScrollParams = new JScrollPane();
   JTextArea jTextAJDBCParams = new JTextArea();
@@ -71,6 +73,9 @@ public class CpoJDBCPropertyPanel extends JPanel  {
     jTextCpoUtilName.setPreferredSize(new Dimension(300, 17));
     jLabJdbcParams.setText("JDBC Params");
     jLabTablePrefix.setText("CPO Table Prefix");
+    jLabSQLStatementDelimiter.setText("SQL Statement Delimiter");
+    jTextSQLStatementDelimiter.setMinimumSize(new Dimension(300, 17));
+    jTextSQLStatementDelimiter.setPreferredSize(new Dimension(300, 17));
     jTextTablePrefix.setMinimumSize(new Dimension(300, 17));
     jTextTablePrefix.setPreferredSize(new Dimension(300, 17));
     
@@ -87,5 +92,7 @@ public class CpoJDBCPropertyPanel extends JPanel  {
     this.add(jScrollParams, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
     this.add(jLabTablePrefix, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
     this.add(jTextTablePrefix, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+    this.add(jLabSQLStatementDelimiter, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+    this.add(jTextSQLStatementDelimiter, new GridBagConstraints(1, 5, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
   }
 }

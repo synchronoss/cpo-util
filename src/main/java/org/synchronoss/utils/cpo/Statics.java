@@ -41,6 +41,7 @@ public class Statics  {
   public static final String PROP_JDBC_DRIVER="cpoutil.jdbc.driver.";
   public static final String PROP_JDBC_PARAMS="cpoutil.jdbc.params.";
   public static final String PROP_JDBC_TABLE_PREFIX="cpoutil.jdbc.tablePrefix.";
+  public static final String PROP_JDBC_SQL_STATEMENT_DELIMITER="cpoutil.jdbc.sqlStatementDelimiter.";
 
   public static final String LPROP_CLASSPATH="cpoutil.classpath";
   public static final String LPROP_DEFDIR="cpoutil.defaultdir";
