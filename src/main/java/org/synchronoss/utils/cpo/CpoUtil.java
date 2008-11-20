@@ -19,17 +19,13 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
+import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import javax.swing.UIManager;
-import javax.swing.JOptionPane;
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.util.*;
+import java.awt.event.*;
 import java.io.*;
+import java.net.*;
 import java.security.*;
-import javax.swing.JFrame;
+import java.util.*;
 //import com.l2fprod.gui.plaf.skin.*;
 //import com.l2fprod.gui.*;
 //import com.l2fprod.util.*;
@@ -250,6 +246,11 @@ public class CpoUtil {
     int result = JOptionPane.showConfirmDialog(frame,message,"Yes or No",JOptionPane.YES_NO_OPTION);
     return (result == 0);
   }
+
+  static void showMessage(String message) {
+    JOptionPane.showMessageDialog(frame, message);
+  }
+
   static File getDefaultDir() {
     File file = null;
     if (localProps.getProperty(Statics.LPROP_DEFDIR) != null) {
