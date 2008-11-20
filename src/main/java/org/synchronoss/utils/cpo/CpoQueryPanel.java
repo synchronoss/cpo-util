@@ -246,7 +246,8 @@ public class CpoQueryPanel extends JPanel {
                 while (iterator.hasNext()) {
                     CpoAttributeMapNode att = (CpoAttributeMapNode)iterator.next();
                     String colName = att.getColumnName();
-                    hash.put(colName, att);
+                    if (colName != null)
+                        hash.put(colName, att);
                 }
             }
 
