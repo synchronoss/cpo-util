@@ -19,14 +19,14 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
+import org.apache.log4j.Category;
+
 import javax.swing.*;
-import java.awt.event.*;
 import javax.swing.tree.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
-import java.util.Enumeration;
-import org.apache.log4j.*;
-import java.lang.reflect.*;
+import java.lang.reflect.Method;
 
 public class CpoBrowserTree extends JTree  {
     /** Version Id for this class. */
@@ -291,15 +291,16 @@ public class CpoBrowserTree extends JTree  {
     }
     CpoUtil.updateStatus("Persisted Nodes to DB");
   }
-  private void refreshFromDB() {
+  private boolean refreshFromDB() {
     if (CpoUtil.checkUnsavedData("There is unsaved data, are you sure you wish to refresh over it??"))
-      return;
+      return false;
     menuNode.getProxy().removeObjectsFromAllCache();
     CpoServerNode csn = new CpoServerNode(menuNode.getProxy(),this);
 //    menuNode.scrubNodes();
 //    ((DefaultTreeModel)this.getModel()).nodeStructureChanged(menuNode);
     ((DefaultTreeModel)this.getModel()).setRoot(csn);    
     CpoUtil.updateStatus("Cleared Local Application Cache");
+    return true;
   }
   private void createNewCpoClassFromClass() {
     OUT.debug("creating new class");
@@ -439,15 +440,13 @@ public class CpoBrowserTree extends JTree  {
     }
     CpoUtil.updateStatus("Meta Class Cache Cleared for "+((CpoClassNode)menuNode).getClassName());
   }
+
   private void exportSqlAllCpo(boolean deleteAll) {
-    StringBuffer sbSql = new StringBuffer();
-    Enumeration menuEnum = menuNode.children();
-    while (menuEnum.hasMoreElements()) {
-    	SQLExporter sqlEx = new SQLExporter(menuNode.getProxy().getTablePrefix(), menuNode.getProxy().getSqlDelimiter());
-      sbSql.append(sqlEx.exportSQL((AbstractCpoNode)menuEnum.nextElement(),deleteAll));
-//      after the first deleteAll - don't need it again
-      deleteAll = false;
-    }
+
+    // bug 197 - force a refresh when someone saves
+    //if (!refreshFromDB())
+        //return;
+
     JFileChooser jFile = new JFileChooser();
     if (CpoUtil.getDefaultDir() != null)
       jFile.setCurrentDirectory(CpoUtil.getDefaultDir());
@@ -457,19 +456,12 @@ public class CpoBrowserTree extends JTree  {
       return;
     }
     CpoUtil.setDefaultDir(jFile.getCurrentDirectory());
-    try {
-      FileWriter fw = new FileWriter(jFile.getSelectedFile());
-      fw.write(sbSql.toString());
-      fw.close();
-    } catch (IOException ioe) {
-      CpoUtil.showException(ioe);
-      return;
-    }
-    CpoUtil.updateStatus("Exported SQL for server: "+menuNode.toString());    
+
+    ExportAllSwingWorker exporter = new ExportAllSwingWorker(menuNode, jFile.getSelectedFile(), deleteAll);
+    exporter.start();
   }
+
   private void exportSql() {
-  	SQLExporter sqlEx = new SQLExporter(menuNode.getProxy().getTablePrefix(), menuNode.getProxy().getSqlDelimiter());
-    String sql = sqlEx.exportSQL(menuNode,false);
     JFileChooser jFile = new JFileChooser();
     jFile.setDialogTitle("Saving SQL for class: "+menuNode.toString());
     if (CpoUtil.getDefaultDir() != null)
@@ -479,16 +471,11 @@ public class CpoBrowserTree extends JTree  {
       return;
     }
     CpoUtil.setDefaultDir(jFile.getCurrentDirectory());
-    try {
-      FileWriter fw = new FileWriter(jFile.getSelectedFile());
-      fw.write(sql);
-      fw.close();
-    } catch (IOException ioe) {
-      CpoUtil.showException(ioe);
-      return;
-    }
-    CpoUtil.updateStatus("Exported SQL for class: "+menuNode.toString());
+
+    ExportClassSwingWorker exporter = new ExportClassSwingWorker(menuNode, jFile.getSelectedFile());
+    exporter.start();
   }
+
   private void reconnectServer() {
     try {
       menuNode.getProxy().getConnection();
