@@ -19,17 +19,18 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import java.security.SecureRandom;
-import java.net.InetAddress;
+import org.apache.log4j.Logger;
+
 import java.math.BigInteger;
-import org.apache.log4j.*;
+import java.net.InetAddress;
+import java.security.SecureRandom;
 
 public class GUID  {
   private static GUID guid;
   private SecureRandom seeder;
   SecureRandom sr;
   String guidMidValue;
-  private static Category OUT = Category.getInstance(GUID.class);
+  private static Logger OUT = Logger.getLogger(GUID.class);
 
   private GUID() {
     initGuid();

@@ -19,29 +19,25 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Enumeration;
+
+import org.apache.log4j.Logger;
+
+import java.io.*;
+import java.util.*;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
-import org.apache.log4j.Category;
-
 public class CpoUtilClassLoader extends ClassLoader {
 
-  private static ArrayList files;
+  private static List<File> files;
   private static CpoUtilClassLoader loader;
-  private Category OUT = Category.getInstance(this.getClass());
+  private Logger OUT = Logger.getLogger(this.getClass());
 
   private CpoUtilClassLoader (ClassLoader parent) {
     super(parent);
   }
   
-  public static CpoUtilClassLoader getInstance(ArrayList files, ClassLoader parent) {
+  public static CpoUtilClassLoader getInstance(List<File> files, ClassLoader parent) {
     if (files == null)
       throw new IllegalArgumentException ("Null classpath passed!");
     if (loader == null)
@@ -74,8 +70,7 @@ public class CpoUtilClassLoader extends ClassLoader {
   
   private byte[] loadClassData (String name)  
   throws IOException {
-    for (int i = 0 ; i < files.size() ; i++) {
-      File file = (File)files.get(i);
+    for (File file : files) {
       if (file.isFile()) {
         if (file.getName().toLowerCase().endsWith(".jar")) {
           String filename = name.replace ('.', '/') + ".class";

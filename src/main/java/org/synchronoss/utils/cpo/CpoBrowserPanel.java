@@ -19,18 +19,12 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.ToolTipManager;
-import javax.swing.event.TreeExpansionEvent;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.event.TreeWillExpandListener;
+import javax.swing.*;
+import javax.swing.event.*;
 import javax.swing.tree.DefaultTreeModel;
+import java.awt.*;
+import java.io.*;
 
 public class CpoBrowserPanel extends JPanel  {
     /** Version Id for this class. */
@@ -46,10 +40,38 @@ public class CpoBrowserPanel extends JPanel  {
   public CpoBrowserPanel() throws Exception {
     String server = CpoUtil.getServerFromUser();
     prox = new Proxy(CpoUtil.props,server,jTreeBrowser);
+
+    // check to make sure they have a sql dir defined.  If they don't make them select one
+    String sqlDirStr = prox.getSqlDir();
+    if (sqlDirStr == null) {
+      throw new SqlDirRequiredException("The selected server does not have a sql directory set.\nPlease select one now.", server);
+    }
+
+    File sqlDir = new File(sqlDirStr);
+    if (!sqlDir.exists()) {
+      if (!sqlDir.mkdirs()) {
+        throw new SqlDirRequiredException("Unable to create directory: " + sqlDir.getPath(), server);
+      }
+    }
+
+    if (!sqlDir.isDirectory()) {
+      throw new SqlDirRequiredException("The sql dir is not a directory: " + sqlDir.getPath(), server);
+    }
+
+    if (!sqlDir.canWrite()) {
+      throw new SqlDirRequiredException("Unable to write to directory: " + sqlDir.getPath(), server);
+    }
+
     try {
       jbInit();
     }catch(Exception e) {
       CpoUtil.showException(e);
+    }
+
+    // if the directory is empty, prime it
+    if (sqlDir.listFiles() == null || sqlDir.listFiles().length == 0) {
+      ExportAllSwingWorker exporter = new ExportAllSwingWorker(prox.getServerNode());
+      exporter.start();
     }
   }
 

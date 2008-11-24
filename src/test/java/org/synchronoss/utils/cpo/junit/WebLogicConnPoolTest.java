@@ -21,30 +21,19 @@
  */
 package org.synchronoss.utils.cpo.junit;
 
-import java.lang.reflect.Method;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.util.Collection;
-import java.util.Properties;
+import junit.framework.*;
+import org.apache.log4j.Logger;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
+import javax.naming.*;
 import javax.sql.DataSource;
-
-import org.apache.log4j.Category;
-import org.synchronoss.utils.cpo.CpoUtil;
-import org.synchronoss.utils.cpo.CpoUtilClassLoader;
-import org.synchronoss.utils.cpo.Statics;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import java.sql.*;
+import java.util.Properties;
 
 /**
  * @author jcolson
  */
 public class WebLogicConnPoolTest extends TestCase {
-  public static Category OUT = Category.getInstance(WebLogicConnPoolTest.class);
+  public static Logger OUT = Logger.getLogger(WebLogicConnPoolTest.class);
   private Connection conn;
   private Context ctx;
   private final static String _URL = "t3://localhost:7001";

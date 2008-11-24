@@ -19,15 +19,14 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
+
+import javax.swing.*;
 import javax.swing.tree.TreeNode;
-import javax.swing.JPanel;
-import java.util.Enumeration;
-import java.util.ArrayList;
 import java.util.*;
 
 public class CpoQueryGroupNode extends AbstractCpoNode {
   private String groupName,type,class_id,group_id;
-  private ArrayList qNodes; //CpoQueryNode(s)
+  private List<CpoQueryNode> qNodes; //CpoQueryNode(s)
   
   public CpoQueryGroupNode(String groupName, String class_id, String group_id, String type, AbstractCpoNode parent) {
     this.groupName = groupName;
@@ -119,8 +118,8 @@ public class CpoQueryGroupNode extends AbstractCpoNode {
   private int getNextQuerySeqNo() {
     int nextSeqNo = 0;
     for (int i = 0 ; i < this.qNodes.size() ; i++) {
-      if (nextSeqNo <= ((CpoQueryNode)this.qNodes.get(i)).getSeqNo()) {
-        nextSeqNo = ((CpoQueryNode)this.qNodes.get(i)).getSeqNo()+1;
+      if (nextSeqNo <= (qNodes.get(i)).getSeqNo()) {
+        nextSeqNo = (qNodes.get(i)).getSeqNo()+1;
       }
     }
     return nextSeqNo;

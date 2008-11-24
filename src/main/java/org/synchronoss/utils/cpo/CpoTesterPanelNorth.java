@@ -19,17 +19,14 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import java.awt.Dimension;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import java.util.Enumeration;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
+import org.apache.log4j.Logger;
+
 import javax.swing.*;
-import org.apache.log4j.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+import java.util.List;
 
 public class CpoTesterPanelNorth extends JPanel  {
     /** Version Id for this class. */
@@ -45,7 +42,7 @@ public class CpoTesterPanelNorth extends JPanel  {
   JCheckBox jCheckPersist = new JCheckBox();
   private CpoTesterParamModel cpoTesterParamModel;
   JComboBox jComClassOut = new JComboBox();
-  private Category OUT = Category.getInstance(this.getClass());
+  private Logger OUT = Logger.getLogger(this.getClass());
 
   public CpoTesterPanelNorth(CpoClassNode cpoClassNode) {
     this.cpoClassNode = cpoClassNode;
@@ -98,7 +95,7 @@ public class CpoTesterPanelNorth extends JPanel  {
           try {
             CpoServerNode cpoServerNode = (CpoServerNode)cqgn.getParent().getParent().getParent();
             OUT.debug("about to get classes for: "+cpoServerNode);
-            ArrayList alClasses = cqgn.getProxy().getClasses(cpoServerNode);
+            List alClasses = cqgn.getProxy().getClasses(cpoServerNode);
             jComClassOut.removeAllItems();
             Iterator itClasses =  alClasses.iterator();
             while (itClasses.hasNext()) {

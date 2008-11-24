@@ -20,13 +20,10 @@
  */
 package org.synchronoss.utils.cpo;
 
-import java.lang.reflect.Field;
-import java.sql.Types;
-import java.util.HashMap;
+import org.apache.log4j.Logger;
+import org.synchronoss.cpo.jdbc.*;
 
-import org.apache.log4j.Category;
-import org.synchronoss.cpo.jdbc.JavaSqlType;
-import org.synchronoss.cpo.jdbc.JavaSqlTypes;
+import java.util.HashMap;
 
 public class Statics  {
   public static final String PROP_WLSURL="cpoutil.wls.url.";
@@ -42,6 +39,7 @@ public class Statics  {
   public static final String PROP_JDBC_PARAMS="cpoutil.jdbc.params.";
   public static final String PROP_JDBC_TABLE_PREFIX="cpoutil.jdbc.tablePrefix.";
   public static final String PROP_JDBC_SQL_STATEMENT_DELIMITER="cpoutil.jdbc.sqlStatementDelimiter.";
+  public static final String PROP_JDBC_SQL_DIR ="cpoutil.jdbc.sqlDir.";
 
   public static final String LPROP_CLASSPATH="cpoutil.classpath";
   public static final String LPROP_DEFDIR="cpoutil.defaultdir";
@@ -54,12 +52,14 @@ public class Statics  {
   public static final String CPO_TYPE_UPDATE="UPDATE";
   public static final String CPO_TYPE_EXIST="EXIST";
   public static final String CPO_TYPE_EXECUTE="EXECUTE";
-  
-  private static Category OUT = Category.getInstance(Statics.class);
+
+  public static final String CREATE_ALL_FILE_NAME = "CPO_CREATE_ALL.sql";
+
+  private static Logger OUT = Logger.getLogger(Statics.class);
   private static HashMap jsqMap = null;
+
   public static final String getJavaSqlType(int sqlTypeNum) {
 	  JavaSqlType jdbcType = JavaSqlTypes.getJavaSqlType(sqlTypeNum);
-	  
 	  return jdbcType.getJavaSqlTypeName();
   }
   

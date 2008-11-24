@@ -33,9 +33,9 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
   protected Proxy prox;
   protected JTree jtree;
   protected AbstractCpoNode parent;
-  private ArrayList dirtyChildren = new ArrayList();
-  private ArrayList newChildren = new ArrayList();
-  private ArrayList removeChildren = new ArrayList();
+  private List<AbstractCpoNode> dirtyChildren = new ArrayList<AbstractCpoNode>();
+  private List<AbstractCpoNode> newChildren = new ArrayList<AbstractCpoNode>();
+  private List<AbstractCpoNode> removeChildren = new ArrayList<AbstractCpoNode>();
   public abstract void refreshChildren();
   public abstract JPanel getPanelForSelected();
   private String userName;
@@ -81,7 +81,7 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
     }
   }
   public boolean isChildDirty() {
-    return dirtyChildren.size() > 0 ? true : false;
+    return (dirtyChildren.size() > 0);
   }
   public void setRemove(boolean remove) {
     if (this.remove == remove) return;
@@ -117,7 +117,7 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
     }
   }
   public boolean isChildRemove() {
-    return removeChildren.size() > 0 ? true : false;
+    return (removeChildren.size() > 0);
   }
   public void setNew(boolean isnew) {
     if (this.isnew == isnew) return;
@@ -146,7 +146,7 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
     }
   }
   public boolean isChildNew() {
-    return newChildren.size() > 0 ? true : false;
+    return (newChildren.size() > 0);
   }
   public void refreshMe() {
     ((DefaultTreeModel)this.jtree.getModel()).nodeStructureChanged(this);

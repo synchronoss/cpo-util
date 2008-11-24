@@ -21,15 +21,13 @@
 package org.synchronoss.utils.cpo;
 import javax.swing.tree.TreeNode;
 import javax.swing.JPanel;
-import java.util.Enumeration;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 
 public class CpoQueryNode extends AbstractCpoNode {
   private String queryId, groupId, textId, sql, desc;
   private int seqNo;
   private CpoQueryTextNode cQTnode;
-  private ArrayList cpoQueryParam; // collection of CpoQueryParameterNode(s)
+  private List cpoQueryParam; // collection of CpoQueryParameterNode(s)
   public CpoQueryNode(String queryId, String groupId, int seqNo, 
       CpoQueryTextNode cQTnode, AbstractCpoNode parent) {
     this.cQTnode = cQTnode;

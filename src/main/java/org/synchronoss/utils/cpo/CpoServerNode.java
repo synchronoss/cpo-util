@@ -19,14 +19,14 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
+import org.apache.log4j.Category;
+
+import javax.swing.*;
 import javax.swing.tree.TreeNode;
-import javax.swing.JPanel;
-import javax.swing.JTree;
 import java.util.*;
-import org.apache.log4j.*;
 
 public class CpoServerNode extends AbstractCpoNode {
-  private ArrayList classes; // CpoClassNode(s)
+  private List classes; // CpoClassNode(s)
   private CpoQueryTextLabelNode cpoQTLN;
   private Category OUT = Category.getInstance(this.getClass());
   

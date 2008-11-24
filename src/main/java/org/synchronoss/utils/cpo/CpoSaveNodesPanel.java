@@ -19,11 +19,9 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import javax.swing.JPanel;
-import java.awt.BorderLayout;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import java.util.ArrayList;
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
 
 public class CpoSaveNodesPanel extends JPanel  {
     /** Version Id for this class. */
@@ -46,7 +44,7 @@ public class CpoSaveNodesPanel extends JPanel  {
     this.add(jScrollSave, BorderLayout.CENTER);
     this.jScrollSave.getViewport().add(new JTable(model));
   }
-  public ArrayList getSelectedNodes() {
+  public List<AbstractCpoNode> getSelectedNodes() {
     return model.getSelectedNodes();
   }
 }

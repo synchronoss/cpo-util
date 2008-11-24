@@ -34,41 +34,79 @@ public class ExportAllSwingWorker extends SwingWorker {
 
     ProgressFrame pf = null;
     AbstractCpoNode menuNode = null;
-    File file = null;
-    boolean deleteAll = false;
 
     Exception error = null;
 
-    public ExportAllSwingWorker(AbstractCpoNode menuNode, File file, boolean deleteAll) {
+    public ExportAllSwingWorker(AbstractCpoNode menuNode) {
         setLocalName("ExportWorker");
         this.menuNode = menuNode;
-        this.file = file;
-        this.deleteAll = deleteAll;
     }
 
     @Override
     public Object construct() {
         logger.debug("Exporting...");
-        pf = new ProgressFrame("Exporting...", -1);
+        pf = new ProgressFrame("Exporting All Classes...", -1);
         pf.start();
 
-        pf.progressMade(new ProgressMaxEvent(this, menuNode.getChildCount() - 1));
+        pf.progressMade(new ProgressMaxEvent(this, (menuNode.getChildCount() - 1)));
 
+        File file = null;
         FileWriter fw = null;
         try {
 
-            StringBuffer sbSql = new StringBuffer();
-            Enumeration menuEnum = menuNode.children();
-            while (menuEnum.hasMoreElements()) {
-                SQLExporter sqlEx = new SQLExporter(menuNode.getProxy().getTablePrefix(), menuNode.getProxy().getSqlDelimiter());
-                sbSql.append(sqlEx.exportSQL((AbstractCpoNode)menuEnum.nextElement(), deleteAll));
-                // after the first deleteAll - don't need it again
-                deleteAll = false;
-                pf.progressMade(new ProgressValueEvent(this, 1));
+            String dir = menuNode.getProxy().getSqlDir();
+            String server = menuNode.getProxy().getServer();
+
+            // First let's make sure that the sql dir exists
+            File sqlDir = new File(dir);
+            if (!sqlDir.exists()) {
+                if (!sqlDir.mkdirs()) {
+                    throw new SqlDirRequiredException("Unable to create directory: " + sqlDir.getPath(), server);
+                }
             }
 
+            if (!sqlDir.isDirectory()) {
+                throw new SqlDirRequiredException("The sql dir is not a directory: " + sqlDir.getPath(), server);
+            }
+
+            if (!sqlDir.canWrite()) {
+                throw new SqlDirRequiredException("Unable to write to directory: " + sqlDir.getPath(), server);
+            }
+
+            SQLExporter sqlEx = new SQLExporter(menuNode.getProxy().getTablePrefix(), menuNode.getProxy().getSqlDelimiter());
+
+            // make the class files
+            Enumeration menuEnum = menuNode.children();
+            while (menuEnum.hasMoreElements()) {
+                AbstractCpoNode child = (AbstractCpoNode)menuEnum.nextElement();
+                if (child instanceof CpoClassNode) {
+                    CpoClassNode classNode = (CpoClassNode)child;
+                    String fileName = classNode.getClassName() + ".sql";
+                    SQLClassExport classExport = sqlEx.exportSQL(classNode);
+
+                    StringBuffer sql = new StringBuffer();
+                    sql.append(classExport.getDeleteSql());
+                    sql.append(classExport.getInsertQueryTextSql());
+                    sql.append(classExport.getInsertSql());
+
+                    // write the file
+                    file = new File(dir, fileName);
+                    fw = new FileWriter(file);
+                    fw.write(sql.toString());
+                    fw.flush();
+                    fw.close();
+
+                    pf.progressMade(new ProgressValueEvent(this, 1));
+                }
+            }
+
+            // write out the create all file
+            pf.progressMade(new ProgressMaxEvent(this, (menuNode.getChildCount() - 1)));
+            pf.setLabel("Generating create all sql...");
+            String createSql = sqlEx.exportCreateAll((CpoServerNode)menuNode, pf);
+            file = new File(dir, Statics.CREATE_ALL_FILE_NAME);
             fw = new FileWriter(file);
-            fw.write(sbSql.toString());
+            fw.write(createSql);
             fw.flush();
             fw.close();
         } catch (Exception ex) {
@@ -79,6 +117,7 @@ public class ExportAllSwingWorker extends SwingWorker {
                 if (fw != null)
                     fw.close();
             } catch (IOException ex) {
+                // ignore
             }
             pf.stop();
         }

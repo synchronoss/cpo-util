@@ -19,14 +19,13 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
+
+import javax.swing.*;
 import javax.swing.tree.TreeNode;
-import javax.swing.JPanel;
-import java.util.Enumeration;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 
 public class CpoQueryGroupLabelNode extends AbstractCpoNode  {
-  private ArrayList qGroups; // contains CpoQueryGroupNode(s)
+  private List<CpoQueryGroupNode> qGroups; // contains CpoQueryGroupNode(s)
   
   public CpoQueryGroupLabelNode(CpoClassNode parent) {
     this.parent = parent;
@@ -34,10 +33,12 @@ public class CpoQueryGroupLabelNode extends AbstractCpoNode  {
 //    this.addObserver(parent);
   }
 
+  @Override
   public JPanel getPanelForSelected() {
     return null;
   }
 
+  @Override
   public void refreshChildren() {
 //    OUT.debug ("Query Groups Label Refreshing Data");
     try {

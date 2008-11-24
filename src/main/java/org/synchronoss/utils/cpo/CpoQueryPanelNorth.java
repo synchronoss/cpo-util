@@ -19,17 +19,14 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
+
+import org.apache.log4j.Category;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyListener;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import java.util.Vector;
-import javax.swing.JLabel;
-import org.apache.log4j.*;
+import java.awt.event.*;
+import java.util.*;
+import java.util.List;
 
 public class CpoQueryPanelNorth extends JPanel  {
     /** Version Id for this class. */
@@ -62,7 +59,7 @@ public class CpoQueryPanelNorth extends JPanel  {
 
   private void jbInit() throws Exception {
 //    this.setSize(new Dimension(175, 300));
-    ArrayList queryText;
+    List queryText;
     try {
       queryText = cpoQueryNode.getProxy().getQueryText((CpoServerNode)cpoQueryNode.getParent().getParent().getParent().getParent());
       if (cpoQueryNode.getParent() instanceof CpoQueryGroupNode) {
@@ -70,7 +67,7 @@ public class CpoQueryPanelNorth extends JPanel  {
         CpoQueryGroupNode cgNode = (CpoQueryGroupNode)cpoQueryNode.getParent();
         if (cgNode.getType().equals("LIST")) {
           OUT.debug("LIST server: "+cgNode.getParent().getParent().getParent());
-          ArrayList al = cgNode.getProxy().getClasses((AbstractCpoNode)cgNode.getParent().getParent().getParent());
+          List al = cgNode.getProxy().getClasses((AbstractCpoNode)cgNode.getParent().getParent().getParent());
           jComQueryObject = new JComboBox(new Vector(al));
           //populate jComQueryObject
         }

@@ -20,12 +20,11 @@
  */
 package org.synchronoss.utils.cpo;
 import javax.swing.*;
-import java.awt.Component;
-import java.util.EventObject;
-import java.util.Vector;
-import java.util.ArrayList;
 import javax.swing.event.CellEditorListener;
 import javax.swing.table.TableCellEditor;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 public class CpoQueryAttributeEditor implements TableCellEditor {
   TableCellEditor editor;
@@ -42,8 +41,8 @@ public class CpoQueryAttributeEditor implements TableCellEditor {
       CpoAttributeMapNode currentCpoAttMap = (CpoAttributeMapNode)value;
       try {
         //CpoAttributeMapNode(s)
-//        ArrayList cpoAttMap = currentCpoAttMap.getProxy().getAttributeMap((CpoAttributeLabelNode)currentCpoAttMap.getParent());
-        ArrayList cpoAttMap = currentCpoAttMap.getProxy().getAttributeMap(cpoQTM.attributeCpoClassNode);
+//        List cpoAttMap = currentCpoAttMap.getProxy().getAttributeMap((CpoAttributeLabelNode)currentCpoAttMap.getParent());
+        List cpoAttMap = currentCpoAttMap.getProxy().getAttributeMap(cpoQTM.attributeCpoClassNode);
         attEdBox = new JComboBox(new Vector(cpoAttMap));
         attEdBox.setSelectedItem(currentCpoAttMap);
       } catch (Exception pe) {

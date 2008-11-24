@@ -19,15 +19,11 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import javax.swing.JPanel;
-import java.awt.BorderLayout;
-import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 
 public class CpoQueryTextPanel extends JPanel  {
     /** Version Id for this class. */
@@ -140,7 +136,7 @@ public class CpoQueryTextPanel extends JPanel  {
     this.tipTextRow = rowAtPoint;
     CpoQueryTextNode node = model.getQueryNodeAt(ts.getTrueRow(rowAtPoint));
     try {
-      ArrayList queryGroups = node.getProxy().getQueryGroups(node);
+      List queryGroups = node.getProxy().getQueryGroups(node);
       Iterator queryGroupIt = queryGroups.iterator();
       sb.append("<html>");
       sb.append("<bold>"+node.getDesc()+"</bold><BR>");

@@ -19,6 +19,7 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -26,6 +27,7 @@ import java.io.*;
 import java.net.*;
 import java.security.*;
 import java.util.*;
+import java.util.List;
 //import com.l2fprod.gui.plaf.skin.*;
 //import com.l2fprod.gui.*;
 //import com.l2fprod.util.*;
@@ -34,7 +36,7 @@ public class CpoUtil {
   static Properties props = new Properties();
   static Properties localProps = new Properties();
   static MainFrame frame;
-  static ArrayList files = new ArrayList();
+  static List<File> files = new ArrayList<File>();
   static String username;
   
   public CpoUtil(String propsLocation) {
@@ -123,18 +125,18 @@ public class CpoUtil {
     }
   }
   public static String getServerFromUser() {
-    Vector vec = new Vector();
+    Vector<String> vec = new Vector<String>();
     // get default provided properties
     Enumeration propsEnum = CpoUtil.props.propertyNames();
     while (propsEnum.hasMoreElements()) {
       String name = (String)propsEnum.nextElement();
       if (name.startsWith(Statics.PROP_WLSURL)) {
         String server = name.substring(Statics.PROP_WLSURL.length());
-        vec.addElement(server+":"+CpoUtil.props.getProperty(Statics.PROP_WLSURL+server)+":"+CpoUtil.props.getProperty(Statics.PROP_WLSCONNPOOL+server));
+        vec.add(server+":"+CpoUtil.props.getProperty(Statics.PROP_WLSURL+server)+":"+CpoUtil.props.getProperty(Statics.PROP_WLSCONNPOOL+server));
       }
       else if (name.startsWith(Statics.PROP_JDBC_URL)) {
         String server = name.substring(Statics.PROP_JDBC_URL.length());
-        vec.addElement(server+":*JDBC ONLY*");        
+        vec.add(server+":*JDBC ONLY*");
       }
     }
     // get local properties
@@ -143,11 +145,11 @@ public class CpoUtil {
       String name = (String)propsEnum.nextElement();
       if (name.startsWith(Statics.PROP_WLSURL)) {
         String server = name.substring(Statics.PROP_WLSURL.length());
-        vec.addElement(server+":"+CpoUtil.localProps.getProperty(Statics.PROP_WLSURL+server)+":"+CpoUtil.localProps.getProperty(Statics.PROP_WLSCONNPOOL+server));
+        vec.add(server+":"+CpoUtil.localProps.getProperty(Statics.PROP_WLSURL+server)+":"+CpoUtil.localProps.getProperty(Statics.PROP_WLSCONNPOOL+server));
       }
       else if (name.startsWith(Statics.PROP_JDBC_URL)) {
         String server = name.substring(Statics.PROP_JDBC_URL.length());
-        vec.addElement(server+":*JDBC ONLY*");        
+        vec.add(server+":*JDBC ONLY*");
       }
     }    
     String[] choices = new String[vec.size()];
@@ -158,8 +160,9 @@ public class CpoUtil {
   public static void setCustomClassPath(String message) {
     JOptionPane.showMessageDialog(frame,new CpoUtilClassPathPanel(files),message,JOptionPane.PLAIN_MESSAGE);
     StringBuffer sbClasspath = new StringBuffer();
-    for (int i = 0 ; i < files.size() ; i++) {
-      sbClasspath.append(files.get(i)+File.pathSeparator);
+    for (File f : files) {
+      sbClasspath.append(f);
+      sbClasspath.append(File.pathSeparator);
     }
     localProps.setProperty(Statics.LPROP_CLASSPATH,sbClasspath.toString());
     saveLocalProps();
@@ -209,33 +212,51 @@ public class CpoUtil {
     }
   }
   static void setNewJDBCConnection(String editServer) {
+    String msg = "Create new JDBC Connection";
     CpoJDBCPropertyPanel pane = new CpoJDBCPropertyPanel();
     if (editServer != null) {
-      pane.jTextCpoUtilName.setText(editServer);
-      pane.jTextJdbcDriver.setText(localProps.getProperty(Statics.PROP_JDBC_DRIVER+editServer));
-      pane.jTextJdbcUrl.setText(localProps.getProperty(Statics.PROP_JDBC_URL+editServer));
-      pane.jTextAJDBCParams.setText(localProps.getProperty(Statics.PROP_JDBC_PARAMS+editServer));
-      pane.jTextTablePrefix.setText(localProps.getProperty(Statics.PROP_JDBC_TABLE_PREFIX+editServer));
-      pane.jTextSQLStatementDelimiter.setText(localProps.getProperty(Statics.PROP_JDBC_SQL_STATEMENT_DELIMITER+editServer));
+      pane.setCpoUtilName(editServer);
+      pane.setJdbcDriver(localProps.getProperty(Statics.PROP_JDBC_DRIVER+editServer));
+      pane.setJdbcUrl(localProps.getProperty(Statics.PROP_JDBC_URL+editServer));
+      pane.setJDBCParams(localProps.getProperty(Statics.PROP_JDBC_PARAMS+editServer));
+      pane.setTablePrefix(localProps.getProperty(Statics.PROP_JDBC_TABLE_PREFIX+editServer));
+      pane.setSQLStatementDelimiter(localProps.getProperty(Statics.PROP_JDBC_SQL_STATEMENT_DELIMITER+editServer));
+      pane.setSqlDir(localProps.getProperty(Statics.PROP_JDBC_SQL_DIR + editServer));
+      msg = "Edit JDBC Connection";
     }
     int result = 0;
     boolean complete = false;
     while (result == 0 && !complete) {
-      result = JOptionPane.showConfirmDialog(frame,pane,"Create a new JDBC Connection",JOptionPane.OK_CANCEL_OPTION);
+      result = JOptionPane.showConfirmDialog(frame, pane, msg, JOptionPane.OK_CANCEL_OPTION);
       if (result == 0) {
-        String server,jdbcdriver,jdbcurl,jdbcparams;
-        if ((server = pane.jTextCpoUtilName.getText()).equals("")) continue;
-        if ((jdbcdriver = pane.jTextJdbcDriver.getText()).equals("")) continue;
-        if ((jdbcurl = pane.jTextJdbcUrl.getText()).equals("")) continue;
-        jdbcparams = pane.jTextAJDBCParams.getText();
-        localProps.setProperty(Statics.PROP_JDBC_DRIVER+server,jdbcdriver);
-        localProps.setProperty(Statics.PROP_JDBC_URL+server,jdbcurl);
-        localProps.setProperty(Statics.PROP_JDBC_PARAMS+server,jdbcparams);
-        localProps.setProperty(Statics.PROP_JDBC_TABLE_PREFIX+server,pane.jTextTablePrefix.getText());
-        localProps.setProperty(Statics.PROP_JDBC_SQL_STATEMENT_DELIMITER+server, pane.jTextSQLStatementDelimiter.getText());
+        String server, jdbcdriver, jdbcurl, jdbcparams;
+        File sqlDir;
+        if ((server = pane.getCpoUtilName()).equals("")) {
+          JOptionPane.showMessageDialog(frame, "You must specify a util name.", "Error", JOptionPane.ERROR_MESSAGE);
+          continue;
+        }
+        if ((jdbcdriver = pane.getJdbcDriver()).equals("")) {
+          JOptionPane.showMessageDialog(frame, "You must specify a driver.", "Error", JOptionPane.ERROR_MESSAGE);
+          continue;
+        }
+        if ((jdbcurl = pane.getJdbcUrl()).equals("")) {
+          JOptionPane.showMessageDialog(frame, "You must specify a url.", "Error", JOptionPane.ERROR_MESSAGE);
+          continue;
+        }
+        if ((sqlDir = pane.getSqlDir()) == null) {
+          JOptionPane.showMessageDialog(frame, "You must specify a sql dir.", "Error", JOptionPane.ERROR_MESSAGE);
+          continue;
+        }
+        jdbcparams = pane.getJDBCParams();
+        localProps.setProperty(Statics.PROP_JDBC_DRIVER + server, jdbcdriver);
+        localProps.setProperty(Statics.PROP_JDBC_URL + server, jdbcurl);
+        localProps.setProperty(Statics.PROP_JDBC_PARAMS + server, jdbcparams);
+        localProps.setProperty(Statics.PROP_JDBC_TABLE_PREFIX + server, pane.getTablePrefix());
+        localProps.setProperty(Statics.PROP_JDBC_SQL_STATEMENT_DELIMITER + server, pane.getSQLStatementDelimiter());
+        localProps.setProperty(Statics.PROP_JDBC_SQL_DIR + server, sqlDir.getPath());
         complete = true;
         saveLocalProps();
-      }    
+      }
     }
   }
   static void editConnection() {
@@ -277,6 +298,7 @@ public class CpoUtil {
     localProps.remove(Statics.PROP_CPONAME+server);
     localProps.remove(Statics.PROP_JDBC_DRIVER+server);
     localProps.remove(Statics.PROP_JDBC_URL+server);
+    localProps.remove(Statics.PROP_JDBC_SQL_DIR +server);
     localProps.remove(Statics.PROP_THEME_URL+server);
     localProps.remove(Statics.PROP_WLSCONNPOOL+server);
     localProps.remove(Statics.PROP_WLSINITCTXFCTRY+server);

@@ -23,10 +23,10 @@ import javax.swing.tree.TreeNode;
 import javax.swing.JPanel;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.ArrayList;
+import java.util.List;
 
 public class CpoAttributeLabelNode extends AbstractCpoNode  {
-  private ArrayList cpoAttMap; // contains collection of CpoAttributeMapNode(s)
+  private List cpoAttMap; // contains collection of CpoAttributeMapNode(s)
   public CpoAttributeLabelNode(CpoClassNode parent) {
     this.parent = parent;
     this.addObserver(parent.getProxy());

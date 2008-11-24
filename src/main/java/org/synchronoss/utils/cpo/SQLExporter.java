@@ -19,28 +19,31 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import javax.swing.tree.*;
-
-import org.apache.log4j.Category;
-
-import java.util.Enumeration;
-import java.util.Properties;
-import java.util.HashSet;
-
 import gnu.regexp.*;
+import org.apache.log4j.Logger;
+
+import javax.swing.tree.TreeNode;
+import java.util.*;
 
 public class SQLExporter  {
-	  private Category OUT = Category.getInstance(this.getClass());
-	private String tablePrefix="";
+
+  private Logger OUT = Logger.getLogger(getClass());
+
+  private String tablePrefix = "";
   private final static String DELIMITER_SLASH = "\n/\n";
   private final static String DELIMITER_SEMI = ";\n";
   private String sqlDelimiter = DELIMITER_SLASH;
 	
-  private SQLExporter(){}
+  private SQLExporter() {
+    // hide the default constructor
+  }
 	
   public SQLExporter(String tablePrefix, String sqlDelimiter) {
-	  this.tablePrefix=tablePrefix==null?"":tablePrefix;
-	  OUT.debug("Creating new SQLExporter with tablePrefix=<"+this.tablePrefix+">");
+    this.tablePrefix = tablePrefix == null ? "" : tablePrefix;
+
+    if (OUT.isDebugEnabled())
+      OUT.debug("Creating new SQLExporter with tablePrefix=<" + tablePrefix + ">");
+
     if (sqlDelimiter != null && sqlDelimiter.trim().length() >0) {
       if (sqlDelimiter.equals("/")) {
         this.sqlDelimiter = DELIMITER_SLASH;
@@ -49,23 +52,19 @@ public class SQLExporter  {
       } else {
         this.sqlDelimiter = sqlDelimiter;
       }
-    } else {
-      // use default
     }
  }
-  
-  public String exportSQL(TreeNode parent, boolean deleteAll) {
-    HashSet createdQueryTexts = new HashSet();
-    StringBuffer sqlDeleteAll = new StringBuffer();
+
+  public SQLClassExport exportSQL(TreeNode parent) {
+    return exportSQL(parent, false);
+  }
+
+  public SQLClassExport exportSQL(TreeNode parent, boolean skipDeletes) {
+    HashSet<String> createdQueryTexts = new HashSet<String>();
     StringBuffer sqlDeleteClassBuffer = new StringBuffer();
     StringBuffer sqlInsertBuffer = new StringBuffer();
     StringBuffer sqlInsertQueryText = new StringBuffer();
-    sqlDeleteAll.append("delete from {$table.prefix}cpo_query_parameter").append(this.sqlDelimiter);
-    sqlDeleteAll.append("delete from {$table.prefix}cpo_attribute_map").append(this.sqlDelimiter);
-    sqlDeleteAll.append("delete from {$table.prefix}cpo_query").append(this.sqlDelimiter);
-    sqlDeleteAll.append("delete from {$table.prefix}cpo_query_text").append(this.sqlDelimiter);
-    sqlDeleteAll.append("delete from {$table.prefix}cpo_query_group").append(this.sqlDelimiter);
-    sqlDeleteAll.append("delete from {$table.prefix}cpo_class").append(this.sqlDelimiter);
+
     /**
      * export Class rows
      */
@@ -75,17 +74,45 @@ public class SQLExporter  {
        * remove cpo_class rows first
        */
 //      String tempTableName = "sncr_temp_cpo";
-      sqlDeleteClassBuffer.append("delete from {$table.prefix}CPO_QUERY_PARAMETER  where query_id in (select distinct query_id from {$table.prefix}CPO_QUERY where group_id in (select distinct group_id from {$table.prefix}CPO_QUERY_GROUP where class_id=(select class_id from {$table.prefix}CPO_CLASS where name='" + classNode.getClassName() + "')))").append(this.sqlDelimiter);
-//      sqlDeleteClassBuffer.append("create table " + tempTableName + " as (select distinct text_id from {$table.prefix}CPO_QUERY where group_id in (select distinct group_id from {$table.prefix}CPO_QUERY_GROUP where class_id=(select class_id from {$table.prefix}CPO_CLASS where name='" + classNode.getClassName() + "')))").append(this.sqlDelimiter);
-      sqlDeleteClassBuffer.append("delete from {$table.prefix}CPO_QUERY where group_id in (select distinct group_id from {$table.prefix}CPO_QUERY_GROUP where class_id=(select class_id from {$table.prefix}CPO_CLASS where name='" + classNode.getClassName() + "'))").append(this.sqlDelimiter);
-//      sqlDeleteClassBuffer.append("delete from {$table.prefix}CPO_QUERY_TEXT where text_id in (select text_id from " + tempTableName +")").append(this.sqlDelimiter);
-//      sqlDeleteClassBuffer.append("drop table " + tempTableName + "").append(this.sqlDelimiter);
+      if (!skipDeletes) {
+        sqlDeleteClassBuffer.append("delete from ");
+        sqlDeleteClassBuffer.append(tablePrefix);
+        sqlDeleteClassBuffer.append("CPO_QUERY_PARAMETER  where query_id in (select distinct query_id from ");
+        sqlDeleteClassBuffer.append(tablePrefix);
+        sqlDeleteClassBuffer.append("CPO_QUERY where group_id in (select distinct group_id from ");
+        sqlDeleteClassBuffer.append(tablePrefix);
+        sqlDeleteClassBuffer.append("CPO_QUERY_GROUP where class_id=(select class_id from ");
+        sqlDeleteClassBuffer.append(tablePrefix);
+        sqlDeleteClassBuffer.append("CPO_CLASS where name='");
+        sqlDeleteClassBuffer.append(classNode.getClassName());
+        sqlDeleteClassBuffer.append("')))");
+        sqlDeleteClassBuffer.append(sqlDelimiter);
+
+        sqlDeleteClassBuffer.append("delete from ");
+        sqlDeleteClassBuffer.append(tablePrefix);
+        sqlDeleteClassBuffer.append("CPO_QUERY where group_id in (select distinct group_id from ");
+        sqlDeleteClassBuffer.append(tablePrefix);
+        sqlDeleteClassBuffer.append("CPO_QUERY_GROUP where class_id=(select class_id from ");
+        sqlDeleteClassBuffer.append(tablePrefix);
+        sqlDeleteClassBuffer.append("CPO_CLASS where name='");
+        sqlDeleteClassBuffer.append(classNode.getClassName());
+        sqlDeleteClassBuffer.append("'))");
+        sqlDeleteClassBuffer.append(sqlDelimiter);
+      }
 
       /**
        * remove cpo_query_group rows first
        */
-      sqlInsertBuffer.append("insert into {$table.prefix}cpo_class (class_id, name) values ('"+classNode.getClassId() +"','"+classNode.getClassName()+"')").append(this.sqlDelimiter);
+      sqlInsertBuffer.append("insert into ");
+      sqlInsertBuffer.append(tablePrefix);
+      sqlInsertBuffer.append("cpo_class (class_id, name) values ('");
+      sqlInsertBuffer.append(classNode.getClassId());
+      sqlInsertBuffer.append("','");
+      sqlInsertBuffer.append(classNode.getClassName());
+      sqlInsertBuffer.append("')");
+      sqlInsertBuffer.append(sqlDelimiter);
       Enumeration enumLabels = classNode.children();
+
       /**
        * must do CpoAttributeMaps FIRST
        */
@@ -106,25 +133,41 @@ public class SQLExporter  {
              */
             if (attMap instanceof CpoAttributeMapNode) {
               CpoAttributeMapNode attMapNode = (CpoAttributeMapNode)attMap;
-              sqlInsertBuffer.append("insert into {$table.prefix}cpo_attribute_map (attribute_id, class_id, column_name, attribute, "
-                  + "column_type, db_column, db_table,transform_class) values ('"+attMapNode.getAttributeId()+"','"
-                  + attMapNode.getClassId() +"','"+attMapNode.getColumnName()+"','"
-                  + attMapNode.getAttribute() +"',"
-                  +"'"+attMapNode.getColumnType()+"'"+","
-                  + (attMapNode.getDbColumn() == null ? null : "'"+attMapNode.getDbColumn()+"'")  +","
-                  + (attMapNode.getDbTable() == null ? null : "'"+attMapNode.getDbTable()+"'") +","
-                  + (attMapNode.getTransformClass() == null ? null : "'"+attMapNode.getTransformClass()+"'")
-                  +")").append(this.sqlDelimiter);
+              sqlInsertBuffer.append("insert into ");
+              sqlInsertBuffer.append(tablePrefix);
+              sqlInsertBuffer.append("cpo_attribute_map (attribute_id, class_id, column_name, attribute, ");
+              sqlInsertBuffer.append("column_type, db_column, db_table,transform_class) values ('");
+              sqlInsertBuffer.append(attMapNode.getAttributeId());
+              sqlInsertBuffer.append("','");
+              sqlInsertBuffer.append(attMapNode.getClassId());
+              sqlInsertBuffer.append("','");
+              sqlInsertBuffer.append(attMapNode.getColumnName());
+              sqlInsertBuffer.append("','");
+              sqlInsertBuffer.append(attMapNode.getAttribute());
+              sqlInsertBuffer.append("',");
+              sqlInsertBuffer.append("'");
+              sqlInsertBuffer.append(attMapNode.getColumnType());
+              sqlInsertBuffer.append("'");
+              sqlInsertBuffer.append(",");
+              sqlInsertBuffer.append(attMapNode.getDbColumn() == null ? null : "'" + attMapNode.getDbColumn() + "'");
+              sqlInsertBuffer.append(",");
+              sqlInsertBuffer.append(attMapNode.getDbTable() == null ? null : "'" + attMapNode.getDbTable() + "'");
+              sqlInsertBuffer.append(",");
+              sqlInsertBuffer.append(attMapNode.getTransformClass() == null ? null : "'" + attMapNode.getTransformClass() + "'");
+              sqlInsertBuffer.append(")");
+              sqlInsertBuffer.append(sqlDelimiter);
             }
           }
         }
       }
       enumLabels = classNode.children();
+
       /**
        * must do query groups second
        */
       while (enumLabels.hasMoreElements()) {
         Object classLabel = enumLabels.nextElement();
+
         /**
          * find Labels
          */
@@ -143,11 +186,19 @@ public class SQLExporter  {
               /**
                * remove cpo_query before inserting
                */
-              sqlInsertBuffer.append("insert into {$table.prefix}cpo_query_group (group_id, class_id, group_type, name) values ('"
-                  + queryGroupNode.getGroupId() + "','" + queryGroupNode.getClassId() + "','"
-                  + queryGroupNode.getType() + "',"
-                  + (queryGroupNode.getGroupName() == null ? null : "'" + queryGroupNode.getGroupName() + "'")
-                  +")").append(this.sqlDelimiter);
+              sqlInsertBuffer.append("insert into ");
+              sqlInsertBuffer.append(tablePrefix);
+              sqlInsertBuffer.append("cpo_query_group (group_id, class_id, group_type, name) values ('");
+              sqlInsertBuffer.append(queryGroupNode.getGroupId());
+              sqlInsertBuffer.append("','");
+              sqlInsertBuffer.append(queryGroupNode.getClassId());
+              sqlInsertBuffer.append("','");
+              sqlInsertBuffer.append(queryGroupNode.getType());
+              sqlInsertBuffer.append("',");
+              sqlInsertBuffer.append(queryGroupNode.getGroupName() == null ? null : "'" + queryGroupNode.getGroupName() + "'");
+              sqlInsertBuffer.append(")");
+              sqlInsertBuffer.append(sqlDelimiter);
+              
               Enumeration enumQuery = queryGroupNode.children();
               while (enumQuery.hasMoreElements()) {
                 Object query = enumQuery.nextElement();
@@ -162,15 +213,33 @@ public class SQLExporter  {
                   /**
                    * remove any query parameters before inserting new ones
                    */
+                  sqlInsertBuffer.append("insert into ");
+                  sqlInsertBuffer.append(tablePrefix);
+                  sqlInsertBuffer.append("cpo_query (query_id, group_id, text_id, seq_no) values ('");
+                  sqlInsertBuffer.append(queryNode.getQueryId());
+                  sqlInsertBuffer.append("','");
+                  sqlInsertBuffer.append(queryNode.getGroupId());
+                  sqlInsertBuffer.append("','");
+                  sqlInsertBuffer.append(queryNode.getTextId());
+                  sqlInsertBuffer.append("','");
+                  sqlInsertBuffer.append(queryNode.getSeqNo());
+                  sqlInsertBuffer.append("')");
+                  sqlInsertBuffer.append(sqlDelimiter);
 
-                  sqlInsertBuffer.append("insert into {$table.prefix}cpo_query (query_id, group_id, text_id, seq_no) values ('"
-                      +queryNode.getQueryId()+"','"+queryNode.getGroupId()+"','"+queryNode.getTextId()
-                      +"','"+queryNode.getSeqNo()+"')").append(this.sqlDelimiter);
                   CpoQueryTextNode queryTextNode = queryNode.getQueryText();
+
                   /**
                    * remove query_text before trying insert
                    */
-                  sqlDeleteClassBuffer.append("delete from {$table.prefix}cpo_query_text where text_id = '"+queryTextNode.getTextId()+"'").append(this.sqlDelimiter);
+                  if (!skipDeletes) {
+                    sqlDeleteClassBuffer.append("delete from ");
+                    sqlDeleteClassBuffer.append(tablePrefix);
+                    sqlDeleteClassBuffer.append("cpo_query_text where text_id = '");
+                    sqlDeleteClassBuffer.append(queryTextNode.getTextId());
+                    sqlDeleteClassBuffer.append("'");
+                    sqlDeleteClassBuffer.append(sqlDelimiter);
+                  }
+
                   /**
                    * export query_text row
                    */
@@ -192,14 +261,31 @@ public class SQLExporter  {
                     return null;
                   }
                   if (!createdQueryTexts.contains(queryTextNode.getTextId())) {
-                    sqlInsertQueryText.append("insert into {$table.prefix}cpo_query_text (text_id, sql_text, description) values ('"
-                        +queryTextNode.getTextId()+"','"+queryTextSql+"',"
-                        +(queryTextDesc == null ? null : "'"+queryTextDesc+"'")
-                        +")").append(this.sqlDelimiter);
-                    sqlInsertQueryText.append("update {$table.prefix}cpo_query_text set sql_text = '"+queryTextSql
-                        +"', description = "
-                        +(queryTextDesc == null ? null : "'"+queryTextDesc+"'")
-                        +" where text_id = '"+queryTextNode.getTextId()+"'").append(this.sqlDelimiter);
+                    sqlInsertQueryText.append("insert into ");
+                    sqlInsertQueryText.append(tablePrefix);
+                    sqlInsertQueryText.append("cpo_query_text (text_id, sql_text, description) values ('");
+                    sqlInsertQueryText.append(queryTextNode.getTextId());
+                    sqlInsertQueryText.append("','");
+                    sqlInsertQueryText.append(queryTextSql);
+                    sqlInsertQueryText.append("',");
+                    sqlInsertQueryText.append(queryTextDesc == null ? null : "'" + queryTextDesc + "'");
+                    sqlInsertQueryText.append(")");
+                    sqlInsertQueryText.append(sqlDelimiter);
+
+                    /**
+                     * This seems completely useless, commenting it out for now
+                    sqlInsertQueryText.append("update ");
+                    sqlInsertQueryText.append(tablePrefix);
+                    sqlInsertQueryText.append("cpo_query_text set sql_text = '");
+                    sqlInsertQueryText.append(queryTextSql);
+                    sqlInsertQueryText.append("', description = ");
+                    sqlInsertQueryText.append(queryTextDesc == null ? null : "'" + queryTextDesc + "'");
+                    sqlInsertQueryText.append(" where text_id = '");
+                    sqlInsertQueryText.append(queryTextNode.getTextId());
+                    sqlInsertQueryText.append("'");
+                    sqlInsertQueryText.append(sqlDelimiter);
+                    **/
+
                     createdQueryTexts.add(queryTextNode.getTextId());
                   }
 
@@ -211,10 +297,18 @@ public class SQLExporter  {
                      */
                     if (queryParam instanceof CpoQueryParameterNode) {
                       CpoQueryParameterNode queryParamNode = (CpoQueryParameterNode)queryParam;
-                      sqlInsertBuffer.append("insert into {$table.prefix}cpo_query_parameter (attribute_id, query_id, seq_no,param_type) values ('"
-                          +queryParamNode.getAttributeId()+"','"+queryParamNode.getQueryId()+"','"
-                          +queryParamNode.getSeqNo()+"','"
-                          +queryParamNode.getType()+"')").append(this.sqlDelimiter);
+                      sqlInsertBuffer.append("insert into ");
+                      sqlInsertBuffer.append(tablePrefix);
+                      sqlInsertBuffer.append("cpo_query_parameter (attribute_id, query_id, seq_no,param_type) values ('");
+                      sqlInsertBuffer.append(queryParamNode.getAttributeId());
+                      sqlInsertBuffer.append("','");
+                      sqlInsertBuffer.append(queryParamNode.getQueryId());
+                      sqlInsertBuffer.append("','");
+                      sqlInsertBuffer.append(queryParamNode.getSeqNo());
+                      sqlInsertBuffer.append("','");
+                      sqlInsertBuffer.append(queryParamNode.getType());
+                      sqlInsertBuffer.append("')");
+                      sqlInsertBuffer.append(sqlDelimiter);
                     }
                   }
                 }
@@ -223,20 +317,104 @@ public class SQLExporter  {
           }
         }
       }
-      sqlDeleteClassBuffer.append("delete from {$table.prefix}CPO_QUERY_GROUP where class_id=(select class_id from {$table.prefix}CPO_CLASS where name='" + classNode.getClassName() + "')").append(this.sqlDelimiter);
-      sqlDeleteClassBuffer.append("delete from {$table.prefix}CPO_ATTRIBUTE_MAP where class_id=(select class_id from {$table.prefix}CPO_CLASS where name='" + classNode.getClassName() + "')").append(this.sqlDelimiter);
-      sqlDeleteClassBuffer.append("delete from {$table.prefix}CPO_CLASS where name='" + classNode.getClassName() + "'").append(this.sqlDelimiter);
-    }
-    // replace the table prefix marker with the actual prefix
 
-    sqlDeleteAll = Statics.replaceMarker(sqlDeleteAll, "{$table.prefix}", this.tablePrefix);
-    sqlDeleteClassBuffer = Statics.replaceMarker(sqlDeleteClassBuffer, "{$table.prefix}", this.tablePrefix);
-    sqlInsertQueryText = Statics.replaceMarker(sqlInsertQueryText, "{$table.prefix}", this.tablePrefix);
-    sqlInsertBuffer = Statics.replaceMarker(sqlInsertBuffer, "{$table.prefix}", this.tablePrefix);
+      if (!skipDeletes) {
+        sqlDeleteClassBuffer.append("delete from ");
+        sqlDeleteClassBuffer.append(tablePrefix);
+        sqlDeleteClassBuffer.append("CPO_QUERY_GROUP where class_id=(select class_id from ");
+        sqlDeleteClassBuffer.append(tablePrefix);
+        sqlDeleteClassBuffer.append("CPO_CLASS where name='");
+        sqlDeleteClassBuffer.append(classNode.getClassName());
+        sqlDeleteClassBuffer.append("')");
+        sqlDeleteClassBuffer.append(sqlDelimiter);
+
+        sqlDeleteClassBuffer.append("delete from ");
+        sqlDeleteClassBuffer.append(tablePrefix);
+        sqlDeleteClassBuffer.append("CPO_ATTRIBUTE_MAP where class_id=(select class_id from ");
+        sqlDeleteClassBuffer.append(tablePrefix);
+        sqlDeleteClassBuffer.append("CPO_CLASS where name='");
+        sqlDeleteClassBuffer.append(classNode.getClassName());
+        sqlDeleteClassBuffer.append("')");
+        sqlDeleteClassBuffer.append(sqlDelimiter);
+
+        sqlDeleteClassBuffer.append("delete from ");
+        sqlDeleteClassBuffer.append(tablePrefix);
+        sqlDeleteClassBuffer.append("CPO_CLASS where name='");
+        sqlDeleteClassBuffer.append(classNode.getClassName());
+        sqlDeleteClassBuffer.append("'");
+        sqlDeleteClassBuffer.append(sqlDelimiter);
+      }
+    }
+
+    SQLClassExport ce = new SQLClassExport();
+    ce.setDeleteSql(sqlDeleteClassBuffer.toString());
+    ce.setInsertQueryTextSql(sqlInsertQueryText.toString());
+    ce.setInsertSql(sqlInsertBuffer.toString());
+    return ce;
+  }
+
+  /**
+   * Generates a delete all string
+   */
+  public String exportDeleteAll() {
+    StringBuffer sqlDeleteAll = new StringBuffer();
+    sqlDeleteAll.append("delete from ");
+    sqlDeleteAll.append(tablePrefix);
+    sqlDeleteAll.append("cpo_query_parameter");
+    sqlDeleteAll.append(sqlDelimiter);
+
+    sqlDeleteAll.append("delete from ");
+    sqlDeleteAll.append(tablePrefix);
+    sqlDeleteAll.append("cpo_attribute_map");
+    sqlDeleteAll.append(sqlDelimiter);
+
+    sqlDeleteAll.append("delete from ");
+    sqlDeleteAll.append(tablePrefix);
+    sqlDeleteAll.append("cpo_query");
+    sqlDeleteAll.append(sqlDelimiter);
+
+    sqlDeleteAll.append("delete from ");
+    sqlDeleteAll.append(tablePrefix);
+    sqlDeleteAll.append("cpo_query_text");
+    sqlDeleteAll.append(sqlDelimiter);
+
+    sqlDeleteAll.append("delete from ");
+    sqlDeleteAll.append(tablePrefix);
+    sqlDeleteAll.append("cpo_query_group");
+    sqlDeleteAll.append(sqlDelimiter);
     
-    if (deleteAll)
-      return sqlDeleteAll.toString()+sqlDeleteClassBuffer.toString()+sqlInsertQueryText.toString()+sqlInsertBuffer.toString();
-    else
-      return sqlDeleteClassBuffer.toString()+sqlInsertQueryText.toString()+sqlInsertBuffer.toString();
+    sqlDeleteAll.append("delete from ");
+    sqlDeleteAll.append(tablePrefix);
+    sqlDeleteAll.append("cpo_class");
+    sqlDeleteAll.append(sqlDelimiter);
+    return sqlDeleteAll.toString();
+  }
+
+  /**
+   * Generates a create all with deletes string
+   */
+  public String exportCreateAll(CpoServerNode menuNode, ProgressEventListener pel) {
+    StringBuffer buf = new StringBuffer();
+
+    // create the delete all statements
+    String delSql = exportDeleteAll();
+    buf.append(delSql);
+
+    // make the class files
+    Enumeration menuEnum = menuNode.children();
+    while (menuEnum.hasMoreElements()) {
+      AbstractCpoNode child = (AbstractCpoNode)menuEnum.nextElement();
+      if (child instanceof CpoClassNode) {
+        CpoClassNode classNode = (CpoClassNode)child;
+        SQLClassExport classExport = exportSQL(classNode, true);
+
+        buf.append(classExport.getInsertQueryTextSql());
+        buf.append(classExport.getInsertSql());
+
+        pel.progressMade(new ProgressValueEvent(this, 1));
+      }
+    }
+
+    return buf.toString();
   }
 }

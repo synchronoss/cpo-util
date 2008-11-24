@@ -19,20 +19,9 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
 public class MainFrame extends JFrame {
     /** Version Id for this class. */
@@ -164,6 +153,10 @@ public class MainFrame extends JFrame {
       CpoBrowserPanel browserPanel = new CpoBrowserPanel();
       this.jTabbedPane.addTab(browserPanel.getServer(),null,browserPanel,browserPanel.getDatabaseName()+" Revisions enabled: "+browserPanel.getProxy().revsEnabled);
       this.statusBar.setText("Connected to: "+browserPanel.getServer()+" using "+browserPanel.getProxy().getConnectionClassName());
+    } catch(SqlDirRequiredException ex) {
+      // the server selected doesn't have a sql dir selected, force the user to pick one
+      JOptionPane.showMessageDialog(this, ex.getMessage(), "Warning", JOptionPane.WARNING_MESSAGE);
+      CpoUtil.setNewJDBCConnection(ex.getServer());
     } catch(ClassNotFoundException cnfe) {
       CpoUtil.showException(cnfe);
       CpoUtil.setCustomClassPath("Make sure platform-ejb.jar and weblogic.jar is in your custom classpath!");

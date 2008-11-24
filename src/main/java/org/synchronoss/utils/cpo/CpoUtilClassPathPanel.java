@@ -19,11 +19,12 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 
 public class CpoUtilClassPathPanel extends JPanel  {
     /** Version Id for this class. */
@@ -34,9 +35,9 @@ public class CpoUtilClassPathPanel extends JPanel  {
   private JButton jButAddClassPath = new JButton();
   private JButton jButRemove = new JButton();
   private JScrollPane jScroll = new JScrollPane();
-  private ArrayList files;
+  private List files;
   
-  public CpoUtilClassPathPanel(ArrayList files) {
+  public CpoUtilClassPathPanel(List files) {
     this.files = files;
     try {
       jbInit();

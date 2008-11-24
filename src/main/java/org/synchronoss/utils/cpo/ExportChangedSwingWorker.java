@@ -23,32 +23,37 @@ package org.synchronoss.utils.cpo;
 import org.apache.log4j.Logger;
 
 import java.io.*;
+import java.util.List;
 
 /**
  * SwingWorker used to launch a progress box up while the sql is being exported.
  */
-public class ExportClassSwingWorker extends SwingWorker {
+public class ExportChangedSwingWorker extends SwingWorker {
 
-    private static final Logger logger = Logger.getLogger(ExportClassSwingWorker.class);
+    private static final Logger logger = Logger.getLogger(ExportChangedSwingWorker.class);
 
     ProgressFrame pf = null;
-    AbstractCpoNode menuNode = null;
+    List<AbstractCpoNode> nodeList = null;
 
     Exception error = null;
 
-    public ExportClassSwingWorker(AbstractCpoNode menuNode) {
+    public ExportChangedSwingWorker(List<AbstractCpoNode> nodeList) {
         setLocalName("ExportWorker");
-        this.menuNode = menuNode;
+        this.nodeList = nodeList;
     }
 
     @Override
     public Object construct() {
         logger.debug("Exporting...");
+
+        if (nodeList == null || nodeList.isEmpty())
+            return null;
+      
         pf = new ProgressFrame("Exporting...", -1);
         pf.start();
 
-        String dir = menuNode.getProxy().getSqlDir();
-        String server = menuNode.getProxy().getServer();
+        AbstractCpoNode first = nodeList.get(0);
+        String dir = first.getProxy().getSqlDir();
 
         File file = null;
         FileWriter fw = null;
@@ -57,36 +62,46 @@ public class ExportClassSwingWorker extends SwingWorker {
             File sqlDir = new File(dir);
             if (!sqlDir.exists()) {
                 if (!sqlDir.mkdirs()) {
-                    throw new SqlDirRequiredException("Unable to create directory: " + sqlDir.getPath(), server);
+                    throw new IOException("Unable to create directory: " + sqlDir.getPath());
                 }
             }
 
             if (!sqlDir.isDirectory()) {
-                throw new SqlDirRequiredException("The sql dir is not a directory: " + sqlDir.getPath(), server);
+                throw new IOException("The sql dir is not a directory: " + sqlDir.getPath());
             }
 
             if (!sqlDir.canWrite()) {
-                throw new SqlDirRequiredException("Unable to write to directory: " + sqlDir.getPath(), server);
+                throw new IOException("Unable to write to directory: " + sqlDir.getPath());
             }
 
-            SQLExporter sqlEx = new SQLExporter(menuNode.getProxy().getTablePrefix(), menuNode.getProxy().getSqlDelimiter());
-            SQLClassExport classExport = sqlEx.exportSQL(menuNode);
+            SQLExporter sqlEx = new SQLExporter(first.getProxy().getTablePrefix(), first.getProxy().getSqlDelimiter());
 
-            StringBuffer sql = new StringBuffer();
-            sql.append(classExport.getDeleteSql());
-            sql.append(classExport.getInsertQueryTextSql());
-            sql.append(classExport.getInsertSql());
+            for (AbstractCpoNode acn : nodeList) {
+              AbstractCpoNode current = acn;
+              while (current != null) {
+                if (current instanceof CpoClassNode) {
+                  CpoClassNode node = (CpoClassNode)current;
 
-            CpoClassNode classNode = (CpoClassNode)menuNode;
-            String fileName = classNode.getClassName() + ".sql";
+                  SQLClassExport classExport = sqlEx.exportSQL(node);
 
-            file = new File(dir, fileName);
-            fw = new FileWriter(file);
-            fw.write(sql.toString());
-            fw.flush();
-            fw.close();
+                  StringBuffer sql = new StringBuffer();
+                  sql.append(classExport.getDeleteSql());
+                  sql.append(classExport.getInsertQueryTextSql());
+                  sql.append(classExport.getInsertSql());
 
-            CpoServerNode serverNode = menuNode.getProxy().getServerNode();
+                  String fileName = node.getClassName() + ".sql";
+
+                  file = new File(dir, fileName);
+                  fw = new FileWriter(file);
+                  fw.write(sql.toString());
+                  fw.flush();
+                  fw.close();
+                }
+                current = (AbstractCpoNode)current.getParent();
+              }
+            }
+
+            CpoServerNode serverNode = first.getProxy().getServerNode();
             pf.progressMade(new ProgressMaxEvent(this, (serverNode.getChildCount() - 1)));
             pf.setLabel("Generating create all sql...");
             String createSql = sqlEx.exportCreateAll(serverNode, pf);
@@ -116,8 +131,6 @@ public class ExportClassSwingWorker extends SwingWorker {
     public void finished() {
         if (error != null) {
             CpoUtil.showException(error);
-        } else {
-            CpoUtil.updateStatus("Exported SQL for class: " + menuNode.toString());
         }
     }
 }

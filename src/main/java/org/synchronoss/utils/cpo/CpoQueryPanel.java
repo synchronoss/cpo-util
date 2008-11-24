@@ -241,7 +241,7 @@ public class CpoQueryPanel extends JPanel {
             HashMap<String, CpoAttributeMapNode> hash = new HashMap<String, CpoAttributeMapNode>();
             CpoClassNode classNode = (CpoClassNode)queryNode.getParent().getParent().getParent();
             if (classNode != null) {
-                ArrayList attributeList = queryNode.getProxy().getAttributeMap(classNode);
+                List attributeList = queryNode.getProxy().getAttributeMap(classNode);
                 Iterator iterator = attributeList.iterator();
                 while (iterator.hasNext()) {
                     CpoAttributeMapNode att = (CpoAttributeMapNode)iterator.next();

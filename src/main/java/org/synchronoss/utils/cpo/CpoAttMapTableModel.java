@@ -19,10 +19,9 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
+
 import javax.swing.table.AbstractTableModel;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
+import java.util.*;
 
 public class CpoAttMapTableModel extends AbstractTableModel  {
     /** Version Id for this class. */
@@ -30,7 +29,7 @@ public class CpoAttMapTableModel extends AbstractTableModel  {
   private String[] columnNames = {"Attribute","Column Name","Column Type","DB Table", "DB Column","Transform Class","User","Date","Modified?"};
   private Object[] columnClasses = {String.class, String.class, String.class, String.class, String.class,  String.class, String.class, Date.class, String.class};
   private CpoAttributeLabelNode cpoAttLabNode;
-  private ArrayList attMap; //CpoAttributeMapNode(s)
+  private List attMap; //CpoAttributeMapNode(s)
 
   public CpoAttMapTableModel(CpoAttributeLabelNode cpoAttLabNode) throws Exception {
     this.cpoAttLabNode = cpoAttLabNode;

@@ -19,19 +19,17 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import javax.swing.table.AbstractTableModel;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.Date;
+import org.apache.log4j.Category;
+
 import javax.swing.*;
-import org.apache.log4j.*;
+import javax.swing.table.AbstractTableModel;
+import java.util.*;
 
 public class CpoQueryTableModel extends AbstractTableModel {
     /** Version Id for this class. */
     private static final long serialVersionUID=1L;
   private CpoQueryNode cpoQueryNode;
-  private ArrayList cpoQPBs; //CpoQueryParameterNode(s)
+  private List cpoQPBs; //CpoQueryParameterNode(s)
   private String[] columnNames = {"Seq Num","Attribute","Column Name","Column Type","In/Out/Both","DB Table", "DB Column","Get Transform Class","User","Date","Changed?"};
   private Object[] columnClasses = {String.class, CpoAttributeMapNode.class, String.class, String.class, JComboBox.class, String.class, String.class, String.class, String.class, Date.class, String.class};
   CpoClassNode attributeCpoClassNode;

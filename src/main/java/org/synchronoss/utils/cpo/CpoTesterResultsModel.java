@@ -19,23 +19,21 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
+
+import org.apache.log4j.Logger;
 
 import javax.swing.table.AbstractTableModel;
-
-import org.apache.log4j.Category;
+import java.lang.reflect.Method;
+import java.util.*;
 
 public class CpoTesterResultsModel extends AbstractTableModel {
     /** Version Id for this class. */
     private static final long serialVersionUID=1L;
   private Collection results;
-  private ArrayList cpoAttMap; //CpoAttributeMapNode(s)
+  private List cpoAttMap; //CpoAttributeMapNode(s)
   private int columnCount;
   private String[] columnNames;
-  private Category OUT = Category.getInstance(this.getClass());
+  private Logger OUT = Logger.getLogger(this.getClass());
   
   public CpoTesterResultsModel(Collection results, CpoClassNode cpoClassNode) throws Exception {
     this.results = results;

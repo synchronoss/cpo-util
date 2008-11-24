@@ -19,41 +19,18 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import gnu.regexp.RE;
-import gnu.regexp.REException;
-import gnu.regexp.REMatch;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Properties;
-import java.util.StringTokenizer;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
-
+import gnu.regexp.*;
+import org.apache.log4j.Logger;
 import org.synchronoss.cpo.CpoAdapter;
-import org.synchronoss.cpo.jdbc.JdbcCpoAdapter;
-import org.synchronoss.cpo.jdbc.JdbcDataSourceInfo;
-import org.synchronoss.cpo.jdbc.JavaSqlTypes;
+import org.synchronoss.cpo.jdbc.*;
 
-
-import org.apache.log4j.Category;
+import javax.naming.*;
+import javax.sql.DataSource;
+import javax.swing.tree.*;
+import java.lang.reflect.Method;
+import java.sql.*;
+import java.util.*;
 
 public class Proxy implements Observer {
   boolean revsEnabled = false;
@@ -61,15 +38,15 @@ public class Proxy implements Observer {
   private Properties defProps;
   private String server;
   private Connection conn;
-  private Hashtable classCache = new Hashtable();
-  private Hashtable classCacheById = new Hashtable();
-  private Hashtable attMapCache = new Hashtable();
-  private Hashtable queryParamCache = new Hashtable();
-  private Hashtable queryCache = new Hashtable();
-  private Hashtable queryGroupCache = new Hashtable();
-  private Hashtable queryGroupByTextCache = new Hashtable();
-  private ArrayList queryTextCache = new ArrayList();
-  private ArrayList allChangedObjects = new ArrayList();
+  private Hashtable<AbstractCpoNode, List<CpoClassNode>> classCache = new Hashtable<AbstractCpoNode, List<CpoClassNode>>();
+  private Hashtable<String, CpoClassNode> classCacheById = new Hashtable<String, CpoClassNode>();
+  private Hashtable<CpoAttributeLabelNode, List<CpoAttributeMapNode>> attMapCache = new Hashtable<CpoAttributeLabelNode, List<CpoAttributeMapNode>>();
+  private Hashtable<CpoQueryNode, List<CpoQueryParameterNode>> queryParamCache = new Hashtable<CpoQueryNode, List<CpoQueryParameterNode>>();
+  private Hashtable<CpoQueryGroupNode, List<CpoQueryNode>> queryCache = new Hashtable<CpoQueryGroupNode, List<CpoQueryNode>>();
+  private Hashtable<CpoQueryGroupLabelNode, List<CpoQueryGroupNode>> queryGroupCache = new Hashtable<CpoQueryGroupLabelNode, List<CpoQueryGroupNode>>();
+  private Hashtable<CpoQueryTextNode, List<CpoQueryGroupNode>> queryGroupByTextCache = new Hashtable<CpoQueryTextNode, List<CpoQueryGroupNode>>();
+  private List<CpoQueryTextNode> queryTextCache = new ArrayList<CpoQueryTextNode>();
+  private List<AbstractCpoNode> allChangedObjects = new ArrayList<AbstractCpoNode>();
 //  private Object cpoMan; //CpoManager
   private CpoAdapter cpoMan;
   private String[] sqlTypes;
@@ -82,9 +59,10 @@ public class Proxy implements Observer {
   private String sqlDelimiter;
   private Properties connProps;
   private boolean classNameToggle = false;
-  private Category OUT = Category.getInstance(this.getClass());
-  private String connectionClassName;
+  private Logger OUT = Logger.getLogger(this.getClass());
+  private String connectionClassName = null;
   //org.synchronoss.cpo.JdbcCpoAdapter
+
   public Proxy(Properties props, String server, CpoBrowserTree cpoTree) throws Exception {
     if (server == null || props == null) throw new Exception("No Server Selected!");
     this.defProps = props;
@@ -92,13 +70,26 @@ public class Proxy implements Observer {
     this.cpoTree = cpoTree;
     getConnection();
     checkForRevsEnabled();
-  }  
+  }
+  
   public String getTablePrefix() {
 	  return this.tablePrefix;
   }
 
   public String getSqlDelimiter() {
 	  return this.sqlDelimiter;
+  }
+
+  public CpoServerNode getServerNode() {
+    CpoServerNode serverNode = null;
+    if (cpoTree != null && cpoTree.getModel() != null) {
+      serverNode = (CpoServerNode)cpoTree.getModel().getRoot();
+    }
+    return serverNode;
+  }
+
+  public String getSqlDir() {
+    return connProps.getProperty(Statics.PROP_JDBC_SQL_DIR + server);
   }
 
   void getConnection() throws Exception {
@@ -117,7 +108,7 @@ public class Proxy implements Observer {
 //    sqlTypeClassMeth = cpoSqlTypesClass.getMethod("getSqlTypeClass",new Class[]{String.class});
 //    sqlTypeClassMethInt = cpoSqlTypesClass.getMethod("getSqlTypeClass",new Class[]{Integer.class});
 //    Collection coll = (Collection)cpoManGetSqlTypesMeth.invoke(null,null);
-    Collection coll = JavaSqlTypes.getSqlTypes();
+    Collection<String> coll = JavaSqlTypes.getSqlTypes();
     sqlTypes = new String[coll.size()];
     coll.toArray(sqlTypes);
 
@@ -255,13 +246,20 @@ public class Proxy implements Observer {
     }
     finally {
       try {
-        pstmt.close();
+        if (pstmt != null) pstmt.close();
       } catch (Exception e) {}
     }
   }
   public String getDatabaseName() {
     return this.databaseName;
   }
+
+  // just in case someone decides to change toString()
+  public String getServer() {
+    return server;
+  }
+
+  @Override
   public String toString() {
     return server;
   }
@@ -275,16 +273,16 @@ public class Proxy implements Observer {
    * returns CpoClassNode(s)
    */
   public CpoClassNode getClassNode(String classId) throws Exception {
-    return (CpoClassNode)this.classCacheById.get(classId);
+    return classCacheById.get(classId);
   }
-  public Hashtable getClassesById() {
+  public Hashtable<String, CpoClassNode> getClassesById() {
     return this.classCacheById;
   }
-  public ArrayList getClasses(AbstractCpoNode parent) throws Exception {
+  public List<CpoClassNode> getClasses(AbstractCpoNode parent) throws Exception {
     if (this.classCache.containsKey(parent)) {
-      return (ArrayList)this.classCache.get(parent);
+      return this.classCache.get(parent);
     }
-    ArrayList al = new ArrayList();
+    List<CpoClassNode> al = new ArrayList<CpoClassNode>();
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
@@ -310,10 +308,10 @@ public class Proxy implements Observer {
     }
     finally {
       try {
-        rs.close();
+        if (rs != null) rs.close();
       } catch (Exception e) {}
       try {
-        pstmt.close();
+        if (pstmt != null) pstmt.close();
       } catch (Exception e) {}
     }
     this.classCache.put(parent,al);
@@ -327,11 +325,11 @@ public class Proxy implements Observer {
     }
     return null;
   }
-  public ArrayList getQueryText(CpoServerNode cpoServer) throws Exception {
+  public List<CpoQueryTextNode> getQueryText(CpoServerNode cpoServer) throws Exception {
     if (this.queryTextCache.size() != 0)
       return this.queryTextCache;
     CpoQueryTextLabelNode parent = this.getCpoQueryTextLabelNode(cpoServer);
-    ArrayList al = new ArrayList();
+    List<CpoQueryTextNode> al = new ArrayList<CpoQueryTextNode>();
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
@@ -357,30 +355,30 @@ public class Proxy implements Observer {
     }
     finally {
       try {
-        rs.close();
+        if (rs != null) rs.close();
       } catch (Exception e) {}
       try {
-        pstmt.close();
+        if (pstmt != null) pstmt.close();
       } catch (Exception e) {}
     }
     queryTextCache = al;
     return al;
   }
-  public ArrayList getQueryGroups(CpoQueryTextNode textNode) throws Exception {
+  public List<CpoQueryGroupNode> getQueryGroups(CpoQueryTextNode textNode) throws Exception {
     if (this.queryGroupByTextCache.containsKey(textNode)) {
-      return (ArrayList)this.queryGroupByTextCache.get(textNode);
+      return this.queryGroupByTextCache.get(textNode);
     }
-    ArrayList al = new ArrayList();
+    List<CpoQueryGroupNode> al = new ArrayList<CpoQueryGroupNode>();
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
     	StringBuffer sql=new StringBuffer();
       if (revsEnabled)
     	  sql.append("select group_id, class_id, group_type, name, userid, createdate from {$table.prefix}cpo_query_group where group_id in "+
-            "(select group_id from {$table.prefix}cpo_query where text_id = ?) order by group_id");
+            "(select group_id from {$table.prefix}cpo_query where text_id = ?) order by name, group_type, group_id");
       else
     	  sql.append("select group_id, class_id, group_type, name from {$table.prefix}cpo_query_group where group_id in "+
-            "(select group_id from {$table.prefix}cpo_query where text_id = ?) order by group_id");
+            "(select group_id from {$table.prefix}cpo_query where text_id = ?) order by name, group_type, group_id");
       pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
       pstmt.setString(1,textNode.getTextId());
       rs = pstmt.executeQuery();
@@ -394,28 +392,29 @@ public class Proxy implements Observer {
       }
     } finally {
       try {
-        rs.close();
+        if (rs != null) rs.close();
       } catch (Exception e) {}
       try {
-        pstmt.close();
+        if (pstmt != null) pstmt.close();
       } catch (Exception e) {}
     }
     this.queryGroupByTextCache.put(textNode,al);
     return al;
   }
-  public ArrayList getQueryGroups(CpoQueryGroupLabelNode parent) throws Exception {
+
+  public List<CpoQueryGroupNode> getQueryGroups(CpoQueryGroupLabelNode parent) throws Exception {
     if (this.queryGroupCache.containsKey(parent)) {
-      return (ArrayList)this.queryGroupCache.get(parent);
+      return this.queryGroupCache.get(parent);
     }
-    ArrayList al = new ArrayList();
+    List<CpoQueryGroupNode> al = new ArrayList<CpoQueryGroupNode>();
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
     	StringBuffer sql=new StringBuffer();
       if (revsEnabled)
-    	  sql.append("select group_id, class_id, group_type, name, userid, createdate from {$table.prefix}cpo_query_group where class_id = ? order by group_id");
+    	  sql.append("select group_id, class_id, group_type, name, userid, createdate from {$table.prefix}cpo_query_group where class_id = ? order by name, group_type, group_id");
       else
-    	  sql.append("select group_id, class_id, group_type, name from {$table.prefix}cpo_query_group where class_id = ? order by group_id");
+    	  sql.append("select group_id, class_id, group_type, name from {$table.prefix}cpo_query_group where class_id = ? order by name, group_type, group_id");
       pstmt = conn.prepareStatement((Statics.replaceMarker(sql, "{$table.prefix}", this.tablePrefix)).toString());
       pstmt.setString(1,((CpoClassNode)parent.getParent()).getClassId());
       rs = pstmt.executeQuery();
@@ -432,15 +431,16 @@ public class Proxy implements Observer {
     }
     finally {
       try {
-        rs.close();
+        if (rs != null) rs.close();
       } catch (Exception e) {}
       try {
-        pstmt.close();
+        if (pstmt != null) pstmt.close();
       } catch (Exception e) {}
     }
     this.queryGroupCache.put(parent,al);
     return al;
   }
+
   public CpoQueryGroupLabelNode getQueryGroupLabelNode(CpoClassNode classNode) {
     Enumeration classEnum = classNode.children();
     while (classEnum.hasMoreElements()) {
@@ -449,12 +449,10 @@ public class Proxy implements Observer {
     }
     return null;
   }
+
   public CpoQueryGroupNode getQueryGroupNode(CpoClassNode classNode, String name, String type) throws Exception {
     CpoQueryGroupLabelNode cqgl = getQueryGroupLabelNode(classNode);
-    ArrayList al = getQueryGroups(cqgl);
-    Iterator iter = al.iterator();
-    while (iter.hasNext()) {
-      CpoQueryGroupNode node = (CpoQueryGroupNode)iter.next();
+    for (CpoQueryGroupNode node : getQueryGroups(cqgl)) {
       if (((name == null && node.getGroupName() == null) ||
           node.getGroupName() != null && name != null &&
           node.getGroupName().equals(name)) 
@@ -465,11 +463,11 @@ public class Proxy implements Observer {
   /**
    * returns CpoQueryNode(s)
    */
-  public ArrayList getQueries(CpoQueryGroupNode parent) throws Exception {
+  public List<CpoQueryNode> getQueries(CpoQueryGroupNode parent) throws Exception {
     if (this.queryCache.containsKey(parent)) {
-      return (ArrayList)this.queryCache.get(parent);
+      return this.queryCache.get(parent);
     }
-    ArrayList al = new ArrayList();
+    List<CpoQueryNode> al = new ArrayList<CpoQueryNode>();
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
@@ -500,10 +498,10 @@ public class Proxy implements Observer {
     }
     finally {
       try {
-        rs.close();
+        if (rs != null) rs.close();
       } catch (Exception e) {}
       try {
-        pstmt.close();
+        if (pstmt != null) pstmt.close();
       } catch (Exception e) {}
     }
     this.queryCache.put(parent,al);
@@ -512,11 +510,11 @@ public class Proxy implements Observer {
   /**
    * returns CpoQueryParameterNode(s)
    */
-  public ArrayList getQueryParameters(CpoQueryNode qNode) throws Exception {
+  public List<CpoQueryParameterNode> getQueryParameters(CpoQueryNode qNode) throws Exception {
     if (this.queryParamCache.containsKey(qNode)) {
-      return (ArrayList)this.queryParamCache.get(qNode);
+      return this.queryParamCache.get(qNode);
     }    
-    ArrayList al = new ArrayList();
+    List<CpoQueryParameterNode> al = new ArrayList<CpoQueryParameterNode>();
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
@@ -534,7 +532,7 @@ public class Proxy implements Observer {
       rs = pstmt.executeQuery();
 //      OUT.debug ("Parent for "+qNode+": "+qNode.getParent());
       while (rs.next()) {
-        CpoQueryParameterNode cpoQPB = new CpoQueryParameterNode(qNode, rs.getInt("seq_no"), 
+        CpoQueryParameterNode cpoQPB = new CpoQueryParameterNode(qNode, rs.getInt("seq_no"),
             getAttributeMap((CpoServerNode)qNode.getParent().getParent().getParent().getParent(),rs.getString("attribute_id")),
             rs.getString("param_type"));
         
@@ -549,16 +547,16 @@ public class Proxy implements Observer {
     }
     finally {
       try {
-        rs.close();
+        if (rs != null) rs.close();
       } catch (Exception e) {}
       try {
-        pstmt.close();
+        if (pstmt != null) pstmt.close();
       } catch (Exception e) {}
     }
     this.queryParamCache.put(qNode,al);
     return al;
   }
-  public ArrayList getAttributeMap(CpoClassNode cpoClassNode) throws Exception {
+  public List<CpoAttributeMapNode> getAttributeMap(CpoClassNode cpoClassNode) throws Exception {
     Enumeration classEnum = cpoClassNode.children();
     while (classEnum.hasMoreElements()) {
       AbstractCpoNode node = (AbstractCpoNode)classEnum.nextElement();
@@ -577,9 +575,7 @@ public class Proxy implements Observer {
     return null;
   }
   public CpoAttributeMapNode getAttributeMap(CpoServerNode cpoServerNode, String attributeId) throws Exception {
-    Iterator classIt = this.getClasses(cpoServerNode).iterator();
-    while (classIt.hasNext()) {
-      CpoClassNode cpoClassNode = (CpoClassNode)classIt.next();
+    for (CpoClassNode cpoClassNode : getClasses(cpoServerNode)) {
       CpoAttributeMapNode attMapNode = getAttributeMap(cpoClassNode,attributeId);
       if (attMapNode != null)
         return attMapNode;
@@ -587,9 +583,7 @@ public class Proxy implements Observer {
     return null;
   }
   public CpoAttributeMapNode getAttributeMap(CpoAttributeLabelNode cpoAttLabNode, String attributeId) throws Exception {
-    Iterator iter = getAttributeMap(cpoAttLabNode).iterator();
-    while (iter.hasNext()) {
-      CpoAttributeMapNode camnTmp = (CpoAttributeMapNode)iter.next();
+    for (CpoAttributeMapNode camnTmp : getAttributeMap(cpoAttLabNode)) {
       if (camnTmp.getAttributeId().equals(attributeId)) {
         return camnTmp;
       }
@@ -599,11 +593,11 @@ public class Proxy implements Observer {
   /**
    * returns CpoAttributeMapNode(s)
    */
-  public ArrayList getAttributeMap(CpoAttributeLabelNode cpoAttLabNode) throws Exception {
+  public List<CpoAttributeMapNode> getAttributeMap(CpoAttributeLabelNode cpoAttLabNode) throws Exception {
     if (this.attMapCache.containsKey(cpoAttLabNode)) {
-      return (ArrayList)this.attMapCache.get(cpoAttLabNode);
+      return this.attMapCache.get(cpoAttLabNode);
     }
-    ArrayList al = new ArrayList();
+    List<CpoAttributeMapNode> al = new ArrayList<CpoAttributeMapNode>();
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
@@ -637,10 +631,10 @@ public class Proxy implements Observer {
     }
     finally {
       try {
-        rs.close();
+        if (rs != null) rs.close();
       } catch (Exception e) {}
       try {
-        pstmt.close();
+        if (pstmt != null) pstmt.close();
       } catch (Exception e) {}
     }
     this.attMapCache.put(cpoAttLabNode,al);
@@ -664,10 +658,10 @@ public class Proxy implements Observer {
 //      throw new ProxyException("getQueryTextUsageCount",se);
     } finally {
       try {
-        rs.close();
+        if (rs != null) rs.close();
       } catch (Exception e) {}
       try {
-        pstmt.close();
+        if (pstmt != null) pstmt.close();
       } catch (Exception e) {}
     }
     return result;
@@ -675,6 +669,7 @@ public class Proxy implements Observer {
   /**
    * lets try to close this oracle connection b4 we take a hike
    */
+  @Override
   protected void finalize() throws Throwable {
     super.finalize();
     try {
@@ -764,7 +759,7 @@ public class Proxy implements Observer {
   /**
    * get a list of all changed objects
    */
-  public ArrayList getAllChangedObjects() {
+  public List<AbstractCpoNode> getAllChangedObjects() {
     return this.allChangedObjects;
   }
   /**
@@ -776,16 +771,14 @@ public class Proxy implements Observer {
   /**
    * saves all nodes passed to it to the db
    */
-  public void saveNodes(ArrayList nodes) throws Exception {
+  public void saveNodes(List<AbstractCpoNode> nodes) throws Exception {
     PreparedStatement pstmt = null;
     try {
-      Iterator iter = nodes.iterator();
       /**
        * do class nodes first
        */
-      ArrayList toBeCleaned = new ArrayList();
-      while (iter.hasNext()) {
-        Object node = iter.next();
+      List<AbstractCpoNode> toBeCleaned = new ArrayList<AbstractCpoNode>();
+      for (AbstractCpoNode node : nodes) {
         if (node instanceof CpoClassNode) {
           CpoClassNode ccn = (CpoClassNode)node;
           if (ccn.isNew()) {
@@ -849,12 +842,11 @@ public class Proxy implements Observer {
         if (pstmt != null)
           pstmt.close();
       }
-      iter = nodes.iterator();
+
       /**
        * do attribute maps second
        */
-      while (iter.hasNext()) {
-        Object node = iter.next();
+      for (AbstractCpoNode node : nodes) {
         if (node instanceof CpoAttributeMapNode) {
           CpoAttributeMapNode camn = (CpoAttributeMapNode)node;
           if (camn.isNew()) {
@@ -913,12 +905,10 @@ public class Proxy implements Observer {
         if (pstmt != null)
           pstmt.close();
       }
-      iter = nodes.iterator();
       /**
        * do query groups
        */
-      while (iter.hasNext()) {
-        Object node = iter.next();
+      for (AbstractCpoNode node : nodes) {
         if (node instanceof CpoQueryGroupNode) {
           CpoQueryGroupNode cqgn = (CpoQueryGroupNode)node;
           if (cqgn.isNew()) {
@@ -975,12 +965,10 @@ public class Proxy implements Observer {
         if (pstmt != null)
           pstmt.close();
       }
-      iter = nodes.iterator();
       /**
        * do query text
        */
-      while (iter.hasNext()) {
-        Object node = iter.next();
+      for (AbstractCpoNode node : nodes) {
         if (node instanceof CpoQueryTextNode) {
           CpoQueryTextNode cQTnode = (CpoQueryTextNode)node;
           // strip sql of CRs
@@ -1037,12 +1025,10 @@ public class Proxy implements Observer {
         if (pstmt != null)
           pstmt.close();
       }
-      iter = nodes.iterator();
       /**
        * do query node
        */
-      while (iter.hasNext()) {
-        Object node = iter.next();
+      for (AbstractCpoNode node : nodes) {
         if (node instanceof CpoQueryNode) {
           CpoQueryNode cqn = (CpoQueryNode)node;
           if (cqn.isNew()) {
@@ -1092,12 +1078,10 @@ public class Proxy implements Observer {
         if (pstmt != null)
           pstmt.close();
       }
-      iter = nodes.iterator();
       /**
        * do query parameters
        */
-      while (iter.hasNext()) {
-        Object node = iter.next();
+      for (AbstractCpoNode node : nodes) {
         if (node instanceof CpoQueryParameterNode) {
           CpoQueryParameterNode cqpn = (CpoQueryParameterNode)node;
           if (cqpn.isNew()) {
@@ -1147,9 +1131,8 @@ public class Proxy implements Observer {
       }
       conn.commit();
       // commit completed ok - clean up objects
-      Iterator toCleanIt = toBeCleaned.iterator();
-      while (toCleanIt.hasNext()) {
-        AbstractCpoNode node = (AbstractCpoNode)toCleanIt.next();
+
+      for (AbstractCpoNode node : toBeCleaned) {
         node.setNew(false);
         node.setDirty(false);
         if (node.isRemove()) {
@@ -1160,7 +1143,8 @@ public class Proxy implements Observer {
     } catch (SQLException se) {
       try {
         conn.rollback();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+      }
       throw se;
 //      CpoUtil.showException(se);
 //      return;
@@ -1188,7 +1172,7 @@ public class Proxy implements Observer {
   /**
    * removes a particular object from all caches, including changed object cache
    */
-  public void removeObjectFromAllCache(Object obj) {
+  public void removeObjectFromAllCache(AbstractCpoNode obj) {
     if (queryTextCache.contains(obj))
       queryTextCache.remove(obj);
     if (allChangedObjects.contains(obj))
@@ -1197,7 +1181,7 @@ public class Proxy implements Observer {
 
     Enumeration classEnum = this.classCache.elements();
     while (classEnum.hasMoreElements()) {
-      ArrayList classes = (ArrayList)classEnum.nextElement();
+      List classes = (List)classEnum.nextElement();
       if (classes.contains(obj))
         classes.remove(obj);
     }   
@@ -1205,7 +1189,7 @@ public class Proxy implements Observer {
     
     classEnum = this.attMapCache.elements();
     while (classEnum.hasMoreElements()) {
-      ArrayList attMap = (ArrayList)classEnum.nextElement();
+      List attMap = (List)classEnum.nextElement();
       if (attMap.contains(obj))
         attMap.remove(obj);
     }
@@ -1213,7 +1197,7 @@ public class Proxy implements Observer {
     
     classEnum = this.queryCache.elements();
     while (classEnum.hasMoreElements()) {
-      ArrayList attMap = (ArrayList)classEnum.nextElement();
+      List attMap = (List)classEnum.nextElement();
       if (attMap.contains(obj))
         attMap.remove(obj);
     }
@@ -1221,7 +1205,7 @@ public class Proxy implements Observer {
     
     classEnum = this.queryGroupCache.elements();
     while (classEnum.hasMoreElements()) {
-      ArrayList attMap = (ArrayList)classEnum.nextElement();
+      List attMap = (List)classEnum.nextElement();
       if (attMap.contains(obj))
         attMap.remove(obj);
     }
@@ -1229,7 +1213,7 @@ public class Proxy implements Observer {
     
     classEnum = this.queryParamCache.elements();
     while (classEnum.hasMoreElements()) {
-      ArrayList attMap = (ArrayList)classEnum.nextElement();
+      List attMap = (List)classEnum.nextElement();
       if (attMap.contains(obj))
         attMap.remove(obj);
     }
@@ -1237,7 +1221,7 @@ public class Proxy implements Observer {
     
     classEnum = this.queryGroupByTextCache.elements();
     while (classEnum.hasMoreElements()) {
-      ArrayList qGroups = (ArrayList)classEnum.nextElement();
+      List qGroups = (List)classEnum.nextElement();
       if (qGroups.contains(obj))
         qGroups.remove(obj);
     }
@@ -1247,9 +1231,7 @@ public class Proxy implements Observer {
    * get a particular querytextnode
    */
   public CpoQueryTextNode getQueryText(CpoServerNode serverNode, String textId) throws Exception {
-    Iterator iter = getQueryText(serverNode).iterator();
-    while (iter.hasNext()) {
-      CpoQueryTextNode cQTnode = (CpoQueryTextNode)iter.next();
+    for (CpoQueryTextNode cQTnode : getQueryText(serverNode)) {
       if (cQTnode.getTextId().equals(textId))
         return cQTnode;
     }
@@ -1258,12 +1240,11 @@ public class Proxy implements Observer {
   /**
    * get an arraylist of querytextnodes that match a certain string
    */
-  public ArrayList getQueryTextMatches(CpoServerNode serverNode, String match) throws Exception {
+  public List<CpoQueryTextNode> getQueryTextMatches(CpoServerNode serverNode, String match) throws Exception {
     if (match.equals("")) return this.getQueryText(serverNode);
-    ArrayList al = new ArrayList();
-    Iterator iter = getQueryText(serverNode).iterator();
-    while (iter.hasNext()) {
-      CpoQueryTextNode cQTnode = (CpoQueryTextNode)iter.next();
+
+    List<CpoQueryTextNode> al = new ArrayList<CpoQueryTextNode>();
+    for (CpoQueryTextNode cQTnode : getQueryText(serverNode)) {
       int index = cQTnode.toString().toLowerCase().indexOf(match.toLowerCase());
       if (index != -1)
         al.add(cQTnode);
@@ -1349,10 +1330,10 @@ public class Proxy implements Observer {
 //      throw new ProxyException("makeClassOuttaSql",se);
     } finally {
       try {
-        rs.close();
+        if (rs != null) rs.close();
       } catch (Exception e) {}
       try {
-        pstmt.close();
+        if (pstmt != null) pstmt.close();
       } catch (Exception e) {}
     }
     sbClass.append("}\n");
@@ -1374,7 +1355,7 @@ public class Proxy implements Observer {
     sbTopClass.append("import java.io.Serializable;\n");
     sbTopClass.append("public class "+className+" implements Serializable {\n");
     sbClass.append("  public "+className+"() {\n  }\n");
-    ArrayList alAttMap = this.getAttributeMap(node);
+    List alAttMap = this.getAttributeMap(node);
     Iterator attMapIt = alAttMap.iterator();
     while (attMapIt.hasNext()) {
       CpoAttributeMapNode atMapNode = (CpoAttributeMapNode)attMapIt.next();
@@ -1456,10 +1437,10 @@ public class Proxy implements Observer {
       }
     } finally {
       try {
-        rs.close();
+        if (rs != null) rs.close();
       } catch (Exception e) {}
       try {
-        pstmt.close();
+        if (pstmt != null) pstmt.close();
       } catch (Exception e) {}
     }
     
@@ -1473,7 +1454,7 @@ public class Proxy implements Observer {
 // retrieve from cpo, so we can verify insertion
         meth = cpoMan.getClass().getMethod("retrieveObject",new Class[]{String.class,Object.class});
         Object resultObj = meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
-        ArrayList al = new ArrayList();
+        List al = new ArrayList();
         if (resultObj != null)
           al.add(resultObj);
         return al;      
@@ -1484,7 +1465,7 @@ public class Proxy implements Observer {
 // retrieve from cpo, so we can verify deletion
         meth = cpoMan.getClass().getMethod("retrieveObject",new Class[]{String.class,Object.class});
         Object resultObj = meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
-        ArrayList al = new ArrayList();
+        List al = new ArrayList();
         if (resultObj != null)
           al.add(resultObj);
         return al;      
@@ -1516,7 +1497,7 @@ public class Proxy implements Observer {
       else if (cpoQGnode.getType().equals(Statics.CPO_TYPE_RETRIEVE)) {
         Method meth = cpoMan.getClass().getMethod("retrieveObject",new Class[]{String.class,Object.class});
         Object resultObj = meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
-        ArrayList al = new ArrayList();
+        List al = new ArrayList();
         if (resultObj != null)
           al.add(resultObj);
         return al;
@@ -1527,7 +1508,7 @@ public class Proxy implements Observer {
 // retrieve from cpo, so we can verify update
         meth = cpoMan.getClass().getMethod("retrieveObject",new Class[]{String.class,Object.class});
         Object resultObj = meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
-        ArrayList al = new ArrayList();
+        List al = new ArrayList();
         if (resultObj != null)
           al.add(resultObj);
         return al;            
@@ -1538,7 +1519,7 @@ public class Proxy implements Observer {
 // retrieve from cpo, so we can verify update
         meth = cpoMan.getClass().getMethod("retrieveObject",new Class[]{String.class,Object.class});
         Object resultObj = meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
-        ArrayList al = new ArrayList();
+        List al = new ArrayList();
         if (resultObj != null)
           al.add(resultObj);
         return al;        
@@ -1546,7 +1527,7 @@ public class Proxy implements Observer {
       else if (cpoQGnode.getType().equals(Statics.CPO_TYPE_EXIST)) {
         Method meth = cpoMan.getClass().getMethod("existsObject",new Class[]{String.class,Object.class});
         Object resultObj = meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
-        ArrayList al = new ArrayList();
+        List al = new ArrayList();
         if (resultObj != null)
           al.add(resultObj);
         return al;
@@ -1573,10 +1554,10 @@ public class Proxy implements Observer {
           }
       } finally {
           try {
-              rs.close();
+              if (rs != null) rs.close();
           } catch (Exception e) {}
           try {
-              pstmt.close();
+              if (pstmt != null) pstmt.close();
           } catch (Exception e) {}
       }
       if (ignoredAttr.length()>0) {

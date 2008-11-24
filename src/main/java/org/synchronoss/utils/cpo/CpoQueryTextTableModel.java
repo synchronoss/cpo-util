@@ -19,11 +19,9 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
 
 import javax.swing.table.AbstractTableModel;
+import java.util.*;
 
 public class CpoQueryTextTableModel extends AbstractTableModel  {
     /** Version Id for this class. */
@@ -31,8 +29,8 @@ public class CpoQueryTextTableModel extends AbstractTableModel  {
   private CpoServerNode serverNode;
   private String[] columnNames = {"Description","SQL","UsageCount","User","Date","Modified?"};
   private Object[] columnClasses = {String.class, String.class, Integer.class, String.class, Date.class, String.class};
-  private ArrayList cpoQueryText;
-  private ArrayList cpoQueryTextFiltered;
+  private List cpoQueryText;
+  private List cpoQueryTextFiltered;
   private String filter;
 
   public CpoQueryTextTableModel(CpoServerNode serverNode) {
@@ -67,7 +65,7 @@ public class CpoQueryTextTableModel extends AbstractTableModel  {
   }
 
   public Object getValueAt(int rowIndex, int columnIndex) {
-    ArrayList workingQueryList = cpoQueryText;
+    List workingQueryList = cpoQueryText;
     if (cpoQueryTextFiltered != null) {
       workingQueryList = cpoQueryTextFiltered;
     }
@@ -98,7 +96,7 @@ public class CpoQueryTextTableModel extends AbstractTableModel  {
     /**
      * this should be handled in the db, but I don't think it is, so here goes
      */
-    ArrayList workingQueryList = cpoQueryText;
+    List workingQueryList = cpoQueryText;
     if (cpoQueryTextFiltered != null) {
       workingQueryList = cpoQueryTextFiltered;
     }

@@ -20,15 +20,14 @@
  */
 package org.synchronoss.utils.cpo;
 import javax.swing.table.AbstractTableModel;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 
 public class CpoSaveNodesTableModel extends AbstractTableModel  {
     /** Version Id for this class. */
     private static final long serialVersionUID=1L;
   private CpoServerNode serverNode;
-  private ArrayList dontSave = new ArrayList();
-  private ArrayList changedObjects = new ArrayList();
+  private List<AbstractCpoNode> dontSave = new ArrayList<AbstractCpoNode>();
+  private List<AbstractCpoNode> changedObjects = new ArrayList<AbstractCpoNode>();
   private String[] columnNames = {"Save","Object Type","Object","Trans Type"};
   private Object[] columnClasses = {Boolean.class, String.class, String.class, String.class};
   
@@ -44,19 +43,19 @@ public class CpoSaveNodesTableModel extends AbstractTableModel  {
     return columnNames.length;
   }
 
+  @Override
   public String getColumnName(int columnIndex) {
     return columnNames[columnIndex];
   }
 
+  @Override
   public Class getColumnClass(int columnIndex) {
     return (Class)columnClasses[columnIndex];
   }
 
+  @Override
   public boolean isCellEditable(int rowIndex, int columnIndex) {
-    if (columnIndex == 0)
-      return true;
-    else
-      return false;
+    return (columnIndex == 0);
   }
 
   public Object getValueAt(int rowIndex, int columnIndex) {
@@ -69,17 +68,18 @@ public class CpoSaveNodesTableModel extends AbstractTableModel  {
     else if (columnIndex == 2)
       return changedObjects.get(rowIndex).toString();
     else if (columnIndex == 3) {
-      if (((AbstractCpoNode)changedObjects.get(rowIndex)).isNew())
+      if ((changedObjects.get(rowIndex)).isNew())
         return "New";
-      else if (((AbstractCpoNode)changedObjects.get(rowIndex)).isRemove())
+      else if ((changedObjects.get(rowIndex)).isRemove())
         return "Delete";
-      else if (((AbstractCpoNode)changedObjects.get(rowIndex)).isDirty())
+      else if ((changedObjects.get(rowIndex)).isDirty())
         return "Update";
       else return "This shouldn't be here!";
     }
     else return null;
   }
 
+  @Override
   public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
     if (columnIndex == 0) {
       if (aValue instanceof Boolean) {
@@ -96,11 +96,9 @@ public class CpoSaveNodesTableModel extends AbstractTableModel  {
     }
     this.fireTableDataChanged();
   }
-  public ArrayList getSelectedNodes() {
-    ArrayList al = new ArrayList();
-    Iterator iter = this.changedObjects.iterator();
-    while (iter.hasNext()) {
-      Object node = iter.next();
+  public List<AbstractCpoNode> getSelectedNodes() {
+    List<AbstractCpoNode> al = new ArrayList<AbstractCpoNode>();
+    for (AbstractCpoNode node : changedObjects) {
       if (!dontSave.contains(node))
         al.add(node);
     }
