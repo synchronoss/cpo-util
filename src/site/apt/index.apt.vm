@@ -1,0 +1,16 @@
+ -----
+ CPOUtil - ${currentVersion}
+ -----
+ Architecture Team
+ -----
+ November 2008
+
+CPOUtil - ${currentVersion}
+
+* What is CPOUtil?
+
+  CPOUtil is a utility Swing GUI that helps in configuring the metadata that CPO needs in order to function
+
+[images/cpoUtil_1.png]
+
+  

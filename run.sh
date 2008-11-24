@@ -20,17 +20,4 @@
 # *  http://www.gnu.org/licenses/lgpl.txt
 # */
 
-
-CLASSES=./lib/gnu-regexp-1.1.4.jar
-CLASSES=./lib/mysql-connector-java-5.0.4-bin.jar:$CLASSES
-CLASSES=./lib/log4j.jar:$CLASSES
-CLASSES=./lib/systray4j.jar:$CLASSES
-CLASSES=./lib/cpo.jar:$CLASSES
-CLASSES=./lib/hsqldb.jar:$CLASSES
-CLASSES=./lib/ojdbc14.jar:$CLASSES
-CLASSES=./bin/utilscpo.jar:$CLASSES
-
-echo "CLASSPATH=$CLASSES"
-
-java -cp $CLASSES org.synchronoss.utils.cpo.CpoUtil
-
+mvn exec:java -Dexec.mainClass="org.synchronoss.utils.cpo.CpoUtil" -e
