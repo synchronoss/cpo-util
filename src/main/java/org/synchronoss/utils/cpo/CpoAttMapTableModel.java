@@ -24,12 +24,14 @@ import javax.swing.table.AbstractTableModel;
 import java.util.*;
 
 public class CpoAttMapTableModel extends AbstractTableModel  {
-    /** Version Id for this class. */
-    private static final long serialVersionUID=1L;
+
+  /** Version Id for this class. */
+  private static final long serialVersionUID=1L;
+
   private String[] columnNames = {"Attribute","Column Name","Column Type","DB Table", "DB Column","Transform Class","User","Date","Modified?"};
   private Object[] columnClasses = {String.class, String.class, String.class, String.class, String.class,  String.class, String.class, Date.class, String.class};
   private CpoAttributeLabelNode cpoAttLabNode;
-  private List attMap; //CpoAttributeMapNode(s)
+  private List<CpoAttributeMapNode> attMap; //CpoAttributeMapNode(s)
 
   public CpoAttMapTableModel(CpoAttributeLabelNode cpoAttLabNode) throws Exception {
     this.cpoAttLabNode = cpoAttLabNode;
@@ -43,48 +45,57 @@ public class CpoAttMapTableModel extends AbstractTableModel  {
     return columnNames.length;
   }
 
+  @Override
   public String getColumnName(int columnIndex) {
     return columnNames[columnIndex];
   }
 
+  @Override
   public Class getColumnClass(int columnIndex) {
     return (Class)columnClasses[columnIndex];
   }
 
+  @Override
   public boolean isCellEditable(int rowIndex, int columnIndex) {
-    if (columnIndex < 6)
-      return true;
-    return false;
-  }
-  public Object getValueAt(int rowIndex, int columnIndex) {
-    if (columnIndex == 0)
-      return ((CpoAttributeMapNode)attMap.get(rowIndex)).getAttribute();
-    else if (columnIndex == 1)
-      return ((CpoAttributeMapNode)attMap.get(rowIndex)).getColumnName();
-    else if (columnIndex == 2)
-      return ((CpoAttributeMapNode)attMap.get(rowIndex)).getColumnType();
-    else if (columnIndex == 3)
-      return ((CpoAttributeMapNode)attMap.get(rowIndex)).getDbTable();
-    else if (columnIndex == 4)
-      return ((CpoAttributeMapNode)attMap.get(rowIndex)).getDbColumn();
-    else if (columnIndex == 5)
-      return ((CpoAttributeMapNode)attMap.get(rowIndex)).getTransformClass();
-    else if (columnIndex == 6)
-      return ((CpoAttributeMapNode)attMap.get(rowIndex)).getUserName();
-    else if (columnIndex == 7)
-      return ((CpoAttributeMapNode)attMap.get(rowIndex)).getCreateDate();    
-    else if (columnIndex == 8) {
-      if (((CpoAttributeMapNode)attMap.get(rowIndex)).isNew()) return "New";
-      else if (((CpoAttributeMapNode)attMap.get(rowIndex)).isRemove()) return "Removed";
-      else if (((CpoAttributeMapNode)attMap.get(rowIndex)).isDirty()) return "Changed";
-      else return "";
-    }
-    else return null;
+    return (columnIndex < 6);
   }
 
+  public Object getValueAt(int rowIndex, int columnIndex) {
+    if (columnIndex == 0) {
+      return (attMap.get(rowIndex)).getAttribute();
+    } else if (columnIndex == 1) {
+      return (attMap.get(rowIndex)).getColumnName();
+    } else if (columnIndex == 2) {
+      return (attMap.get(rowIndex)).getColumnType();
+    } else if (columnIndex == 3) {
+      return (attMap.get(rowIndex)).getDbTable();
+    } else if (columnIndex == 4) {
+      return (attMap.get(rowIndex)).getDbColumn();
+    } else if (columnIndex == 5) {
+      return (attMap.get(rowIndex)).getTransformClass();
+    } else if (columnIndex == 6) {
+      return (attMap.get(rowIndex)).getUserName();
+    } else if (columnIndex == 7) {
+      return (attMap.get(rowIndex)).getCreateDate();
+    } else if (columnIndex == 8) {
+      if ((attMap.get(rowIndex)).isNew()) {
+        return "New";
+      } else if ((attMap.get(rowIndex)).isRemove()) {
+        return "Removed";
+      } else if ((attMap.get(rowIndex)).isDirty()) {
+        return "Changed";
+      } else {
+        return "";
+      }
+    } else {
+      return null;
+    }
+  }
+
+  @Override
   public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
     if (aValue instanceof String) {
-      CpoAttributeMapNode node = (CpoAttributeMapNode)attMap.get(rowIndex);
+      CpoAttributeMapNode node = attMap.get(rowIndex);
       if (columnIndex == 0)
         node.setAttribute((String)aValue);
       else if (columnIndex == 1)
@@ -99,10 +110,12 @@ public class CpoAttMapTableModel extends AbstractTableModel  {
         node.setTransformClass((String)aValue);
     }
   }
+
   public void removeRow(int rowIndex) {
-    ((CpoAttributeMapNode)attMap.get(rowIndex)).setRemove(true);
+    (attMap.get(rowIndex)).setRemove(true);
     this.fireTableDataChanged();
   }
+  
   public void addNewAttribute(String columnName, String attribute, 
       String columnType, String transform, String dbTable, String dbColumn) {
     CpoClassNode ccn = (CpoClassNode)cpoAttLabNode.getParent();
@@ -119,11 +132,11 @@ public class CpoAttMapTableModel extends AbstractTableModel  {
     camn.setNew(true);
     this.fireTableDataChanged();
   }
+
   public boolean attributeExists(String columnName) {
-    Iterator itrAttr = attMap.iterator();
-    while (itrAttr.hasNext()) {
-        CpoAttributeMapNode attr = (CpoAttributeMapNode)itrAttr.next();
-        if (attr.getAttribute().equals(columnName)) return true;
+    for (CpoAttributeMapNode attr : attMap) {
+        if (attr.getAttribute().equals(columnName))
+          return true;
     }
     return false;  
   }
