@@ -19,6 +19,7 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
+
 import javax.swing.JPanel;
 import java.util.Enumeration;
 import javax.swing.tree.TreeNode;
@@ -37,29 +38,35 @@ public class CpoQueryParameterNode extends AbstractCpoNode {
     
 //    this.addObserver(parent);
   }
-  public String getType()
-  {
+  public String getType() {
     return this.inOutType;
   }
-  public void setType(String value)
-  { if(this.inOutType==null&&value==null)return;
+
+  public void setType(String value) {
+    if (this.inOutType == null && value == null)
+      return;
     if (this.inOutType == null || value == null || !value.equals(this.inOutType)) {
       this.inOutType = value;
       this.setDirty(true);
     }
   }
+
   public String getAttributeId() {
     return this.cpoAMB.getAttributeId();
   }
+
   public String getQueryId() {
     return ((CpoQueryNode)this.parent).getQueryId();
   }
+
   public int getSeqNo() {
     return this.seqNo;
   }
+
   public CpoAttributeMapNode getCpoAttributeMapBean() {
     return this.cpoAMB;
   }
+
   public void setCpoAttributeMap(CpoAttributeMapNode cpoAMB) {
     if (this.cpoAMB == null && cpoAMB == null) return;
     if (this.cpoAMB == null || cpoAMB == null || !cpoAMB.equals(this.cpoAMB)) {
@@ -67,11 +74,16 @@ public class CpoQueryParameterNode extends AbstractCpoNode {
       this.setDirty(true);
     }
   }
+
+  @Override
   public void refreshChildren() {
   }
+  
+  @Override
   public JPanel getPanelForSelected() {
     return null;
   }
+
   public TreeNode getChildAt(int childIndex) {
     return null;
   }
@@ -92,18 +104,24 @@ public class CpoQueryParameterNode extends AbstractCpoNode {
     return true;
   }
 
-  public Enumeration children() {
+  public Enumeration<AbstractCpoNode> children() {
     return null;
   }
+  
+  @Override
   public boolean equals(Object obj) {
     if (!(obj instanceof CpoQueryParameterNode)) return false;
     if (((CpoQueryParameterNode)obj).getQueryId().equals(this.getQueryId())
         && ((CpoQueryParameterNode)obj).getSeqNo() == this.getSeqNo()) return true;
     return false;
   }
+  
+  @Override
   public int hashCode() {
     return this.getQueryId().hashCode();
   }
+  
+  @Override
   public String toString() {
     return this.getQueryId()+" - "+this.getSeqNo();
   }

@@ -27,6 +27,7 @@ import java.util.*;
 import java.sql.Timestamp;
 
 public abstract class AbstractCpoNode extends Observable implements TreeNode { //, Observer
+  
   private boolean dirty = false;
   private boolean remove = false;
   private boolean isnew = false;
@@ -44,8 +45,10 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
   public Proxy getProxy() {
     if (this.parent != null)
       return parent.getProxy();
-    else return this.prox;
+    
+    return this.prox;
   }
+  
   public JTree getJtree() {
     if (this.jtree != null)
      return this.jtree;
@@ -53,18 +56,22 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
       return parent.getJtree();
     else return null;
   }
+  
   public TreeNode getParent() {
     return parent;
   }
+  
   public void setDirty(boolean dirty) {
     if (this.dirty == dirty) return;
     this.dirty = dirty;
     this.setChanged();
     this.notifyObservers(this);
   }
+  
   public boolean isDirty() {
     return this.dirty;
   }
+
   public void setChildDirty(AbstractCpoNode childNode) {
     boolean notify = false;
     if (this.isChildDirty() != childNode.isDirty())
@@ -80,18 +87,22 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
       this.notifyObservers(childNode);      
     }
   }
+
   public boolean isChildDirty() {
     return (dirtyChildren.size() > 0);
   }
+
   public void setRemove(boolean remove) {
     if (this.remove == remove) return;
     this.remove = remove;
     this.setChanged();
     this.notifyObservers(this);
   }
+
   public boolean isRemove() {
     return this.remove;
   }
+
   public void setChildRemove(AbstractCpoNode childNode) {
 //  OUT.debug ("SETCHILDREMOVE: "+this+", "+childNode+" isremove>"+childNode.isRemove()+" isnew>"+childNode.isNew());
     boolean notify = false;
@@ -104,11 +115,9 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
         newChildren.remove(childNode);
       if (dirtyChildren.contains(childNode))
         dirtyChildren.remove(childNode);
-    }
-    else if (childNode.isRemove() && !removeChildren.contains(childNode)) {
+    } else if (childNode.isRemove() && !removeChildren.contains(childNode)) {
       removeChildren.add(childNode);
-    }
-    else if (!childNode.isRemove() && removeChildren.contains(childNode)) {
+    } else if (!childNode.isRemove() && removeChildren.contains(childNode)) {
       removeChildren.remove(childNode);
     }
     if (notify) {
@@ -116,18 +125,22 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
       this.notifyObservers(childNode);
     }
   }
+
   public boolean isChildRemove() {
     return (removeChildren.size() > 0);
   }
+
   public void setNew(boolean isnew) {
     if (this.isnew == isnew) return;
     this.isnew = isnew;
     this.setChanged();
     this.notifyObservers(this);
   }
+
   public boolean isNew() {
     return this.isnew;
   }
+
   public void setChildNew(AbstractCpoNode childNode) {
     boolean notify = false;
     if (this.isChildNew() != childNode.isNew())
@@ -135,8 +148,7 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
     if (childNode.isNew() && !newChildren.contains(childNode)) {
       newChildren.add(childNode);
 //      OUT.debug (this+" adding new for "+childNode);
-    }
-    else if (!childNode.isNew() && newChildren.contains(childNode)) {
+    } else if (!childNode.isNew() && newChildren.contains(childNode)) {
       newChildren.remove(childNode);
 //      OUT.debug (this+" removing new for "+childNode);
     }
@@ -145,9 +157,11 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
       this.notifyObservers(childNode);      
     }
   }
+
   public boolean isChildNew() {
     return (newChildren.size() > 0);
   }
+
   public void refreshMe() {
     ((DefaultTreeModel)this.jtree.getModel()).nodeStructureChanged(this);
   }
@@ -202,19 +216,24 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
     }
   }
 */
+  
   public String getUserName() {
     return this.userName;
   }
+  
   public void setUserName(String userName) {
     this.userName = userName;
   }
+
   public Date getCreateDate() {
     return this.createDate;
   }
+
   public void setCreateDate(Timestamp createDate) {
     if (createDate == null) return;
     this.createDate = new Date(createDate.getTime());
   }
+
   public boolean isLabel() {
     return this.getClass().getName().toLowerCase().indexOf("label") != -1;
   }

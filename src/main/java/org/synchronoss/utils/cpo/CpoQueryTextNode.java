@@ -35,8 +35,10 @@ public class CpoQueryTextNode extends AbstractCpoNode  {
     this.addObserver(parent.getProxy());
 //    this.addObserver(parent);
   }
+  @Override
   public void refreshChildren() {
   }
+  @Override
   public JPanel getPanelForSelected() {
     return null;
   }
@@ -60,7 +62,7 @@ public class CpoQueryTextNode extends AbstractCpoNode  {
     return true;
   }
 
-  public Enumeration children() {
+  public Enumeration<AbstractCpoNode> children() {
     return null;
   }
   public String getDesc() {
@@ -82,21 +84,27 @@ public class CpoQueryTextNode extends AbstractCpoNode  {
     this.desc = desc;
     this.setDirty(true);
   }
+  @Override
   public boolean equals(Object obj) {
     if (!(obj instanceof CpoQueryTextNode)) {return false;}
     //PJD for HSQLDB 
-    if (((CpoQueryTextNode)obj).getTextId() == null) {return false;}
-    if (((CpoQueryTextNode)obj).getTextId().equals(this.getTextId())) return true;
-    else return false;
+    if (((CpoQueryTextNode)obj).getTextId() == null) {
+      return false;
+    }
+    if (((CpoQueryTextNode)obj).getTextId().equals(this.getTextId()))
+      return true;
+    
+    return false;
   }
+  @Override
   public int hashCode() {
     //PJD for HSQLDB 
     if (this.getTextId() == null) {
       return -1;
-    } else {
-      return this.getTextId().hashCode();
     }
+    return this.getTextId().hashCode();
   }
+  @Override
   public String toString() {
     return this.hashCode()+" -- "+this.getDesc();
   }

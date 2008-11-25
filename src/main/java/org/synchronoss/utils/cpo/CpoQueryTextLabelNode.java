@@ -31,10 +31,12 @@ public class CpoQueryTextLabelNode extends AbstractCpoNode  {
     this.addObserver(parent.getProxy());
   }
 
+  @Override
   public JPanel getPanelForSelected() {
     return new CpoQueryTextPanel((CpoServerNode)getParent());
   }
 
+  @Override
   public void refreshChildren() {
   }
 
@@ -58,9 +60,10 @@ public class CpoQueryTextLabelNode extends AbstractCpoNode  {
     return true;
   }
 
-  public Enumeration children() {
+  public Enumeration<AbstractCpoNode> children() {
     return null;
   }
+  @Override
   public String toString() {
     return "Query Text";
   }

@@ -38,13 +38,15 @@ public class CpoQueryGroupNode extends AbstractCpoNode {
       this.addObserver(parent.getProxy());
   }
 
+  @Override
   public JPanel getPanelForSelected() {
     return null;
   }
   
   public TreeNode getChildAt(int childIndex) {
-    if (childIndex >= qNodes.size()) return null;
-    else return (TreeNode)qNodes.get(childIndex);
+    if (childIndex >= qNodes.size())
+      return null;
+    return qNodes.get(childIndex);
   }
 
   public int getChildCount() {
@@ -63,12 +65,12 @@ public class CpoQueryGroupNode extends AbstractCpoNode {
     return false;
   }
 
-  public Enumeration children() {
+  public Enumeration<CpoQueryNode> children() {
     if (qNodes == null) // due to panel not being removed from center pane ... this should be fixed
       refreshChildren();
-    return new Enumeration() {
-      Iterator iter = qNodes.iterator();
-      public Object nextElement() {
+    return new Enumeration<CpoQueryNode>() {
+      Iterator<CpoQueryNode> iter = qNodes.iterator();
+      public CpoQueryNode nextElement() {
         return iter.next();
       }
       public boolean hasMoreElements() {
@@ -76,6 +78,7 @@ public class CpoQueryGroupNode extends AbstractCpoNode {
       }
     };
   }
+  @Override
   public void refreshChildren() {
     try {
       this.qNodes = getProxy().getQueries(this);
@@ -84,6 +87,7 @@ public class CpoQueryGroupNode extends AbstractCpoNode {
     }    
   }
 
+  @Override
   public String toString() {
     return this.groupName+" ("+this.type+")";
   }

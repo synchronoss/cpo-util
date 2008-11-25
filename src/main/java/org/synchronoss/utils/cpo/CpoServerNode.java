@@ -19,16 +19,17 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import org.apache.log4j.Category;
+
+import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.tree.TreeNode;
 import java.util.*;
 
 public class CpoServerNode extends AbstractCpoNode {
-  private List classes; // CpoClassNode(s)
+  private List<CpoClassNode> classes; // CpoClassNode(s)
   private CpoQueryTextLabelNode cpoQTLN;
-  private Category OUT = Category.getInstance(this.getClass());
+  private Logger OUT = Logger.getLogger(this.getClass());
   
   public CpoServerNode(Proxy prox, JTree jtree) {
     this.jtree = jtree;
@@ -36,16 +37,18 @@ public class CpoServerNode extends AbstractCpoNode {
     this.addObserver(prox);
   }
 
+  @Override
   public JPanel getPanelForSelected() {
     return null;
   }
   
   public TreeNode getChildAt(int childIndex) {
-    if (childIndex >= classes.size()+1 || childIndex < 0) return null;
+    if (childIndex >= classes.size() + 1 || childIndex < 0)
+      return null;
     else if (childIndex == 0)
       return this.cpoQTLN;
-    else
-      return (TreeNode)classes.get(childIndex-1);
+    
+    return classes.get(childIndex-1);
   }
 
   public int getChildCount() {
@@ -72,28 +75,31 @@ public class CpoServerNode extends AbstractCpoNode {
     return false;
   }
 
-  public Enumeration children() {
+  public Enumeration<AbstractCpoNode> children() {
     if (this.classes == null || this.cpoQTLN == null) refreshChildren();
-    return new Enumeration() {
+    return new Enumeration<AbstractCpoNode>() {
       int count = 0;
-      public Object nextElement() {
+      public AbstractCpoNode nextElement() {
         if (count == 0) {
           count++;
           return cpoQTLN;
         }
-        else 
-          return classes.get(count++-1);
+        return classes.get(count++-1);
       }
       public boolean hasMoreElements() {
-        if (classes.size()+1 == count) return false;
-          else return true;
+        if (classes.size()+1 == count)
+          return false;
+        
+        return true;
       }
     };
   }
     
+  @Override
   public String toString() {
     return this.prox.toString();
   }
+  @Override
   public void refreshChildren() {
     OUT.debug ("CpoServerNode refreshing data");
     try {

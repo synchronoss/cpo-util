@@ -19,17 +19,18 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
+
 import javax.swing.tree.TreeNode;
 import javax.swing.JPanel;
 import java.util.*;
 
 public class CpoQueryNode extends AbstractCpoNode {
-  private String queryId, groupId, textId, sql, desc;
+  private String queryId, groupId;
   private int seqNo;
   private CpoQueryTextNode cQTnode;
-  private List cpoQueryParam; // collection of CpoQueryParameterNode(s)
-  public CpoQueryNode(String queryId, String groupId, int seqNo, 
-      CpoQueryTextNode cQTnode, AbstractCpoNode parent) {
+  private List<CpoQueryParameterNode> cpoQueryParam; // collection of CpoQueryParameterNode(s)
+  
+  public CpoQueryNode(String queryId, String groupId, int seqNo, CpoQueryTextNode cQTnode, AbstractCpoNode parent) {
     this.cQTnode = cQTnode;
     this.queryId = queryId;
     this.groupId = groupId;
@@ -39,13 +40,15 @@ public class CpoQueryNode extends AbstractCpoNode {
 //    this.addObserver(parent);
   }
 
+  @Override
   public JPanel getPanelForSelected() {
     return new CpoQueryPanel(this);
   }
   
   public TreeNode getChildAt(int childIndex) {
-    if (childIndex >= cpoQueryParam.size() || childIndex < 0) return null;
-    else return (TreeNode)cpoQueryParam.get(childIndex);
+    if (childIndex >= cpoQueryParam.size() || childIndex < 0)
+      return null;
+    return cpoQueryParam.get(childIndex);
   }
 
   public int getChildCount() {
@@ -66,12 +69,12 @@ public class CpoQueryNode extends AbstractCpoNode {
     return true;
   }
 
-  public Enumeration children() {
+  public Enumeration<CpoQueryParameterNode> children() {
     if (cpoQueryParam == null) // due to panel not being removed from center pane ... this should be fixed
       refreshChildren();
-    return new Enumeration() {
-      Iterator iter = cpoQueryParam.iterator();
-      public Object nextElement() {
+    return new Enumeration<CpoQueryParameterNode>() {
+      Iterator<CpoQueryParameterNode> iter = cpoQueryParam.iterator();
+      public CpoQueryParameterNode nextElement() {
         return iter.next();
       }
       public boolean hasMoreElements() {
@@ -79,6 +82,7 @@ public class CpoQueryNode extends AbstractCpoNode {
       }
     };
   }
+  @Override
   public void refreshChildren() {
     try {
       this.cpoQueryParam = getProxy().getQueryParameters(this);
@@ -86,12 +90,13 @@ public class CpoQueryNode extends AbstractCpoNode {
       CpoUtil.showException(pe);
     }        
   }
+  @Override
   public String toString() {
     if (this.getQueryText() != null) {
       if (this.getQueryText().getDesc() == null || this.getQueryText().getDesc().equals(""))
         return this.getSeqNo()+" (NO DESCRIPTION)";
-      else
-        return this.getSeqNo()+" ("+this.getQueryText().getDesc()+")";
+      
+      return this.getSeqNo()+" ("+this.getQueryText().getDesc()+")";
     }
     return this.getSeqNo()+" (NO QUERY TEXT ASSOC)";
   }

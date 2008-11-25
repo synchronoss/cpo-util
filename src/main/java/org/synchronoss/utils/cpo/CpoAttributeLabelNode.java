@@ -19,6 +19,7 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
+
 import javax.swing.tree.TreeNode;
 import javax.swing.JPanel;
 import java.util.Enumeration;
@@ -26,17 +27,21 @@ import java.util.Iterator;
 import java.util.List;
 
 public class CpoAttributeLabelNode extends AbstractCpoNode  {
-  private List cpoAttMap; // contains collection of CpoAttributeMapNode(s)
+  
+  private List<CpoAttributeMapNode> cpoAttMap; // contains collection of CpoAttributeMapNode(s)
+  
   public CpoAttributeLabelNode(CpoClassNode parent) {
     this.parent = parent;
     this.addObserver(parent.getProxy());
 //    this.addObserver(parent);
   }
 
+  @Override
   public JPanel getPanelForSelected() {
     return new CpoAttributeMapPanel(this);
   }
 
+  @Override
   public void refreshChildren() {
     try {
       this.cpoAttMap = getProxy().getAttributeMap(this);
@@ -46,8 +51,10 @@ public class CpoAttributeLabelNode extends AbstractCpoNode  {
   }
 
   public TreeNode getChildAt(int childIndex) {
-    if (childIndex >= cpoAttMap.size()) return null;
-    else return (TreeNode)cpoAttMap.get(childIndex);
+    if (childIndex >= cpoAttMap.size()) 
+      return null;
+    
+    return cpoAttMap.get(childIndex);
   }
 
   public int getChildCount() {
@@ -68,12 +75,13 @@ public class CpoAttributeLabelNode extends AbstractCpoNode  {
     return true;
   }
 
-  public Enumeration children() {
+  public Enumeration<CpoAttributeMapNode> children() {
     if (cpoAttMap == null) // due to panel not being removed from center pane ... this should be fixed
       refreshChildren();
-    return new Enumeration() {
-      Iterator iter = cpoAttMap.iterator();
-      public Object nextElement() {
+    
+    return new Enumeration<CpoAttributeMapNode>() {
+      Iterator<CpoAttributeMapNode> iter = cpoAttMap.iterator();
+      public CpoAttributeMapNode nextElement() {
         return iter.next();
       }
       public boolean hasMoreElements() {
@@ -81,6 +89,8 @@ public class CpoAttributeLabelNode extends AbstractCpoNode  {
       }
     };
   }
+  
+  @Override
   public String toString() {
     return "Attribute Map";
   }

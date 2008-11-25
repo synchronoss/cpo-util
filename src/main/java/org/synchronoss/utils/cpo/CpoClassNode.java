@@ -19,11 +19,13 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
+
 import javax.swing.tree.TreeNode;
 import javax.swing.JPanel;
 import java.util.Enumeration;
 
 public class CpoClassNode extends AbstractCpoNode {
+  
   private String name,class_id;
   private CpoQueryGroupLabelNode queryGroupLabel;
   private CpoAttributeLabelNode attributeLabel;
@@ -37,6 +39,7 @@ public class CpoClassNode extends AbstractCpoNode {
 //    this.addObserver(parent);
   }
 
+  @Override
   public JPanel getPanelForSelected() {
     return new CpoTesterPanel(this);
   }
@@ -65,38 +68,45 @@ public class CpoClassNode extends AbstractCpoNode {
     return false;
   }
 
-  public Enumeration children() {
-    if (queryGroupLabel == null || attributeLabel == null) refreshChildren();
-    return new Enumeration() {
+  public Enumeration<AbstractCpoNode> children() {
+    if (queryGroupLabel == null || attributeLabel == null)
+      refreshChildren();
+    
+    return new Enumeration<AbstractCpoNode>() {
       int count = 0;
-      public Object nextElement() {
-        if (count++==0) return queryGroupLabel;
-        else return attributeLabel;
+      public AbstractCpoNode nextElement() {
+        if (count++ == 0) {
+          return queryGroupLabel;
+        }
+        return attributeLabel;
       }
       public boolean hasMoreElements() {
-        if (count > 1) return false;
-          else return true;
+        return (count <= 1);
       }
     };
   }
 
+  @Override
   public String toString() {
     return this.getDisplayClassName();
   }
+
   public String getClassId() {
     return this.class_id;
   }
+
   public String getClassName() {
     return this.name;
   }
+
   public String getDisplayClassName() {
-    if (!this.getProxy().getClassNameToggle() && getClassName().lastIndexOf(".") != -1 && getClassName().length() > getClassName().lastIndexOf(".")+1) {
-      return getClassName().substring(getClassName().lastIndexOf(".")+1);
+    if (!this.getProxy().getClassNameToggle() && getClassName().lastIndexOf(".") != -1 && getClassName().length() > getClassName().lastIndexOf(".") + 1) {
+      return getClassName().substring(getClassName().lastIndexOf(".") + 1);
     }
-    else {
-      return getClassName();
-    }
+    return getClassName();
   }
+  
+  @Override
   public void refreshChildren() {
     if (this.queryGroupLabel == null || this.attributeLabel == null) {
 //      OUT.debug("CpoClassNode refreshing data");
@@ -105,7 +115,8 @@ public class CpoClassNode extends AbstractCpoNode {
     }
   }
   public void setClassName(String className) {
-    if ((className == null && this.name == null) || (this.name != null && this.name.equals(className))) return;
+    if ((className == null && this.name == null) || (this.name != null && this.name.equals(className)))
+      return;
     this.name = className;
     this.setDirty(true);
   }

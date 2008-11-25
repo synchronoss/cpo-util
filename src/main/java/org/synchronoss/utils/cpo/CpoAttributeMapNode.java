@@ -69,6 +69,7 @@ public class CpoAttributeMapNode extends AbstractCpoNode {
   public String getDbColumn() {
     return this.db_column;
   }
+  @Override
   public String toString() {
     return this.attribute;
   }
@@ -107,13 +108,15 @@ public class CpoAttributeMapNode extends AbstractCpoNode {
     this.db_column = dbColumn;
     this.setDirty(true);
   }
+  @Override
   public boolean equals(Object obj) {
     if (!(obj instanceof CpoAttributeMapNode)) return false;
     if (((CpoAttributeMapNode)obj).getAttributeId().equals(this.getAttributeId())) {
       return true;
     }
-    else return false;
+    return false;
   }
+  @Override
   public int hashCode() {
     return this.getAttributeId().hashCode();
   }
@@ -137,12 +140,14 @@ public class CpoAttributeMapNode extends AbstractCpoNode {
     return true;
   }
 
-  public Enumeration children() {
+  public Enumeration<AbstractCpoNode> children() {
     return null;
   }
+  @Override
   public void refreshChildren() {
     
   }
+  @Override
   public JPanel getPanelForSelected() {
     return null;
   }

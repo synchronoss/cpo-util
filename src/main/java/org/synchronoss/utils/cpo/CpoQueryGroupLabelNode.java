@@ -49,7 +49,7 @@ public class CpoQueryGroupLabelNode extends AbstractCpoNode  {
   }
 
   public TreeNode getChildAt(int childIndex) {
-    return (TreeNode)qGroups.get(childIndex);
+    return qGroups.get(childIndex);
   }
 
   public int getChildCount() {
@@ -69,12 +69,12 @@ public class CpoQueryGroupLabelNode extends AbstractCpoNode  {
     return false;
   }
 
-  public Enumeration children() {
+  public Enumeration<CpoQueryGroupNode> children() {
     if (this.qGroups == null)
       refreshChildren();
-    return new Enumeration() {
-      Iterator iter = qGroups.iterator();
-      public Object nextElement() {
+    return new Enumeration<CpoQueryGroupNode>() {
+      Iterator<CpoQueryGroupNode> iter = qGroups.iterator();
+      public CpoQueryGroupNode nextElement() {
         return iter.next();
       }
       public boolean hasMoreElements() {
@@ -98,6 +98,7 @@ public class CpoQueryGroupLabelNode extends AbstractCpoNode  {
     cqgn.setNew(true);
   }
 
+  @Override
   public String toString() {
     return "Query Groups";
   }
