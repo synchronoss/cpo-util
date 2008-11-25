@@ -1,5 +1,5 @@
 #!/bin/sh
-#/*
+# *
 # *  Copyright (C) 2006  David E. Berry
 # *
 # *  This library is free software; you can redistribute it and/or
@@ -18,6 +18,6 @@
 # *  
 # *  A copy of the GNU Lesser General Public License may also be found at 
 # *  http://www.gnu.org/licenses/lgpl.txt
-# */
-
+# *
 mvn exec:java -Dexec.mainClass="org.synchronoss.utils.cpo.CpoUtil" -e
+
