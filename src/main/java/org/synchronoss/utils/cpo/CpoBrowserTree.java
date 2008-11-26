@@ -472,8 +472,31 @@ public class CpoBrowserTree extends JTree  {
     if (!refreshFromDB())
       return;
     
-    ExportClassSwingWorker exporter = new ExportClassSwingWorker(menuNode);
-    exporter.start();
+    String sqlDir = menuNode.getProxy().getSqlDir();
+    JFileChooser chooser = new JFileChooser();
+    if (CpoUtil.getDefaultDir() != null) {
+      // if there is a default dir, use that
+      chooser.setCurrentDirectory(CpoUtil.getDefaultDir());
+    } else if (sqlDir != null) {
+      // if there wasn't a default dir try the saved dir 
+      chooser.setCurrentDirectory(new File(sqlDir));
+    }
+    chooser.setApproveButtonText("Select");
+    chooser.setDialogTitle("Select directory to save sql:");
+    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+    int option = chooser.showSaveDialog(this);
+    if (option == JFileChooser.APPROVE_OPTION) {
+      File dir = chooser.getSelectedFile();
+      
+      if (OUT.isDebugEnabled())
+        OUT.debug("Directory: " + dir.getPath());
+    
+      // Save the default dir for next time
+      CpoUtil.setDefaultDir(dir);
+    
+      ExportClassSwingWorker exporter = new ExportClassSwingWorker(menuNode, dir);
+      exporter.start();
+    }
   }
 
   private void reconnectServer() {
