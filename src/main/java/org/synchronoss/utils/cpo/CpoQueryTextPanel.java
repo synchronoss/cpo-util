@@ -19,11 +19,11 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
 import java.util.List;
+
+import javax.swing.*;
 
 public class CpoQueryTextPanel extends JPanel  {
     /** Version Id for this class. */
@@ -56,6 +56,7 @@ public class CpoQueryTextPanel extends JPanel  {
         /** Version Id for this class. */
         private static final long serialVersionUID=1L;
 
+      @Override
       public String getToolTipText(MouseEvent e) {
         return getTipText(e.getPoint());
       }
@@ -63,6 +64,7 @@ public class CpoQueryTextPanel extends JPanel  {
     ToolTipManager.sharedInstance().registerComponent(queryTextJtable);
     ts.addMouseListenerToHeaderInTable(queryTextJtable);
 		queryTextJtable.addMouseListener(new MouseAdapter() {
+      @Override
       public void mouseReleased(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
           showMenu(e.getPoint());
@@ -70,6 +72,7 @@ public class CpoQueryTextPanel extends JPanel  {
       }
     });
     queryTextJtable.getTableHeader().addMouseListener(new MouseAdapter() {
+      @Override
       public void mouseReleased(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
           showMenu(e.getPoint());
@@ -136,12 +139,10 @@ public class CpoQueryTextPanel extends JPanel  {
     this.tipTextRow = rowAtPoint;
     CpoQueryTextNode node = model.getQueryNodeAt(ts.getTrueRow(rowAtPoint));
     try {
-      List queryGroups = node.getProxy().getQueryGroups(node);
-      Iterator queryGroupIt = queryGroups.iterator();
       sb.append("<html>");
       sb.append("<bold>"+node.getDesc()+"</bold><BR>");
-      while (queryGroupIt.hasNext()) {
-        CpoQueryGroupNode qGnode = (CpoQueryGroupNode)queryGroupIt.next();
+      List<CpoQueryGroupNode> queryGroups = node.getProxy().getQueryGroups(node);
+      for (CpoQueryGroupNode qGnode : queryGroups) {
         CpoClassNode classNode = node.getProxy().getClassNode(qGnode.getClassId());
         sb.append("Class: "+classNode.getClassName()+" -- Query Group: "+qGnode.getGroupName()+"<BR>");
       }

@@ -140,6 +140,7 @@ public class CpoAttributeMapNode extends AbstractCpoNode {
     return true;
   }
 
+  @Override
   public Enumeration<AbstractCpoNode> children() {
     return null;
   }

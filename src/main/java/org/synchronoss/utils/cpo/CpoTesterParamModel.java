@@ -25,59 +25,66 @@ import java.util.Hashtable;
 import org.apache.log4j.*;
 
 public class CpoTesterParamModel extends AbstractTableModel {
-    /** Version Id for this class. */
-    private static final long serialVersionUID=1L;
+  
+  /** Version Id for this class. */
+  private static final long serialVersionUID=1L;
   public static int COLUMN_PARAMETER = 4;
   public static int COLUMN_ATTRIBUTE_NAME = 3;
   private String[] columnNames = {"Query Seq Num","Param Seq Num","Column Name","Attribute Name","Parameter"};
   private Object[] columnClasses = {Integer.class, String.class, String.class, String.class, String.class};
   CpoQueryGroupNode cpoQGnode;
-  Hashtable parameter = new Hashtable();
-  private Category OUT = Category.getInstance(this.getClass());
+  Hashtable<Object, Object> parameter = new Hashtable<Object, Object>();
+  private Logger OUT = Logger.getLogger(this.getClass());
   
   public CpoTesterParamModel(CpoQueryGroupNode cpoQGnode) {
     this.cpoQGnode = cpoQGnode;
   }
+  
   public int getRowCount() {
     int rowCount = 0;
-    Enumeration enumQueries = cpoQGnode.children();
+    Enumeration<CpoQueryNode> enumQueries = cpoQGnode.children();
     while (enumQueries.hasMoreElements()) {
-      CpoQueryNode node = (CpoQueryNode)enumQueries.nextElement();
-      Enumeration enumQueryParams = node.children();
+      CpoQueryNode node = enumQueries.nextElement();
+      Enumeration<CpoQueryParameterNode> enumQueryParams = node.children();
       while (enumQueryParams.hasMoreElements()) {
-        CpoQueryParameterNode qpNode = (CpoQueryParameterNode)enumQueryParams.nextElement();
+        //CpoQueryParameterNode qpNode = enumQueryParams.nextElement();
+        enumQueryParams.nextElement();
         rowCount++;
       }
     }
     return rowCount;
   }
+  
   public int getColumnCount() {
     return columnNames.length;
   }
 
+  @Override
   public String getColumnName(int columnIndex) {
     return columnNames[columnIndex];
   }
 
-  public Class getColumnClass(int columnIndex) {
-    return (Class)columnClasses[columnIndex];
+  @Override
+  public Class<?> getColumnClass(int columnIndex) {
+    return (Class<?>)columnClasses[columnIndex];
   }
 
+  @Override
   public boolean isCellEditable(int rowIndex, int columnIndex) {
     if (columnIndex == 4)
       return true;
-    else
-      return false;
+    
+    return false;
   }
 
   public Object getValueAt(int rowIndex, int columnIndex) {
     int rowCount = 0;
-    Enumeration enumQueries = cpoQGnode.children();
+    Enumeration<CpoQueryNode> enumQueries = cpoQGnode.children();
     while (enumQueries.hasMoreElements()) {
-      CpoQueryNode node = (CpoQueryNode)enumQueries.nextElement();
-      Enumeration enumQueryParams = node.children();
+      CpoQueryNode node = enumQueries.nextElement();
+      Enumeration<CpoQueryParameterNode> enumQueryParams = node.children();
       while (enumQueryParams.hasMoreElements()) {
-        CpoQueryParameterNode qpNode = (CpoQueryParameterNode)enumQueryParams.nextElement();
+        CpoQueryParameterNode qpNode = enumQueryParams.nextElement();
         if (rowCount == rowIndex) {
           if (columnIndex == 0) {
             return new Integer(node.getSeqNo());
@@ -96,11 +103,14 @@ public class CpoTesterParamModel extends AbstractTableModel {
     }
     return null;
   }
+  @Override
   public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
     if (columnIndex == 4) {
-      OUT.debug(getValueAt(rowIndex,3)+" : "+aValue);
-      if (aValue == null) this.parameter.remove(getValueAt(rowIndex,3));
-      else this.parameter.put(getValueAt(rowIndex,3),aValue);
+      OUT.debug(getValueAt(rowIndex, 3) + " : " + aValue);
+      if (aValue == null)
+        this.parameter.remove(getValueAt(rowIndex, 3));
+      
+      this.parameter.put(getValueAt(rowIndex, 3), aValue);
       this.fireTableDataChanged();
     }
   }

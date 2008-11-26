@@ -65,6 +65,7 @@ public class CpoQueryGroupNode extends AbstractCpoNode {
     return false;
   }
 
+  @Override
   public Enumeration<CpoQueryNode> children() {
     if (qNodes == null) // due to panel not being removed from center pane ... this should be fixed
       refreshChildren();

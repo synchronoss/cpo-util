@@ -20,10 +20,7 @@
  */
 package org.synchronoss.utils.cpo;
 
-import org.apache.log4j.Logger;
 import org.synchronoss.cpo.jdbc.*;
-
-import java.util.HashMap;
 
 public class Statics  {
   public static final String PROP_WLSURL="cpoutil.wls.url.";
@@ -55,14 +52,19 @@ public class Statics  {
 
   public static final String CREATE_ALL_FILE_NAME = "CPO_CREATE_ALL.sql";
 
-  private static Logger OUT = Logger.getLogger(Statics.class);
-  private static HashMap jsqMap = null;
+//  private static Logger OUT = Logger.getLogger(Statics.class);
+//  private static HashMap jsqMap = null;
 
   public static final String getJavaSqlType(int sqlTypeNum) {
-	  JavaSqlType jdbcType = JavaSqlTypes.getJavaSqlType(sqlTypeNum);
+	  JavaSqlType<?> jdbcType = JavaSqlTypes.getJavaSqlType(sqlTypeNum);
 	  return jdbcType.getJavaSqlTypeName();
   }
   
+  /**
+   * @deprecated - this is just bad.  If you're using a StringBuffer in the first place,
+   * append the value instead of the marker.
+   */
+  @Deprecated
   public static StringBuffer replaceMarker(StringBuffer source, String marker, String replace){
       int attrOffset = 0;
       int fromIndex = 0;
@@ -80,6 +82,5 @@ public class Statics  {
       //OUT.debug("ending string <"+source.toString()+">");
 
       return source;
-
   }
 }

@@ -20,8 +20,6 @@
  */
 package org.synchronoss.utils.cpo;
 
-import org.apache.log4j.Logger;
-
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
@@ -46,7 +44,7 @@ public class CpoQueryPanel extends JPanel {
     private TableCellEditor editor;
     private JComboBox jIOTypeBox;
 
-    private Logger OUT = Logger.getLogger(this.getClass());
+//    private Logger OUT = Logger.getLogger(this.getClass());
 
     public CpoQueryPanel(CpoQueryNode queryNode) {
         this.queryNode = queryNode;
@@ -213,10 +211,10 @@ public class CpoQueryPanel extends JPanel {
     }
 
     private void insertSQLparams() {
-        Enumeration queryEnum = queryNode.children();
+        Enumeration<CpoQueryParameterNode> queryEnum = queryNode.children();
         StringBuffer sbParams = new StringBuffer();
         while (queryEnum.hasMoreElements()) {
-            CpoQueryParameterNode node = (CpoQueryParameterNode)queryEnum.nextElement();
+            CpoQueryParameterNode node = queryEnum.nextElement();
             sbParams.append(node.getCpoAttributeMapBean().getColumnName());
             sbParams.append(",");
         }
@@ -241,10 +239,8 @@ public class CpoQueryPanel extends JPanel {
             HashMap<String, CpoAttributeMapNode> hash = new HashMap<String, CpoAttributeMapNode>();
             CpoClassNode classNode = (CpoClassNode)queryNode.getParent().getParent().getParent();
             if (classNode != null) {
-                List attributeList = queryNode.getProxy().getAttributeMap(classNode);
-                Iterator iterator = attributeList.iterator();
-                while (iterator.hasNext()) {
-                    CpoAttributeMapNode att = (CpoAttributeMapNode)iterator.next();
+                List<CpoAttributeMapNode> attributeList = queryNode.getProxy().getAttributeMap(classNode);
+                for (CpoAttributeMapNode att : attributeList) {
                     String colName = att.getColumnName();
                     if (colName != null)
                         hash.put(colName, att);

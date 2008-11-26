@@ -33,7 +33,7 @@ public class MainFrame extends JFrame {
   private JMenuItem menuFileClassPath = new JMenuItem();
   private JMenuItem menuFileExit = new JMenuItem();
   private JMenuItem menuFileNewJdbc = new JMenuItem();
-  private JMenuItem menuFileNewWL = new JMenuItem();
+//  private JMenuItem menuFileNewWL = new JMenuItem();
   private JMenuItem menuFileEditCon = new JMenuItem();
   private JMenuItem menuFileUnloadLoader = new JMenuItem();
   private JMenu menuFile = new JMenu();

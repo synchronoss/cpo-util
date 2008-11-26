@@ -19,16 +19,11 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import javax.swing.JPanel;
-import java.awt.GridBagLayout;
-import javax.swing.JComboBox;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.util.Properties;
-import java.util.Enumeration;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+
+import javax.swing.*;
 
 public class CpoEditConnPanel extends JPanel  {
     /** Version Id for this class. */
@@ -67,6 +62,8 @@ public class CpoEditConnPanel extends JPanel  {
     this.add(jButDelete, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
     populateCombo();
   }
+  
+  @SuppressWarnings("unchecked")
   private void populateCombo() {
     this.jComConn.removeAllItems();
     Enumeration propsEnum = props.keys();

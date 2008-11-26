@@ -57,6 +57,7 @@ public class TableMap extends AbstractTableModel
         return model.getValueAt(aRow, aColumn); 
     }
         
+    @Override
     public void setValueAt(Object aValue, int aRow, int aColumn) {
         model.setValueAt(aValue, aRow, aColumn); 
     }
@@ -69,14 +70,17 @@ public class TableMap extends AbstractTableModel
         return (model == null) ? 0 : model.getColumnCount(); 
     }
         
+    @Override
     public String getColumnName(int aColumn) {
         return model.getColumnName(aColumn); 
     }
 
-    public Class getColumnClass(int aColumn) {
+    @Override
+    public Class<?> getColumnClass(int aColumn) {
         return model.getColumnClass(aColumn); 
     }
         
+    @Override
     public boolean isCellEditable(int row, int column) { 
          return model.isCellEditable(row, column); 
     }

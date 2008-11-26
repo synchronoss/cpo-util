@@ -29,13 +29,12 @@ import java.util.*;
 public class CpoTesterResultsModel extends AbstractTableModel {
     /** Version Id for this class. */
     private static final long serialVersionUID=1L;
-  private Collection results;
-  private List cpoAttMap; //CpoAttributeMapNode(s)
-  private int columnCount;
+  private Collection<?> results;
+  private List<CpoAttributeMapNode> cpoAttMap; //CpoAttributeMapNode(s)
   private String[] columnNames;
   private Logger OUT = Logger.getLogger(this.getClass());
   
-  public CpoTesterResultsModel(Collection results, CpoClassNode cpoClassNode) throws Exception {
+  public CpoTesterResultsModel(Collection<?> results, CpoClassNode cpoClassNode) throws Exception {
     this.results = results;
     this.cpoAttMap = cpoClassNode.getProxy().getAttributeMap(cpoClassNode);
   }
@@ -45,37 +44,32 @@ public class CpoTesterResultsModel extends AbstractTableModel {
   }
   public int getColumnCount() {
 //    OUT.debug ("Getting column count");
-    if (this.columnCount != 0) return this.columnCount;
-    Iterator iter = cpoAttMap.iterator();
-    while (iter.hasNext()) {
-      iter.next();
-      this.columnCount++;
-    }
-    return this.columnCount;
+    if (cpoAttMap == null)
+      return 0;
+    
+    return cpoAttMap.size();
   }
 
+  @Override
   public String getColumnName(int columnIndex) {
 //    OUT.debug ("Getting column name: "+columnIndex);
     if (this.columnNames != null) return this.columnNames[columnIndex];
     this.columnNames = new String[getColumnCount()];
     int columnCounter = 0;
-    Iterator iter = cpoAttMap.iterator();
-    while (iter.hasNext()) {
-      CpoAttributeMapNode camn = (CpoAttributeMapNode)iter.next();
+    for (CpoAttributeMapNode camn : cpoAttMap) {
       columnNames[columnCounter] = camn.getAttribute();
       columnCounter++;
     }
     return this.columnNames[columnIndex];
   }
 
-  public Class getColumnClass(int columnIndex) {
+  @Override
+  public Class<?> getColumnClass(int columnIndex) {
 //    OUT.debug ("Getting return type for column: "+columnIndex);
     String columnName = getColumnName(columnIndex);
     String methodName = "get"+columnName.substring(0,1).toUpperCase()+columnName.substring(1);
 //    OUT.debug("getting return type for method: "+methodName);
-    Iterator iter = results.iterator();
-    if (iter.hasNext()) {
-      Object obj = iter.next();
+    for (Object obj : results) {
       Method[] methods = obj.getClass().getMethods();
       for (int i = 0 ; i < methods.length ; i++) {
         if (methods[i].getName().equals(methodName) && methods[i].getParameterTypes().length == 0) {
@@ -92,6 +86,7 @@ public class CpoTesterResultsModel extends AbstractTableModel {
     return String.class;
   }
 
+  @Override
   public boolean isCellEditable(int rowIndex, int columnIndex) {
     return false;
   }
@@ -103,9 +98,7 @@ public class CpoTesterResultsModel extends AbstractTableModel {
     String methodName = "get"+columnName.substring(0,1).toUpperCase()+columnName.substring(1);
 //    OUT.debug("getting return type for method: "+methodName);
     Object rowObj = null;
-    Iterator iter = results.iterator();
-    while (iter.hasNext()) {
-      Object obj = iter.next();
+    for (Object obj : results) {
       if (row == rowIndex) {
         rowObj = obj;
         Method[] methods = obj.getClass().getMethods();
@@ -113,7 +106,7 @@ public class CpoTesterResultsModel extends AbstractTableModel {
           if (methods[i].getName().equals(methodName) && methods[i].getParameterTypes().length == 0) {
             try {
 //              OUT.debug(methods[i].invoke(obj,null));
-              return methods[i].invoke(obj,null);
+              return methods[i].invoke(obj, (Object)null);
             } catch (Exception e) {
               e.printStackTrace();
               return e.getMessage();
@@ -126,6 +119,7 @@ public class CpoTesterResultsModel extends AbstractTableModel {
     OUT.debug("Did not find column/row you are looking for - trying to return toString!");
     return rowObj==null?"":rowObj.toString();
   }
+  @Override
   public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
   }
 }

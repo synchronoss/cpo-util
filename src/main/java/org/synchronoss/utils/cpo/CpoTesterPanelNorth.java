@@ -95,11 +95,10 @@ public class CpoTesterPanelNorth extends JPanel  {
           try {
             CpoServerNode cpoServerNode = (CpoServerNode)cqgn.getParent().getParent().getParent();
             OUT.debug("about to get classes for: "+cpoServerNode);
-            List alClasses = cqgn.getProxy().getClasses(cpoServerNode);
+            List<CpoClassNode> alClasses = cqgn.getProxy().getClasses(cpoServerNode);
             jComClassOut.removeAllItems();
-            Iterator itClasses =  alClasses.iterator();
-            while (itClasses.hasNext()) {
-              jComClassOut.addItem(itClasses.next());
+            for (CpoClassNode ccn : alClasses) {
+              jComClassOut.addItem(ccn);
             }
             jComClassOut.setSelectedItem(cqgn.getParent().getParent());
           } catch (Exception ex) {
@@ -113,11 +112,11 @@ public class CpoTesterPanelNorth extends JPanel  {
         setTableCellSize();
       }
     });
-    Enumeration enumClassChildren = this.cpoClassNode.children();
+    Enumeration<AbstractCpoNode> enumClassChildren = this.cpoClassNode.children();
     while (enumClassChildren.hasMoreElements()) {
-      AbstractCpoNode node = (AbstractCpoNode)enumClassChildren.nextElement();
+      AbstractCpoNode node = enumClassChildren.nextElement();
       if (node instanceof CpoQueryGroupLabelNode) {
-        Enumeration enumQG = node.children();
+        Enumeration<? extends AbstractCpoNode> enumQG = node.children();
         while (enumQG.hasMoreElements()) {
           this.jComQueryGroup.addItem(enumQG.nextElement());
         }

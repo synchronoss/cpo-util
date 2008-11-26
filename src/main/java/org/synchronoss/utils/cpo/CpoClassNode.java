@@ -68,6 +68,7 @@ public class CpoClassNode extends AbstractCpoNode {
     return false;
   }
 
+  @Override
   public Enumeration<AbstractCpoNode> children() {
     if (queryGroupLabel == null || attributeLabel == null)
       refreshChildren();

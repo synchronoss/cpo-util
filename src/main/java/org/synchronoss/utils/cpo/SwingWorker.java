@@ -38,7 +38,7 @@ public abstract class SwingWorker {
 
     private Object value;  // see getValue(), setValue()
     private String localName = "SwingWorker";
-    private Thread thread;
+    //private Thread thread;
     private ThreadVar threadVar;
 
     /**

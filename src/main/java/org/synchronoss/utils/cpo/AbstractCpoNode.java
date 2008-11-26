@@ -237,4 +237,6 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
   public boolean isLabel() {
     return this.getClass().getName().toLowerCase().indexOf("label") != -1;
   }
+  
+  public abstract Enumeration<? extends AbstractCpoNode> children();
 }

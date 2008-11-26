@@ -55,6 +55,7 @@ public class CpoUtil {
     frame.setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
     frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     frame.addWindowListener(new WindowAdapter() {
+      @Override
       public void windowClosing(WindowEvent e) {
         if (CpoUtil.checkUnsavedData("You have unsaved data, are you sure you wish to exit??"))
           return;
@@ -72,11 +73,13 @@ public class CpoUtil {
       e.printStackTrace();
     }
     Policy.setPolicy(new Policy() {
+      @Override
       public PermissionCollection getPermissions(CodeSource codesource) {
         Permissions perms = new Permissions();
         perms.add(new AllPermission());
         return(perms);
       }
+      @Override
       public void refresh() {}
     });
     String propsLocation = null;
@@ -127,7 +130,7 @@ public class CpoUtil {
   public static String getServerFromUser() {
     Vector<String> vec = new Vector<String>();
     // get default provided properties
-    Enumeration propsEnum = CpoUtil.props.propertyNames();
+    Enumeration<?> propsEnum = CpoUtil.props.propertyNames();
     while (propsEnum.hasMoreElements()) {
       String name = (String)propsEnum.nextElement();
       if (name.startsWith(Statics.PROP_WLSURL)) {

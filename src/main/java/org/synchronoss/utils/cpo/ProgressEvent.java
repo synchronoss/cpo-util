@@ -36,6 +36,7 @@ public class ProgressEvent extends EventObject {
         this.value = value;
     }
 
+    @Override
     public String toString() {
         return "max=" + max + "; value=" + value;
     }

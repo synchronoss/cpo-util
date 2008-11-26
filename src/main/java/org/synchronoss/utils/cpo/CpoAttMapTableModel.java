@@ -51,8 +51,8 @@ public class CpoAttMapTableModel extends AbstractTableModel  {
   }
 
   @Override
-  public Class getColumnClass(int columnIndex) {
-    return (Class)columnClasses[columnIndex];
+  public Class<?> getColumnClass(int columnIndex) {
+    return (Class<?>)columnClasses[columnIndex];
   }
 
   @Override

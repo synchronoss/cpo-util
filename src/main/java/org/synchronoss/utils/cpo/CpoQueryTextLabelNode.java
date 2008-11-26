@@ -60,6 +60,7 @@ public class CpoQueryTextLabelNode extends AbstractCpoNode  {
     return true;
   }
 
+  @Override
   public Enumeration<AbstractCpoNode> children() {
     return null;
   }

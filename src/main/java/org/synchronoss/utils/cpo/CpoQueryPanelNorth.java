@@ -20,7 +20,7 @@
  */
 package org.synchronoss.utils.cpo;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -46,7 +46,7 @@ public class CpoQueryPanelNorth extends JPanel  {
   JComboBox jComQueryText = new JComboBox();
   JComboBox jComQueryObject;
   private JLabel jLabListQ = new JLabel();
-  private Category OUT = Category.getInstance(this.getClass());
+  private Logger OUT = Logger.getLogger(this.getClass());
 
   public CpoQueryPanelNorth(CpoQueryNode cpoQueryNode) {
     this.cpoQueryNode = cpoQueryNode;
@@ -59,7 +59,7 @@ public class CpoQueryPanelNorth extends JPanel  {
 
   private void jbInit() throws Exception {
 //    this.setSize(new Dimension(175, 300));
-    List queryText;
+    List<CpoQueryTextNode> queryText;
     try {
       queryText = cpoQueryNode.getProxy().getQueryText((CpoServerNode)cpoQueryNode.getParent().getParent().getParent().getParent());
       if (cpoQueryNode.getParent() instanceof CpoQueryGroupNode) {
@@ -67,8 +67,8 @@ public class CpoQueryPanelNorth extends JPanel  {
         CpoQueryGroupNode cgNode = (CpoQueryGroupNode)cpoQueryNode.getParent();
         if (cgNode.getType().equals("LIST")) {
           OUT.debug("LIST server: "+cgNode.getParent().getParent().getParent());
-          List al = cgNode.getProxy().getClasses((AbstractCpoNode)cgNode.getParent().getParent().getParent());
-          jComQueryObject = new JComboBox(new Vector(al));
+          List<CpoClassNode> al = cgNode.getProxy().getClasses((AbstractCpoNode)cgNode.getParent().getParent().getParent());
+          jComQueryObject = new JComboBox(new Vector<CpoClassNode>(al));
           //populate jComQueryObject
         }
       }
@@ -76,10 +76,11 @@ public class CpoQueryPanelNorth extends JPanel  {
       CpoUtil.showException(pe);
       return;
     }
-    Iterator iter = queryText.iterator();
-    while (iter.hasNext()) {
-      this.jComQueryText.addItem(iter.next());
+    
+    for (CpoQueryTextNode qt : queryText) {
+      this.jComQueryText.addItem(qt);
     }
+    
     this.jTextQuerySeach.addKeyListener(new KeyListener() {
       public void keyTyped(KeyEvent ke) {
       }
@@ -88,11 +89,11 @@ public class CpoQueryPanelNorth extends JPanel  {
       public void keyReleased(KeyEvent ke) {
         try {
           jComQueryText.removeAllItems();
-          Iterator iter = cpoQueryNode.getProxy().getQueryTextMatches(
-              (CpoServerNode)cpoQueryNode.getParent().getParent().getParent().getParent(),
-              jTextQuerySeach.getText()).iterator();
-          while (iter.hasNext()) {
-            jComQueryText.addItem(iter.next());
+          List<CpoQueryTextNode> qts = cpoQueryNode.getProxy().getQueryTextMatches(
+              (CpoServerNode)cpoQueryNode.getParent().getParent().getParent().getParent(), jTextQuerySeach.getText());
+          
+          for (CpoQueryTextNode qt : qts) {
+            jComQueryText.addItem(qt);
           }
         } catch (Exception pe) {
           CpoUtil.showException(pe);

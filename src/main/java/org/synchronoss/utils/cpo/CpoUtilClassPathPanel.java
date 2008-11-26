@@ -20,11 +20,13 @@
  */
 package org.synchronoss.utils.cpo;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.util.*;
 import java.util.List;
+
+import javax.swing.*;
 
 public class CpoUtilClassPathPanel extends JPanel  {
     /** Version Id for this class. */
@@ -35,9 +37,9 @@ public class CpoUtilClassPathPanel extends JPanel  {
   private JButton jButAddClassPath = new JButton();
   private JButton jButRemove = new JButton();
   private JScrollPane jScroll = new JScrollPane();
-  private List files;
+  private List<File> files;
   
-  public CpoUtilClassPathPanel(List files) {
+  public CpoUtilClassPathPanel(List<File> files) {
     this.files = files;
     try {
       jbInit();
@@ -50,7 +52,7 @@ public class CpoUtilClassPathPanel extends JPanel  {
     this.setSize(new Dimension(515, 387));
     this.setLayout(gridBagLayout1);
     jLabClasspath.setText("Currently in Classpath");
-    jListClasspath.setListData(new Vector(files));
+    jListClasspath.setListData(new Vector<File>(files));
     jButAddClassPath.setText("Add");
     jButAddClassPath.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
@@ -76,13 +78,13 @@ public class CpoUtilClassPathPanel extends JPanel  {
     int result = jFile.showOpenDialog(this);
     if (result == 1) return;
     files.addAll(Arrays.asList(jFile.getSelectedFiles()));
-    this.jListClasspath.setListData(new Vector(files));
+    this.jListClasspath.setListData(new Vector<File>(files));
   }
   private void removeFile() {
     Object[] selectedFiles = this.jListClasspath.getSelectedValues();
     for (int i = 0 ; i < selectedFiles.length ; i++) {
       files.remove(selectedFiles[i]);
     }
-    this.jListClasspath.setListData(new Vector(files));
+    this.jListClasspath.setListData(new Vector<File>(files));
   }
 }

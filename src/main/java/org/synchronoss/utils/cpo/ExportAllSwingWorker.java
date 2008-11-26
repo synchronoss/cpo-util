@@ -76,9 +76,9 @@ public class ExportAllSwingWorker extends SwingWorker {
             SQLExporter sqlEx = new SQLExporter(menuNode.getProxy().getTablePrefix(), menuNode.getProxy().getSqlDelimiter());
 
             // make the class files
-            Enumeration menuEnum = menuNode.children();
+            Enumeration<? extends AbstractCpoNode> menuEnum = menuNode.children();
             while (menuEnum.hasMoreElements()) {
-                AbstractCpoNode child = (AbstractCpoNode)menuEnum.nextElement();
+                AbstractCpoNode child = menuEnum.nextElement();
                 if (child instanceof CpoClassNode) {
                     CpoClassNode classNode = (CpoClassNode)child;
                     String fileName = classNode.getClassName() + ".sql";

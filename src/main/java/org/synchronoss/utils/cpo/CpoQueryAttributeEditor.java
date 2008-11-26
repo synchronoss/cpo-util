@@ -42,8 +42,8 @@ public class CpoQueryAttributeEditor implements TableCellEditor {
       try {
         //CpoAttributeMapNode(s)
 //        List cpoAttMap = currentCpoAttMap.getProxy().getAttributeMap((CpoAttributeLabelNode)currentCpoAttMap.getParent());
-        List cpoAttMap = currentCpoAttMap.getProxy().getAttributeMap(cpoQTM.attributeCpoClassNode);
-        attEdBox = new JComboBox(new Vector(cpoAttMap));
+        List<CpoAttributeMapNode> cpoAttMap = currentCpoAttMap.getProxy().getAttributeMap(cpoQTM.attributeCpoClassNode);
+        attEdBox = new JComboBox(new Vector<CpoAttributeMapNode>(cpoAttMap));
         attEdBox.setSelectedItem(currentCpoAttMap);
       } catch (Exception pe) {
         CpoUtil.showException(pe);

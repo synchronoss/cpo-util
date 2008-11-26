@@ -75,6 +75,7 @@ public class CpoAttributeLabelNode extends AbstractCpoNode  {
     return true;
   }
 
+  @Override
   public Enumeration<CpoAttributeMapNode> children() {
     if (cpoAttMap == null) // due to panel not being removed from center pane ... this should be fixed
       refreshChildren();

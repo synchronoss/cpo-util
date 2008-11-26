@@ -75,6 +75,7 @@ public class CpoServerNode extends AbstractCpoNode {
     return false;
   }
 
+  @Override
   public Enumeration<AbstractCpoNode> children() {
     if (this.classes == null || this.cpoQTLN == null) refreshChildren();
     return new Enumeration<AbstractCpoNode>() {

@@ -69,6 +69,7 @@ public class CpoQueryNode extends AbstractCpoNode {
     return true;
   }
 
+  @Override
   public Enumeration<CpoQueryParameterNode> children() {
     if (cpoQueryParam == null) // due to panel not being removed from center pane ... this should be fixed
       refreshChildren();

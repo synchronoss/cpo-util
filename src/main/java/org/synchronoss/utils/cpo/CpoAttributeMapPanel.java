@@ -41,7 +41,7 @@ public class CpoAttributeMapPanel extends JPanel  {
   TableSorter ts;
   private JPopupMenu menu = new JPopupMenu();
   private int menuRow;
-  private Category OUT = Category.getInstance(this.getClass());
+  private Logger OUT = Logger.getLogger(this.getClass());
   
   public CpoAttributeMapPanel(CpoAttributeLabelNode cpoAttLabelNode) {
 //    this.cpoClassNode = cpoClassNode;
@@ -58,7 +58,8 @@ public class CpoAttributeMapPanel extends JPanel  {
     ts = new TableSorter(model);
     jTableAttMap = new JTable(ts);
     ts.addMouseListenerToHeaderInTable(jTableAttMap);
-        jTableAttMap.addMouseListener(new MouseAdapter() {
+    jTableAttMap.addMouseListener(new MouseAdapter() {
+      @Override
       public void mouseReleased(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
           showMenu(e.getPoint());

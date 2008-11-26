@@ -62,4 +62,8 @@ public class QueryGroupPanel extends JPanel  {
   public String getGroupType() {
     return (String)this.jComType.getSelectedItem();
   }
+  
+  public AbstractCpoNode getCpoNode() {
+    return cpoNode;
+  }
 }

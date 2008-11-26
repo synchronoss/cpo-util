@@ -35,6 +35,10 @@ public class CpoSaveNodesTableModel extends AbstractTableModel  {
     this.serverNode = serverNode;
     this.changedObjects = serverNode.getProxy().getAllChangedObjects();
   }
+  public CpoServerNode getServerNode() {
+    return serverNode;
+  }
+  
   public int getRowCount() {
     return this.changedObjects.size();
   }
@@ -49,8 +53,8 @@ public class CpoSaveNodesTableModel extends AbstractTableModel  {
   }
 
   @Override
-  public Class getColumnClass(int columnIndex) {
-    return (Class)columnClasses[columnIndex];
+  public Class<?> getColumnClass(int columnIndex) {
+    return (Class<?>)columnClasses[columnIndex];
   }
 
   @Override

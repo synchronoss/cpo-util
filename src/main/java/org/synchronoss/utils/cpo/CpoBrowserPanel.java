@@ -31,7 +31,7 @@ public class CpoBrowserPanel extends JPanel  {
     private static final long serialVersionUID=1L;
   private Proxy prox;
   private BorderLayout borderLayout = new BorderLayout();
-  private JPanel jPanelCenter = new JPanel();
+  //private JPanel jPanelCenter = new JPanel();
   private JScrollPane jScrollWest = new JScrollPane();
   private CpoBrowserTree jTreeBrowser = new CpoBrowserTree();
   private JScrollPane jScrollCenter = new JScrollPane();

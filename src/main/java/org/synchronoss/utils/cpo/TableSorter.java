@@ -56,7 +56,7 @@ public class TableSorter extends TableMap {
     /** Version Id for this class. */
     private static final long serialVersionUID=1L;
     int             indexes[];
-    Vector          sortingColumns = new Vector();
+    Vector<Integer> sortingColumns = new Vector<Integer>();
     boolean         ascending = true;
     int compares;
 
@@ -68,13 +68,14 @@ public class TableSorter extends TableMap {
         setModel(model);
     }
 
+    @Override
     public void setModel(TableModel model) {
         super.setModel(model); 
         reallocateIndexes(); 
     }
 
     public int compareRowsByColumn(int row1, int row2, int column) {
-        Class type = model.getColumnClass(column);
+        Class<?> type = model.getColumnClass(column);
         TableModel data = model;
 
         // Check for nulls.
@@ -171,7 +172,7 @@ public class TableSorter extends TableMap {
     public int compare(int row1, int row2) {
         compares++;
         for (int level = 0; level < sortingColumns.size(); level++) {
-            Integer column = (Integer)sortingColumns.elementAt(level);
+            Integer column = sortingColumns.elementAt(level);
             int result = compareRowsByColumn(row1, row2, column.intValue());
             if (result != 0) {
                 return ascending ? result : -result;
@@ -193,6 +194,7 @@ public class TableSorter extends TableMap {
         }
     }
 
+    @Override
     public void tableChanged(TableModelEvent e) {
         //OUT.debug("Sorter: tableChanged"); 
         reallocateIndexes();
@@ -213,7 +215,7 @@ public class TableSorter extends TableMap {
         compares = 0;
         // n2sort();
         // qsort(0, indexes.length-1);
-        shuttlesort((int[])indexes.clone(), indexes, 0, indexes.length);
+        shuttlesort(indexes.clone(), indexes, 0, indexes.length);
         //OUT.debug("Compares: "+compares);
     }
 
@@ -288,6 +290,7 @@ public class TableSorter extends TableMap {
     // The mapping only affects the contents of the data rows.
     // Pass all requests to these rows through the mapping array: "indexes".
 
+    @Override
     public Object getValueAt(int aRow, int aColumn) {
         checkModel();
         return model.getValueAt(indexes[aRow], aColumn);
@@ -305,6 +308,7 @@ public class TableSorter extends TableMap {
       return returnRows;
     }
 
+    @Override
     public void setValueAt(Object aValue, int aRow, int aColumn) {
         checkModel();
         model.setValueAt(aValue, indexes[aRow], aColumn);
@@ -330,6 +334,7 @@ public class TableSorter extends TableMap {
         final JTable tableView = table; 
 //        tableView.setColumnSelectionAllowed(false); 
         MouseAdapter listMouseListener = new MouseAdapter() {
+            @Override
             public void mouseClicked(MouseEvent e) {
               if (SwingUtilities.isLeftMouseButton(e)) {
                 try {

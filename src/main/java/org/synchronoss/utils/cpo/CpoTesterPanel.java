@@ -122,14 +122,14 @@ public class CpoTesterPanel extends JPanel implements ClipboardOwner  {
     }
     OUT.debug ("Class name tester will use: "+cpoClassName+" and "+cpoClassNameReturnType+" as the return type class");
     try  {
-      Class cpoClass = CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass(cpoClassName);
+      Class<?> cpoClass = CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass(cpoClassName);
 //      Class cpoClass = Class.forName(cpoClassName);
       Object cpoObject = cpoClass.newInstance();
       Object cpoObjectReturnType = CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass(cpoClassNameReturnType).newInstance();
       Method[] methods = cpoClass.getMethods();
 //      Method[] methods = cpoClass.getDeclaredMethods();
       CpoTesterParamModel ctpm = (CpoTesterParamModel)cpoTPnorth.jTableParam.getModel();
-      Enumeration enumParams = ctpm.parameter.keys();
+      Enumeration<Object> enumParams = ctpm.parameter.keys();
       while (enumParams.hasMoreElements()) {
         String key = (String)enumParams.nextElement();
         String methodName = "set"+key.substring(0,1).toUpperCase()+key.substring(1);
@@ -137,7 +137,7 @@ public class CpoTesterPanel extends JPanel implements ClipboardOwner  {
         boolean found = false;
         for (int i = 0 ; i < methods.length ; i++) {
           if (methods[i].getName().equals(methodName)) {
-            Class[] paramTypes = methods[i].getParameterTypes();
+            Class<?>[] paramTypes = methods[i].getParameterTypes();
             if (paramTypes.length != 1)//throw new Exception("Param types count is not equal to 1");
               continue;
             methods[i].invoke(cpoObject,new Object[]{getMethObjFrStr(paramTypes[0],(String)ctpm.parameter.get(key))});
@@ -146,7 +146,7 @@ public class CpoTesterPanel extends JPanel implements ClipboardOwner  {
         }
         if (!found) throw new Exception("Could not find method: "+methodName);
       }
-      Collection result = cpoClassNode.getProxy().executeQueryGroup(cpoObject,cpoObjectReturnType,(CpoQueryGroupNode)cpoTPnorth.jComQueryGroup.getSelectedItem(),cpoTPnorth.jCheckPersist.isSelected());
+      Collection<?> result = cpoClassNode.getProxy().executeQueryGroup(cpoObject,cpoObjectReturnType,(CpoQueryGroupNode)cpoTPnorth.jComQueryGroup.getSelectedItem(),cpoTPnorth.jCheckPersist.isSelected());
       TableSorter ts = new TableSorter(new CpoTesterResultsModel(result,returnClassNode));
       this.jTableResults.setModel(ts);
       ts.addMouseListenerToHeaderInTable(this.jTableResults);
@@ -166,7 +166,7 @@ public class CpoTesterPanel extends JPanel implements ClipboardOwner  {
       this.jTableResults.getColumnModel().getColumn(i).setPreferredWidth(columnSize);
     }
   }
-  private Object getMethObjFrStr(Class cls, String param) throws Exception {
+  private Object getMethObjFrStr(Class<?> cls, String param) throws Exception {
     if (param.equalsIgnoreCase("null") || param.equals(""))
       return null;
     else if (param.equalsIgnoreCase("guid"))
@@ -194,9 +194,8 @@ public class CpoTesterPanel extends JPanel implements ClipboardOwner  {
         }
         if (param.length() == 10) {
            return sdfDateOnly.parse(param);
-        } else {
-          return sdf.parse(param);
         }
+        return sdf.parse(param);
 //        return new SimpleDateFormat("MM/dd/yyyy").parse(param);
       }
       else if (cls == java.sql.Date.class) {
@@ -206,9 +205,8 @@ public class CpoTesterPanel extends JPanel implements ClipboardOwner  {
         }
         if (param.length() == 10) {
            return new java.sql.Date(sdfDateOnly.parse(param).getTime());
-        } else {
-          return new java.sql.Date(sdf.parse(param).getTime());
-        }
+        } 
+        return new java.sql.Date(sdf.parse(param).getTime());
 //        return new SimpleDateFormat("MM/dd/yyyy").parse(param);
       }
       else if (cls == Timestamp.class) {
@@ -218,11 +216,8 @@ public class CpoTesterPanel extends JPanel implements ClipboardOwner  {
         }
         if (param.length() == 10) {
            return new Timestamp(sdfDateOnly.parse(param).getTime());
-        } else {
-          return new Timestamp(sdf.parse(param).getTime());
         }
-        
-        
+        return new Timestamp(sdf.parse(param).getTime());
 //        return new Timestamp(new SimpleDateFormat("MM/dd/yyyy").parse(param).getTime());
       }
       else if (cls == byte[].class) {
@@ -246,7 +241,7 @@ public class CpoTesterPanel extends JPanel implements ClipboardOwner  {
     if ((e.getKeyCode() == KeyEvent.VK_COPY) ||
         ((e.getKeyCode() == KeyEvent.VK_C) && e.isControlDown()) ||
         ((e.getKeyCode() == KeyEvent.VK_C) && e.isMetaDown())||
-        (int)e.getKeyChar() == 3) {
+        e.getKeyChar() == 3) {
       Clipboard clipboard=Toolkit.getDefaultToolkit().getSystemClipboard();
       clipboard.setContents(new StringSelection(value),this);
     }

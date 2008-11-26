@@ -140,7 +140,6 @@ public class QueryParser {
 
         // at this point, the colList will only have columns that correspond to a ?
         if (OUT.isDebugEnabled()) {
-            StringBuilder buf = new StringBuilder();
             for (String s : colList) {
                 OUT.debug("Column [" + s + "]");
             }
