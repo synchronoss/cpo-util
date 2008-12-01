@@ -966,7 +966,7 @@ public class Proxy implements Observer {
               sql.append("update ");
               sql.append(tablePrefix);
               sql.append("cpo_attribute_map set ");
-              sql.append("column_nasql.append(me = ?, attribute = ?, column_type = ?, db_table = ?, ");
+              sql.append("column_name = ?, attribute = ?, column_type = ?, db_table = ?, ");
               sql.append("db_column = ?, userid = '");
               sql.append(CpoUtil.username);
               sql.append("', transform_class=? where attribute_id = ?");
