@@ -74,6 +74,9 @@ public class ExportAllSwingWorker extends SwingWorker {
             }
 
             SQLExporter sqlEx = new SQLExporter(menuNode.getProxy().getTablePrefix(), menuNode.getProxy().getSqlDelimiter());
+            
+            StringBuffer createAllBuf = new StringBuffer();
+            createAllBuf.append(sqlEx.exportDeleteAll());
 
             // make the class files
             Enumeration<? extends AbstractCpoNode> menuEnum = menuNode.children();
@@ -88,6 +91,10 @@ public class ExportAllSwingWorker extends SwingWorker {
                     sql.append(classExport.getDeleteSql());
                     sql.append(classExport.getInsertQueryTextSql());
                     sql.append(classExport.getInsertSql());
+                    
+                    // append this for the create all script
+                    createAllBuf.append(classExport.getInsertQueryTextSql());
+                    createAllBuf.append(classExport.getInsertSql());
 
                     // write the file
                     file = new File(dir, fileName);
@@ -101,12 +108,9 @@ public class ExportAllSwingWorker extends SwingWorker {
             }
 
             // write out the create all file
-            pf.progressMade(new ProgressMaxEvent(this, (menuNode.getChildCount() - 1)));
-            pf.setLabel("Generating create all sql...");
-            String createSql = sqlEx.exportCreateAll((CpoServerNode)menuNode, pf);
             file = new File(dir, Statics.CREATE_ALL_FILE_NAME);
             fw = new FileWriter(file);
-            fw.write(createSql);
+            fw.write(createAllBuf.toString());
             fw.flush();
             fw.close();
         } catch (Exception ex) {
