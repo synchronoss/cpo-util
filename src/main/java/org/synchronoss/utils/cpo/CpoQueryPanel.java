@@ -81,6 +81,7 @@ public class CpoQueryPanel extends JPanel {
             }
 
             public void keyReleased(KeyEvent ke) {
+                int oldSeqNo = queryNode.getSeqNo();
                 int newSeqNo = queryNode.getSeqNo();
                 try {
                     newSeqNo = Integer.parseInt(cpoQPnorth.jTextSeq.getText());
@@ -89,6 +90,10 @@ public class CpoQueryPanel extends JPanel {
                     return;
                 }
                 queryNode.setSeqNo(newSeqNo);
+                
+                // if the seq changed, dirty the node
+                if (oldSeqNo != newSeqNo)
+                    queryNode.setDirty(true);
             }
         });
         cpoQPnorth.jTextAdesc.addKeyListener(new KeyListener() {
@@ -99,7 +104,13 @@ public class CpoQueryPanel extends JPanel {
             }
 
             public void keyReleased(KeyEvent ke) {
-                queryNode.getQueryText().setDesc(cpoQPnorth.jTextAdesc.getText());
+                String desc = queryNode.getQueryText().getDesc();
+                String newDesc = cpoQPnorth.jTextAdesc.getText();
+                queryNode.getQueryText().setDesc(newDesc);
+                
+                // if the desc changed, dirty the node
+                if (!newDesc.equals(desc))
+                  queryNode.setDirty(true);
             }
         });
         cpoQPnorth.jTextASQL.addKeyListener(new KeyListener() {
@@ -186,7 +197,13 @@ public class CpoQueryPanel extends JPanel {
                 cpoQTM.removeNewRow();
             }
         }
-        queryNode.getQueryText().setSQL(cpoQPnorth.jTextASQL.getText());
+        String oldSql = queryNode.getQueryText().getSQL();
+        String newSql = cpoQPnorth.jTextASQL.getText();
+        queryNode.getQueryText().setSQL(newSql);
+        
+        // if the sql changed, mark the node dirty
+        if (!newSql.equals(oldSql))
+            queryNode.setDirty(true);
 //    jTableQueryParam.revalidate();
     }
 
