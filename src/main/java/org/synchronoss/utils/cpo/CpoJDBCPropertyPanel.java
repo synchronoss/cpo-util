@@ -67,7 +67,7 @@ public class CpoJDBCPropertyPanel extends JPanel  {
     jLabJdbcUrl.setText("JDBC URL:");
     jLabJdbcDriver.setText("JDBC Driver:");
     jTextJdbcUrl.setText("jdbc:oracle:thin:[USER]/[PASS]@[HOSTNAME]:1521:[INSTANCE]");
-    jTextJdbcDriver.setText("oracle.jdbc.OracleDriver:");
+    jTextJdbcDriver.setText("oracle.jdbc.OracleDriver");
     jLabCpoUtilName.setText("Cpo Util Name:");
     jTextCpoUtilName.setText("MyNewServer");
     jLabJdbcParams.setText("JDBC Params:");
