@@ -403,7 +403,7 @@ public class Proxy implements Observer {
         sql.append("select group_id, class_id, group_type, name from ");
         sql.append(tablePrefix);
         sql.append("cpo_query_group where group_id in ");
-        sql.append("(select group_id from");
+        sql.append("(select group_id from ");
         sql.append(tablePrefix);
         sql.append("cpo_query where text_id = ?) order by name, group_type, group_id");
       }
