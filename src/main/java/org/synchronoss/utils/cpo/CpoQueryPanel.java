@@ -122,7 +122,7 @@ public class CpoQueryPanel extends JPanel {
 
             public void keyReleased(KeyEvent ke) {
 //        queryNode.getQueryText().setDirty(true);
-                checkSQLAttributes();
+                checkSQL();
 /*        try {
           SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -158,7 +158,7 @@ public class CpoQueryPanel extends JPanel {
                     queryNode.setQueryText((CpoQueryTextNode)cpoQPnorth.jComQueryText.getSelectedItem());
                     cpoQPnorth.jTextAdesc.setText(queryNode.getQueryText().getDesc());
                     cpoQPnorth.jTextASQL.setText(queryNode.getQueryText().getSQL());
-                    checkSQLAttributes();
+                    checkSQL();
                 }
             }
         });
@@ -175,7 +175,7 @@ public class CpoQueryPanel extends JPanel {
         }
     }
 
-    private void checkSQLAttributes() {
+    private void checkSQL() {
         if (cpoQPnorth.jTextASQL.getText().length() < 1)
             return;
         int index = -1, tokenCount = 0;
@@ -199,6 +199,11 @@ public class CpoQueryPanel extends JPanel {
         }
         String oldSql = queryNode.getQueryText().getSQL();
         String newSql = cpoQPnorth.jTextASQL.getText();
+        if (newSql.trim().endsWith(";")) {
+            // if the sql ends with a semicolon, strip it
+            newSql = newSql.substring(0, newSql.lastIndexOf(";"));
+            cpoQPnorth.jTextASQL.setText(newSql);
+        }
         queryNode.getQueryText().setSQL(newSql);
         
         // if the sql changed, mark the node dirty
@@ -236,7 +241,7 @@ public class CpoQueryPanel extends JPanel {
             sbParams.append(",");
         }
         cpoQPnorth.jTextASQL.insert(sbParams.toString().substring(0, sbParams.toString().length() - 1), cpoQPnorth.jTextASQL.getCaretPosition());
-        checkSQLAttributes();
+        checkSQL();
     }
 
     private void guessAttributes() {
