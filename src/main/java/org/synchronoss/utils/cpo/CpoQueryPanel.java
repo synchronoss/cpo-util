@@ -136,6 +136,11 @@ public class CpoQueryPanel extends JPanel {
         cpoQPnorth.jTextASQL.addMouseListener(new MouseListener() {
             public void mouseClicked(MouseEvent e) {
                 if (e.isMetaDown()) {
+                    // This is an ugly hack for a focus issue with JTable.  Selecting the cell at 0, 0
+                    // will cause the table to realize it needs to stop editing the selected cell and
+                    // will cause the cell editor to end removing the combo box
+                    jTableQueryParam.editCellAt(0, 0);
+                    
                     showMenu(e.getPoint());
                 }
             }
