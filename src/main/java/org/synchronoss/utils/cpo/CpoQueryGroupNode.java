@@ -25,9 +25,10 @@ import javax.swing.tree.TreeNode;
 import java.util.*;
 
 public class CpoQueryGroupNode extends AbstractCpoNode {
-  private String groupName,type,class_id,group_id;
-  private List<CpoQueryNode> qNodes; //CpoQueryNode(s)
-  
+
+  private String groupName, type, class_id, group_id;
+  private List<CpoQueryNode> qNodes;
+
   public CpoQueryGroupNode(String groupName, String class_id, String group_id, String type, AbstractCpoNode parent) {
     this.groupName = groupName;
     this.type = type;
@@ -42,7 +43,7 @@ public class CpoQueryGroupNode extends AbstractCpoNode {
   public JPanel getPanelForSelected() {
     return null;
   }
-  
+
   public TreeNode getChildAt(int childIndex) {
     if (childIndex >= qNodes.size())
       return null;
@@ -69,41 +70,50 @@ public class CpoQueryGroupNode extends AbstractCpoNode {
   public Enumeration<CpoQueryNode> children() {
     if (qNodes == null) // due to panel not being removed from center pane ... this should be fixed
       refreshChildren();
+
     return new Enumeration<CpoQueryNode>() {
       Iterator<CpoQueryNode> iter = qNodes.iterator();
+
       public CpoQueryNode nextElement() {
         return iter.next();
       }
+
       public boolean hasMoreElements() {
         return iter.hasNext();
       }
     };
   }
+
   @Override
   public void refreshChildren() {
     try {
       this.qNodes = getProxy().getQueries(this);
     } catch (Exception pe) {
       CpoUtil.showException(pe);
-    }    
+    }
   }
 
   @Override
   public String toString() {
-    return this.groupName+" ("+this.type+")";
+    return this.groupName + " (" + this.type + ")";
   }
+
   public String getClassId() {
     return this.class_id;
   }
+
   public String getGroupId() {
     return this.group_id;
   }
+
   public String getGroupName() {
     return this.groupName;
   }
+
   public String getType() {
     return this.type;
   }
+
   public void addNewQueryNode() {
     if (this.qNodes == null)
       this.refreshChildren();
@@ -116,21 +126,24 @@ public class CpoQueryGroupNode extends AbstractCpoNode {
       CpoUtil.showException(pe);
       return;
     }
-    CpoQueryNode cqn = new CpoQueryNode(queryId, this.getGroupId(), seqNo, null, this);
+    CpoQueryNode cqn = new CpoQueryNode(queryId, this.getGroupId(), seqNo, null, null, this);
     this.qNodes.add(cqn);
     cqn.setNew(true);
   }
+
   private int getNextQuerySeqNo() {
     int nextSeqNo = 0;
-    for (int i = 0 ; i < this.qNodes.size() ; i++) {
-      if (nextSeqNo <= (qNodes.get(i)).getSeqNo()) {
-        nextSeqNo = (qNodes.get(i)).getSeqNo()+1;
+    for (CpoQueryNode cqn : qNodes) {
+      if (nextSeqNo <= cqn.getSeqNo()) {
+        nextSeqNo = cqn.getSeqNo() + 1;
       }
     }
     return nextSeqNo;
   }
+
   public void setGroupName(String groupName) {
-    if ((groupName == null && this.groupName == null) || (this.groupName != null && this.groupName.equals(groupName))) return;
+    if ((groupName == null && this.groupName == null) || (this.groupName != null && this.groupName.equals(groupName)))
+      return;
     this.groupName = groupName;
     this.setDirty(true);
   }

@@ -71,10 +71,7 @@ public class CpoQueryTableModel extends AbstractTableModel {
 
   @Override
   public boolean isCellEditable(int rowIndex, int columnIndex) {
-    if (columnIndex == 1||columnIndex==4)
-      return true;
-    
-    return false;
+    return (columnIndex == 1 || columnIndex==4);
   }
 
   public Object getValueAt(int rowIndex, int columnIndex) {

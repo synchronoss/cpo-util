@@ -57,11 +57,9 @@ public class CpoBrowserTree extends JTree  {
             AbstractCpoNode node = (AbstractCpoNode)value;
             if (node.isDirty()||node.isRemove() || node.isNew()) {
               this.setIcon(iconRed);
-            }
-            else if (node.isChildDirty()||node.isChildRemove()||node.isChildNew()) {
+            } else if (node.isChildDirty()||node.isChildRemove()||node.isChildNew()) {
               this.setIcon(iconYellow);
-            }
-            else {
+            } else {
               this.setIcon(iconGreen);
             }
           }
@@ -71,8 +69,7 @@ public class CpoBrowserTree extends JTree  {
 //            this.setOpaque(true);
 //              this.setFont(new Font(this.getFont().getName(),Font.BOLD,this.getFont().getSize()));
           this.setForeground(Color.red);
-        }
-        else {
+        } else {
           this.setForeground(Color.blue);
 //            this.setFont(new Font(this.getFont().getName(),Font.PLAIN,this.getFont().getSize()));
         }
@@ -248,8 +245,7 @@ public class CpoBrowserTree extends JTree  {
       }
       if (!(menuNode instanceof CpoServerNode) 
           && (!(menuNode instanceof CpoAttributeLabelNode))
-          && (!(menuNode instanceof CpoQueryGroupLabelNode))
-          && (!(menuNode instanceof CpoQueryTextLabelNode))) {
+          && (!(menuNode instanceof CpoQueryGroupLabelNode))) {
         JMenuItem jMenuRemove = new JMenuItem("Remove this object!");
         jMenuRemove.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae) {
@@ -310,7 +306,12 @@ public class CpoBrowserTree extends JTree  {
     CpoServerNode csn = new CpoServerNode(menuNode.getProxy(),this);
 //    menuNode.scrubNodes();
 //    ((DefaultTreeModel)this.getModel()).nodeStructureChanged(menuNode);
-    ((DefaultTreeModel)this.getModel()).setRoot(csn);    
+    ((DefaultTreeModel)this.getModel()).setRoot(csn);
+
+    // force a selection on the root node
+    TreePath tp = new TreePath(getModel().getRoot());
+    this.setSelectionPath(tp);
+    
     CpoUtil.updateStatus("Cleared Local Application Cache");
     return true;
   }
@@ -337,8 +338,7 @@ public class CpoBrowserTree extends JTree  {
         } catch (Exception pe) {
           CpoUtil.showException(pe);
         }
-      }
-      else {
+      } else {
         /**
          * user wishes to cancel creation
          */
@@ -385,8 +385,7 @@ public class CpoBrowserTree extends JTree  {
         } catch (Exception pe) {
           CpoUtil.showException(pe);
         }
-      }
-      else {
+      } else {
         /**
          * user wishes to cancel creation
          */

@@ -22,7 +22,7 @@ package org.synchronoss.utils.cpo;
 
 import gnu.regexp.*;
 import org.apache.log4j.Logger;
-import org.synchronoss.cpo.CpoAdapter;
+import org.synchronoss.cpo.*;
 import org.synchronoss.cpo.jdbc.*;
 
 import javax.naming.*;
@@ -33,6 +33,7 @@ import java.sql.*;
 import java.util.*;
 
 public class Proxy implements Observer {
+  
   boolean revsEnabled = false;
   private Context ctx;
   private Properties defProps;
@@ -44,10 +45,7 @@ public class Proxy implements Observer {
   private Hashtable<CpoQueryNode, List<CpoQueryParameterNode>> queryParamCache = new Hashtable<CpoQueryNode, List<CpoQueryParameterNode>>();
   private Hashtable<CpoQueryGroupNode, List<CpoQueryNode>> queryCache = new Hashtable<CpoQueryGroupNode, List<CpoQueryNode>>();
   private Hashtable<CpoQueryGroupLabelNode, List<CpoQueryGroupNode>> queryGroupCache = new Hashtable<CpoQueryGroupLabelNode, List<CpoQueryGroupNode>>();
-  private Hashtable<CpoQueryTextNode, List<CpoQueryGroupNode>> queryGroupByTextCache = new Hashtable<CpoQueryTextNode, List<CpoQueryGroupNode>>();
-  private List<CpoQueryTextNode> queryTextCache = new ArrayList<CpoQueryTextNode>();
   private List<AbstractCpoNode> allChangedObjects = new ArrayList<AbstractCpoNode>();
-//  private Object cpoMan; //CpoManager
   private CpoAdapter cpoMan;
   private String[] sqlTypes;
 //  private Method sqlTypeClassMeth = null;
@@ -325,111 +323,7 @@ public class Proxy implements Observer {
     this.classCache.put(parent,al);
     return al;
   }
-  public CpoQueryTextLabelNode getCpoQueryTextLabelNode(CpoServerNode serverNode) {
-    Enumeration<AbstractCpoNode> serverNodeEnum = serverNode.children();
-    while (serverNodeEnum.hasMoreElements()) {
-      AbstractCpoNode node = serverNodeEnum.nextElement();
-      if (node instanceof CpoQueryTextLabelNode) 
-        return (CpoQueryTextLabelNode)node;
-    }
-    return null;
-  }
   
-  public List<CpoQueryTextNode> getQueryText(CpoServerNode cpoServer) throws Exception {
-    if (this.queryTextCache.size() != 0)
-      return this.queryTextCache;
-    CpoQueryTextLabelNode parent = this.getCpoQueryTextLabelNode(cpoServer);
-    List<CpoQueryTextNode> al = new ArrayList<CpoQueryTextNode>();
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
-    try {
-      StringBuffer sql = new StringBuffer();
-      if (revsEnabled) {
-        sql.append("select text.text_id, text.sql_text, text.description, (select count(*) from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_query where text_id = text.text_id) as usagecount, text.userid, text.createdate from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_query_text text order by text.description");
-      } else {
-        sql.append("select text.text_id, text.sql_text, text.description, count(query.text_id) as usagecount from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_query_text text, ");
-        sql.append(tablePrefix);
-        sql.append("cpo_query query WHERE text.text_id = query.text_id GROUP BY text.text_id, text.sql_text, text.description order by text.description");
-      }
-      pstmt = conn.prepareStatement(sql.toString());
-      rs = pstmt.executeQuery();
-      while (rs.next()) {
-        CpoQueryTextNode cpoQTNode = new CpoQueryTextNode(rs.getString("text_id"),
-            rs.getString("sql_text"),rs.getString("description"),parent);
-        cpoQTNode.setUsageCount(rs.getInt("usagecount"));
-        if (revsEnabled) {
-          cpoQTNode.setUserName(rs.getString("userid"));
-          cpoQTNode.setCreateDate(rs.getTimestamp("createdate"));
-        }
-        al.add(cpoQTNode);
-      }
-//    } catch (SQLException se) {
-//      throw new ProxyException("getQueryText()",se);
-    } finally {
-      try {
-        if (rs != null) rs.close();
-      } catch (Exception e) {}
-      try {
-        if (pstmt != null) pstmt.close();
-      } catch (Exception e) {}
-    }
-    queryTextCache = al;
-    return al;
-  }
-  
-  public List<CpoQueryGroupNode> getQueryGroups(CpoQueryTextNode textNode) throws Exception {
-    if (this.queryGroupByTextCache.containsKey(textNode)) {
-      return this.queryGroupByTextCache.get(textNode);
-    }
-    List<CpoQueryGroupNode> al = new ArrayList<CpoQueryGroupNode>();
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
-    try {
-    	StringBuffer sql = new StringBuffer();
-      if (revsEnabled) {
-        sql.append("select group_id, class_id, group_type, name, userid, createdate from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_query_group where group_id in ");
-        sql.append("(select group_id from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_query where text_id = ?) order by name, group_type, group_id");
-      } else {
-        sql.append("select group_id, class_id, group_type, name from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_query_group where group_id in ");
-        sql.append("(select group_id from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_query where text_id = ?) order by name, group_type, group_id");
-      }
-      pstmt = conn.prepareStatement(sql.toString());
-      pstmt.setString(1,textNode.getTextId());
-      rs = pstmt.executeQuery();
-      while (rs.next()) {
-        CpoQueryGroupNode cpoQueryGroupNode = new CpoQueryGroupNode(rs.getString("name"),rs.getString("class_id"), rs.getString("group_id"), rs.getString("group_type"),null);
-        if (revsEnabled) {
-          cpoQueryGroupNode.setUserName(rs.getString("userid"));
-          cpoQueryGroupNode.setCreateDate(rs.getTimestamp("createdate"));
-        }
-        al.add(cpoQueryGroupNode);
-      }
-    } finally {
-      try {
-        if (rs != null) rs.close();
-      } catch (Exception e) {}
-      try {
-        if (pstmt != null) pstmt.close();
-      } catch (Exception e) {}
-    }
-    this.queryGroupByTextCache.put(textNode,al);
-    return al;
-  }
-
   public List<CpoQueryGroupNode> getQueryGroups(CpoQueryGroupLabelNode parent) throws Exception {
     if (this.queryGroupCache.containsKey(parent)) {
       return this.queryGroupCache.get(parent);
@@ -507,23 +401,26 @@ public class Proxy implements Observer {
     try {
     	StringBuffer sql = new StringBuffer();
       if (revsEnabled) {
-        sql.append("select q.query_id, q.group_id, q.text_id, q.seq_no, q.userid, q.createdate from ");
+        sql.append("select q.query_id, q.group_id, q.seq_no, q.sql_text, q.description, q.userid, q.createdate from ");
         sql.append(tablePrefix);
-        sql.append("cpo_query q where q.group_id = ? order by q.seq_no");
+        sql.append("cpo_query q ");
+        sql.append("where q.group_id = ? order by q.seq_no");
       } else {
-        sql.append("select q.query_id, q.group_id, q.text_id, q.seq_no from ");
+        sql.append("select q.query_id, q.group_id, q.seq_no, q.sql_text, q.description from ");
         sql.append(tablePrefix);
-        sql.append("cpo_query q where q.group_id = ? order by q.seq_no");
+        sql.append("cpo_query q ");
+        sql.append("where q.group_id = ? order by q.seq_no");
       }
       pstmt = conn.prepareStatement(sql.toString());
       pstmt.setString(1,parent.getGroupId());
       rs = pstmt.executeQuery();
       while (rs.next()) {
-        CpoQueryTextNode cQTnode = this.getQueryText(
-            (CpoServerNode)parent.getParent().getParent().getParent(),rs.getString("text_id"));
         CpoQueryNode cpoQueryNode = new CpoQueryNode(rs.getString("query_id"),
-            rs.getString("group_id"), rs.getInt("seq_no"),
-            cQTnode,parent);
+            rs.getString("group_id"), 
+            rs.getInt("seq_no"),
+            rs.getString("sql_text"),
+            rs.getString("description"),
+            parent);
         if (revsEnabled) {
           cpoQueryNode.setUserName(rs.getString("userid"));
           cpoQueryNode.setCreateDate(rs.getTimestamp("createdate"));
@@ -747,8 +644,7 @@ public class Proxy implements Observer {
         parent.setChildDirty((AbstractCpoNode)obj);
         parent.setChildNew((AbstractCpoNode)obj);
         parent.setChildRemove((AbstractCpoNode)obj);
-        int index = 0;
-        index = parent.getIndex((TreeNode)obs);
+        int index = parent.getIndex((TreeNode)obs);
         OUT.debug ("Set parent flags - index is: "+index);
         if (index >= 0 && obs == obj) {
           OUT.debug ("Index: "+index+" size: "+((AbstractCpoNode)obs).getParent().getChildCount());
@@ -810,6 +706,7 @@ public class Proxy implements Observer {
    * saves all nodes passed to it to the db
    */
   public void saveNodes(List<AbstractCpoNode> nodes) throws Exception {
+    
     PreparedStatement pstmt = null;
     try {
       /**
@@ -910,11 +807,10 @@ public class Proxy implements Observer {
             pstmt.setString(2,ccn.getClassId());
             pstmt.executeUpdate();
           }
-        } else
-          continue;
-        toBeCleaned.add(node);
-        if (pstmt != null)
-          pstmt.close();
+          toBeCleaned.add(node);
+          if (pstmt != null)
+            pstmt.close();
+        }
       }
 
       /**
@@ -987,12 +883,12 @@ public class Proxy implements Observer {
             pstmt.setString(7,camn.getAttributeId());
             pstmt.executeUpdate();
           }
-        } else
-          continue;
-        toBeCleaned.add(node);
-        if (pstmt != null)
-          pstmt.close();
+          toBeCleaned.add(node);
+          if (pstmt != null)
+            pstmt.close();
+        } 
       }
+      
       /**
        * do query groups
        */
@@ -1069,21 +965,21 @@ public class Proxy implements Observer {
             pstmt.setString(3,cqgn.getGroupId());
             pstmt.executeUpdate();
           }
+          toBeCleaned.add(node);
+          if (pstmt != null)
+            pstmt.close();
         }
-        else
-          continue;
-        toBeCleaned.add(node);
-        if (pstmt != null)
-          pstmt.close();
       }
+      
       /**
-       * do query text
+       * do query node
        */
       for (AbstractCpoNode node : nodes) {
-        if (node instanceof CpoQueryTextNode) {
-          CpoQueryTextNode cQTnode = (CpoQueryTextNode)node;
+        if (node instanceof CpoQueryNode) {
+          CpoQueryNode cqn = (CpoQueryNode)node;
+          
           // strip sql of CRs
-          String sqlText = cQTnode.getSQL();
+          String sqlText = cqn.getSQL();
           if (sqlText == null) sqlText = "";
           else sqlText = sqlText.trim();      
           try {
@@ -1094,86 +990,28 @@ public class Proxy implements Observer {
           } catch (REException ree) {
             CpoUtil.showException(ree);
           }
-          if (cQTnode.isNew()) {
-        	  StringBuffer insertTextId=new StringBuffer();
-            if (revsEnabled) {
-              insertTextId.append("insert into ");
-              insertTextId.append(tablePrefix);
-              insertTextId.append("cpo_query_text (text_id, sql_text, description,userid) ");
-              insertTextId.append("values (?,?,?,'");
-              insertTextId.append(CpoUtil.username);
-              insertTextId.append("')");
-            } else {
-              insertTextId.append("insert into ");
-              insertTextId.append(tablePrefix);
-              insertTextId.append("cpo_query_text (text_id, sql_text, description) values (?,?,?)");
-            }
-            pstmt = conn.prepareStatement(insertTextId.toString());
-            pstmt.setString(1,cQTnode.getTextId());
-            pstmt.setString(2,sqlText);
-            pstmt.setString(3,cQTnode.getDesc());
-            pstmt.executeUpdate();
-//            int result = pstmt.executeUpdate();
-//            OUT.debug("Inserted query TEXT node: "+cQTnode.getTextId()+" "+result);
-          } else if (cQTnode.isRemove()) {
-            StringBuffer removeTextId=new StringBuffer("delete from ");
-            removeTextId.append(tablePrefix);
-            removeTextId.append("cpo_query_text where text_id = ?");
-            pstmt = conn.prepareStatement(removeTextId.toString());
-            pstmt.setString(1,cQTnode.getTextId());
-            pstmt.execute();
-          } else if (cQTnode.isDirty()) {
-        	  StringBuffer updateTextId=new StringBuffer();
-            if (revsEnabled) {
-              updateTextId.append("update ");
-              updateTextId.append(tablePrefix);
-              updateTextId.append("cpo_query_text set sql_text = ?, description = ?, userid = '");
-              updateTextId.append(CpoUtil.username);
-              updateTextId.append("' where text_id = ?");
-            } else {
-              updateTextId.append("update ");
-              updateTextId.append(tablePrefix);
-              updateTextId.append("cpo_query_text set sql_text = ?, description = ? where text_id = ?");
-            }
-            pstmt = conn.prepareStatement(updateTextId.toString());
-            pstmt.setString(1,sqlText);
-            pstmt.setString(2,cQTnode.getDesc());
-            pstmt.setString(3,cQTnode.getTextId());
-            pstmt.executeUpdate();
-          }
-        }
-        else
-          continue;
-        toBeCleaned.add(node);
-        if (pstmt != null)
-          pstmt.close();
-      }
-      /**
-       * do query node
-       */
-      for (AbstractCpoNode node : nodes) {
-        if (node instanceof CpoQueryNode) {
-          CpoQueryNode cqn = (CpoQueryNode)node;
+          
           if (cqn.isNew()) {
         	  StringBuffer sql = new StringBuffer();
             if (revsEnabled) {
               sql.append("insert into ");
               sql.append(tablePrefix);
-              sql.append("cpo_query (query_id, group_id, text_id, seq_no, userid) ");
-              sql.append("values (?,?,?,?,'");
+              sql.append("cpo_query (query_id, group_id, seq_no, sql_text, description, userid) ");
+              sql.append("values (?,?,?,?,?,'");
               sql.append(CpoUtil.username);
               sql.append("')");
             } else {
               sql.append("insert into ");
               sql.append(tablePrefix);
-              sql.append("cpo_query (query_id, group_id, text_id, seq_no) ");
-              sql.append("values (?,?,?,?)");
+              sql.append("cpo_query (query_id, group_id, seq_no, sql_text, description) ");
+              sql.append("values (?,?,?,?,?)");
             }
             pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1,cqn.getQueryId());
-            pstmt.setString(2,cqn.getGroupId());
-            pstmt.setString(3,cqn.getTextId());
-            pstmt.setInt(4,cqn.getSeqNo());
+            pstmt.setString(1, cqn.getQueryId());
+            pstmt.setString(2, cqn.getGroupId());
+            pstmt.setInt(3, cqn.getSeqNo());
+            pstmt.setString(4, sqlText);
+            pstmt.setString(5, cqn.getDesc());
             pstmt.executeUpdate();
 //            int result = pstmt.executeUpdate();
 //            OUT.debug("Inserted query node: "+cqn.getQueryId()+" "+result);
@@ -1200,26 +1038,25 @@ public class Proxy implements Observer {
             if (revsEnabled) {
               sql.append("update ");
               sql.append(tablePrefix);
-              sql.append("cpo_query set text_id = ?, seq_no = ?, userid = '");
+              sql.append("cpo_query set seq_no = ?, sql_text = ?, description = ?, userid = '");
               sql.append(CpoUtil.username);
               sql.append("' where query_id = ?");
             } else {
               sql.append("update ");
               sql.append(tablePrefix);
-              sql.append("cpo_query set text_id = ?, seq_no = ? where query_id = ?");
+              sql.append("cpo_query set seq_no = ?, sql_text = ?, description = ? where query_id = ?");
         		}
             pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1,cqn.getTextId());
-            pstmt.setInt(2,cqn.getSeqNo());
-            pstmt.setString(3,cqn.getQueryId());
+            pstmt.setInt(1, cqn.getSeqNo());
+            pstmt.setString(2, sqlText);
+            pstmt.setString(3, cqn.getDesc());
+            pstmt.setString(4, cqn.getQueryId());
             pstmt.executeUpdate();
           }
+          toBeCleaned.add(node);
+          if (pstmt != null)
+            pstmt.close();
         }
-        else
-          continue;
-        toBeCleaned.add(node);
-        if (pstmt != null)
-          pstmt.close();
       }
       /**
        * do query parameters
@@ -1280,12 +1117,10 @@ public class Proxy implements Observer {
             pstmt.executeUpdate();
             //OUT.debug("updated parameter query_id="+cqpn.getQueryId()+" seq="+cqpn.getSeqNo()+ " group_type="+cqpn.getType());
           }
+          toBeCleaned.add(node);
+          if (pstmt != null)
+            pstmt.close();
         }
-        else
-          continue;
-        toBeCleaned.add(node);
-        if (pstmt != null)
-          pstmt.close();
       }
       conn.commit();
       // commit completed ok - clean up objects
@@ -1313,26 +1148,24 @@ public class Proxy implements Observer {
       } catch (Exception e) {}
     }
   }
+  
   /**
    * cleans ALL cache elements completely out
    */
   public void removeObjectsFromAllCache() {
     classCache.clear();
-    queryTextCache.clear();
     allChangedObjects.clear();
     attMapCache.clear();
     queryCache.clear();
     queryGroupCache.clear();
     queryParamCache.clear();
-    queryGroupByTextCache.clear();
     classCacheById.clear();
   }
+  
   /**
    * removes a particular object from all caches, including changed object cache
    */
   public void removeObjectFromAllCache(AbstractCpoNode obj) {
-    if (queryTextCache.contains(obj))
-      queryTextCache.remove(obj);
     if (allChangedObjects.contains(obj))
       allChangedObjects.remove(obj);
     this.allChangedObjects.remove(obj);
@@ -1342,9 +1175,9 @@ public class Proxy implements Observer {
       List<CpoClassNode> classes = classEnum.nextElement();
       if (classes.contains(obj))
         classes.remove(obj);
-    }   
+    }
     if (this.classCache.contains(obj)) this.classCache.remove(obj);
-    
+
     Enumeration<List<CpoAttributeMapNode>>attMapEnum = this.attMapCache.elements();
     while (attMapEnum.hasMoreElements()) {
       List<CpoAttributeMapNode> attMap = attMapEnum.nextElement();
@@ -1352,7 +1185,7 @@ public class Proxy implements Observer {
         attMap.remove(obj);
     }
     if (this.attMapCache.contains(obj)) this.attMapCache.remove(obj);
-    
+
     Enumeration<List<CpoQueryNode>> queryEnum = this.queryCache.elements();
     while (queryEnum.hasMoreElements()) {
       List<CpoQueryNode> attMap = queryEnum.nextElement();
@@ -1360,7 +1193,7 @@ public class Proxy implements Observer {
         attMap.remove(obj);
     }
     if (this.queryCache.contains(obj)) this.queryCache.remove(obj);
-    
+
     Enumeration<List<CpoQueryGroupNode>> groupEnum = this.queryGroupCache.elements();
     while (groupEnum.hasMoreElements()) {
       List<CpoQueryGroupNode> group = groupEnum.nextElement();
@@ -1368,7 +1201,7 @@ public class Proxy implements Observer {
         group.remove(obj);
     }
     if (this.queryGroupCache.contains(obj)) this.queryGroupCache.remove(obj);
-    
+
     Enumeration<List<CpoQueryParameterNode>> paramEnum = this.queryParamCache.elements();
     while (paramEnum.hasMoreElements()) {
       List<CpoQueryParameterNode> params = paramEnum.nextElement();
@@ -1376,69 +1209,21 @@ public class Proxy implements Observer {
         params.remove(obj);
     }
     if (this.queryParamCache.contains(obj)) this.queryParamCache.remove(obj);
-    
-    Enumeration<List<CpoQueryGroupNode>> qgEnum = this.queryGroupByTextCache.elements();
-    while (classEnum.hasMoreElements()) {
-      List<CpoQueryGroupNode> qGroups = qgEnum.nextElement();
-      if (qGroups.contains(obj))
-        qGroups.remove(obj);
-    }
-    if (this.queryGroupByTextCache.contains(obj)) this.queryGroupByTextCache.remove(obj);
   }
-  /**
-   * get a particular querytextnode
-   */
-  public CpoQueryTextNode getQueryText(CpoServerNode serverNode, String textId) throws Exception {
-    for (CpoQueryTextNode cQTnode : getQueryText(serverNode)) {
-      if (cQTnode.getTextId().equals(textId))
-        return cQTnode;
-    }
-    return null;
-  }
-  /**
-   * get an arraylist of querytextnodes that match a certain string
-   */
-  public List<CpoQueryTextNode> getQueryTextMatches(CpoServerNode serverNode, String match) throws Exception {
-    if (match.equals("")) return this.getQueryText(serverNode);
-
-    List<CpoQueryTextNode> al = new ArrayList<CpoQueryTextNode>();
-    for (CpoQueryTextNode cQTnode : getQueryText(serverNode)) {
-      int index = cQTnode.toString().toLowerCase().indexOf(match.toLowerCase());
-      if (index != -1)
-        al.add(cQTnode);
-    }
-    return al;
-  }
+  
   public void clearMetaClassCache() throws Exception {
-//    try {
-      //Method cpoManClearMetaClassMeth = this.cpoMan.getClass().getMethod("clearMetaClass",null);
-      //cpoManClearMetaClassMeth.invoke(cpoMan,null);
-      this.cpoMan.clearMetaClass();
-//    } catch (Exception re) {
-//      throw new ProxyException("clearMetaClassCache()",re);
-//    }
+      cpoMan.clearMetaClass();
   }
+  
   public void clearMetaClassCache(String className) throws Exception {
-//    try {
-//      Method cpoManClearMetaClassMeth = this.cpoMan.getClass().getMethod("clearMetaClass",new Class[]{String.class});
-//      cpoManClearMetaClassMeth.invoke(cpoMan,new Object[]{className});
-      this.cpoMan.clearMetaClass(className);
-//    } catch (Exception re) {
-//      throw new ProxyException("clearMetaClassCache(String)",re);
-//    }
+      cpoMan.clearMetaClass(className);
   }
 
   public Class<?> getSqlTypeClass(String typeName) throws Exception {
-      //Method cpoGetSqlTypeClassMeth = this.cpoMan.getClass().getMethod("getSqlTypeClass",new Class[]{String.class});
-      //return (Class) cpoGetSqlTypeClassMeth.invoke(cpoMan,new Object[]{typeName});
-      //return (Class) this.sqlTypeClassMeth.invoke(cpoMan,new Object[]{typeName});
       return JavaSqlTypes.getSqlTypeClass(typeName);
   }
   
   public Class<?> getSqlTypeClass(int typeInt) throws Exception {
-    //Method cpoGetSqlTypeClassMeth = this.cpoMan.getClass().getMethod("getSqlTypeClass",new Class[]{String.class});
-    //return (Class) cpoGetSqlTypeClassMeth.invoke(cpoMan,new Object[]{typeName});
-    //return (Class) this.sqlTypeClassMethInt.invoke(cpoMan,new Object[]{new Integer(typeInt)});
     return JavaSqlTypes.getSqlTypeClass(typeInt);
   }
 
@@ -1497,6 +1282,7 @@ public class Proxy implements Observer {
     sbClass.append("}\n");
     return sbTopClass.toString()+sbClass.toString();
   }
+
   public String makeClassOuttaNode(CpoClassNode node) throws Exception {
     //Method meth = cpoMan.getClass().getMethod("getSqlTypeClass",new Class[]{String.class});
     String className = node.getClassName();
@@ -1536,6 +1322,7 @@ public class Proxy implements Observer {
     sbClass.append("}\n");
     return sbTopClass.toString()+sbClass.toString();
   }
+
   String makeAttFromColName(String columnName) throws REException {
     columnName = columnName.toLowerCase();
     RE reFixCol = new RE("_.");
@@ -1545,6 +1332,7 @@ public class Proxy implements Observer {
     }
     return columnName;
   }
+
   void generateNewAttributeMap(CpoClassNode ccn, Method[] methods) throws Exception {
     CpoAttributeLabelNode attMapParent = null;
     Enumeration<AbstractCpoNode> enumChildren = ccn.children();
@@ -1554,20 +1342,21 @@ public class Proxy implements Observer {
         attMapParent = (CpoAttributeLabelNode)child;
     }
     if (attMapParent == null) throw new Exception ("Can't find the Attribute Label for this node: "+ccn);
-    for (int i = 0 ; i < methods.length ; i++) {
-      if (methods[i].getName().startsWith("get")) {
-        //Class<?> returnClass = methods[i].getReturnType();
+    for (Method method : methods) {
+      if (method.getName().startsWith("get")) {
+        //Class<?> returnClass = method.getReturnType();
         String columnTypeName = "VARCHAR"; // this needs to be fixed!!!!
-        String attributeName = methods[i].getName().substring(3);
+        String attributeName = method.getName().substring(3);
         String columnName = attributeName;
-        CpoAttributeMapNode camn = new CpoAttributeMapNode(attMapParent,this.getNewGuid(),
-            ccn.getClassId(),columnName,attributeName, 
-            columnTypeName,null, null,null,"IN");
+        CpoAttributeMapNode camn = new CpoAttributeMapNode(attMapParent, this. getNewGuid(),
+            ccn.getClassId(), columnName, attributeName,
+            columnTypeName, null, null, null, "IN");
         this.getAttributeMap(ccn).add(camn);
         camn.setNew(true);
       }
     }
   }
+
   void generateNewAttributeMap(CpoClassNode ccn, String sql) throws Exception {
     CpoAttributeLabelNode attMapParent = null;
     Enumeration<AbstractCpoNode> enumChildren = ccn.children();
@@ -1594,13 +1383,15 @@ public class Proxy implements Observer {
     } finally {
       try {
         if (rs != null) rs.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+      }
       try {
         if (pstmt != null) pstmt.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+      }
     }
-    
   }
+
   public Collection<?> executeQueryGroup(Object obj, Object objReturnType, CpoQueryGroupNode cpoQGnode, boolean persist) throws Exception {
 //    try {
       List<Object> result = new ArrayList<Object>();
@@ -1678,6 +1469,7 @@ public class Proxy implements Observer {
 //    }
     return result;
   }
+
   public void addToAttributeMapFromSQL(CpoAttMapTableModel model, String sql) throws Exception {
       PreparedStatement pstmt = null;
       ResultSet rs = null;
@@ -1705,12 +1497,15 @@ public class Proxy implements Observer {
           CpoUtil.updateStatus(message);
       }
   }
+
   public void toggleClassNames() {
     this.classNameToggle = !classNameToggle;
   }
+
   public boolean getClassNameToggle() {
     return this.classNameToggle;
   }
+
   public String getConnectionClassName() {
     return this.connectionClassName;
   }

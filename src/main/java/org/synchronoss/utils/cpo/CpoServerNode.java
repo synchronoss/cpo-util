@@ -28,7 +28,6 @@ import java.util.*;
 
 public class CpoServerNode extends AbstractCpoNode {
   private List<CpoClassNode> classes; // CpoClassNode(s)
-  private CpoQueryTextLabelNode cpoQTLN;
   private Logger OUT = Logger.getLogger(this.getClass());
   
   public CpoServerNode(Proxy prox, JTree jtree) {
@@ -43,28 +42,22 @@ public class CpoServerNode extends AbstractCpoNode {
   }
   
   public TreeNode getChildAt(int childIndex) {
-    if (childIndex >= classes.size() + 1 || childIndex < 0)
+    if (childIndex >= classes.size() || childIndex < 0)
       return null;
-    else if (childIndex == 0)
-      return this.cpoQTLN;
     
-    return classes.get(childIndex-1);
+    return classes.get(childIndex);
   }
 
   public int getChildCount() {
     if (classes == null)
       refreshChildren();
-    return this.classes.size()+1;
+    return classes.size();
   }
 
   public int getIndex(TreeNode node) {
-    if (this.classes == null) refreshChildren();
-    if (node.equals(this.cpoQTLN)) return 0;
-    for (int i = 0 ; i < classes.size() ; i++) {
-//      OUT.debug (classes.get(i).getClass().getName()+" "+i+" string: "+classes.get(i).toString());
-      if (node.equals(classes.get(i))) return i+1;
-    }
-    return -1;
+    if (classes == null) 
+      refreshChildren();
+    return classes.indexOf(node);
   }
 
   public boolean getAllowsChildren() {
@@ -76,38 +69,32 @@ public class CpoServerNode extends AbstractCpoNode {
   }
 
   @Override
-  public Enumeration<AbstractCpoNode> children() {
-    if (this.classes == null || this.cpoQTLN == null) refreshChildren();
-    return new Enumeration<AbstractCpoNode>() {
-      int count = 0;
-      public AbstractCpoNode nextElement() {
-        if (count == 0) {
-          count++;
-          return cpoQTLN;
-        }
-        return classes.get(count++-1);
+  public Enumeration<CpoClassNode> children() {
+    if (classes == null)
+      refreshChildren();
+    
+    return new Enumeration<CpoClassNode>() {
+      Iterator<CpoClassNode> iterator = classes.iterator();
+      public CpoClassNode nextElement() {
+        return iterator.next();
       }
       public boolean hasMoreElements() {
-        if (classes.size()+1 == count)
-          return false;
-        
-        return true;
+        return iterator.hasNext();
       }
     };
   }
     
   @Override
   public String toString() {
-    return this.prox.toString();
+    return prox.toString();
   }
   @Override
   public void refreshChildren() {
     OUT.debug ("CpoServerNode refreshing data");
     try {
-      this.classes = prox.getClasses(this);
+      classes = prox.getClasses(this);
     } catch (Exception pe) {
       CpoUtil.showException(pe);
     }
-    this.cpoQTLN = new CpoQueryTextLabelNode(this);
   }
 }

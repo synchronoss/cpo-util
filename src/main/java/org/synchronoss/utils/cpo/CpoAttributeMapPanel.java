@@ -19,20 +19,17 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
+
+import org.apache.log4j.Logger;
+
 import javax.swing.*;
-
-import java.awt.BorderLayout;
-import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import org.apache.log4j.*;
+import java.awt.*;
+import java.awt.event.*;
 
 public class CpoAttributeMapPanel extends JPanel  {
-    /** Version Id for this class. */
-    private static final long serialVersionUID=1L;
+
+  /** Version Id for this class. */
+  private static final long serialVersionUID=1L;
   private BorderLayout borderLayout1 = new BorderLayout();
   private CpoAttributeLabelNode cpoAttLabNode;
   private JTable jTableAttMap;
@@ -44,7 +41,6 @@ public class CpoAttributeMapPanel extends JPanel  {
   private Logger OUT = Logger.getLogger(this.getClass());
   
   public CpoAttributeMapPanel(CpoAttributeLabelNode cpoAttLabelNode) {
-//    this.cpoClassNode = cpoClassNode;
     this.cpoAttLabNode = cpoAttLabelNode;
     try {
       jbInit();
@@ -110,35 +106,30 @@ public class CpoAttributeMapPanel extends JPanel  {
       model.addNewAttribute(cnap.jTextColName.getText(), cnap.jTextAtt.getText(),
           (String)cnap.jComColType.getSelectedItem(),cnap.jTextTransform.getText(),cnap.jTextDBTable.getText(),cnap.jTextDBColumn.getText());
   }
-  
+
   private void addAttrToClassFromSQL() {
-      String className = null;
-      String sql = null;
-      CpoClassNode ccn = (CpoClassNode)cpoAttLabNode.getParent();
-      CpoNewClassPanel cncp = new CpoNewClassPanel();
-      if (ccn.getClassName() != null)
-          cncp.jTextClassName.setText(ccn.getClassName());
-      OUT.debug(cncp.jTextClassName.getText());
-      int result = JOptionPane.showConfirmDialog(this,cncp,"Add New Attributes based on SQL", JOptionPane.OK_CANCEL_OPTION);
-      if (result == 0) {
-          className = cncp.jTextClassName.getText();
-          if (className.lastIndexOf(".") != -1)
-              CpoUtil.setDefaultPackageName(className.substring(0,className.lastIndexOf(".")));
-          sql = cncp.jTextAsql.getText();
-          OUT.debug(sql);
-          try {
-              cpoAttLabNode.getProxy().addToAttributeMapFromSQL(model, sql);
-          } catch (Exception e) {
-              CpoUtil.showException(e);
-              return;
-          }
-      } else {
-          /**
-           * user wishes to cancel creation
-           */
-          CpoUtil.updateStatus("Aborted Attribute Creation");
-          return;
+    CpoClassNode ccn = (CpoClassNode)cpoAttLabNode.getParent();
+    CpoNewClassPanel cncp = new CpoNewClassPanel();
+    if (ccn.getClassName() != null)
+      cncp.jTextClassName.setText(ccn.getClassName());
+    OUT.debug(cncp.jTextClassName.getText());
+    int result = JOptionPane.showConfirmDialog(this, cncp, "Add New Attributes based on SQL", JOptionPane.OK_CANCEL_OPTION);
+    if (result == 0) {
+      String className = cncp.jTextClassName.getText();
+      if (className.lastIndexOf(".") != -1)
+        CpoUtil.setDefaultPackageName(className.substring(0, className.lastIndexOf(".")));
+      String sql = cncp.jTextAsql.getText();
+      OUT.debug(sql);
+      try {
+        cpoAttLabNode.getProxy().addToAttributeMapFromSQL(model, sql);
+      } catch (Exception e) {
+        CpoUtil.showException(e);
       }
+    } else {
+      /**
+       * user wishes to cancel creation
+       */
+      CpoUtil.updateStatus("Aborted Attribute Creation");
+    }
   }
-  
 }
