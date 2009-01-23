@@ -40,6 +40,7 @@ public class CpoQueryPanel extends JPanel {
     private JPopupMenu menu = new JPopupMenu();
     private TableCellEditor editor;
     private JComboBox jIOTypeBox;
+    private JSplitPane jSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
 //    private Logger OUT = Logger.getLogger(this.getClass());
 
@@ -68,8 +69,9 @@ public class CpoQueryPanel extends JPanel {
         jTableQueryParam.setDefaultEditor(JComboBox.class, editor);
 //    this.setSize(new Dimension(200, 500));
         this.setLayout(borderLayout1);
-        this.add(cpoQPnorth, BorderLayout.NORTH);
-        this.add(jScrollTable, BorderLayout.CENTER);
+        this.add(jSplitPane, BorderLayout.CENTER);
+        jSplitPane.setTopComponent(cpoQPnorth);
+        jSplitPane.setBottomComponent(jScrollTable);
         cpoQPnorth.jTextSeq.addKeyListener(new KeyListener() {
             public void keyTyped(KeyEvent ke) {
             }

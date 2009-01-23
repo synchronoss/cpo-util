@@ -27,15 +27,14 @@ import java.awt.*;
 import java.io.*;
 
 public class CpoBrowserPanel extends JPanel  {
-    /** Version Id for this class. */
-    private static final long serialVersionUID=1L;
+  /** Version Id for this class. */
+  private static final long serialVersionUID=1L;
   private Proxy prox;
   private BorderLayout borderLayout = new BorderLayout();
-  //private JPanel jPanelCenter = new JPanel();
   private JScrollPane jScrollWest = new JScrollPane();
   private CpoBrowserTree jTreeBrowser = new CpoBrowserTree();
-  private JScrollPane jScrollCenter = new JScrollPane();
-  private JSplitPane jSplitPane1 = new JSplitPane();
+  private JSplitPane jSplitPane = new JSplitPane();
+  private JPanel emptyPanel = new JPanel();
   
   public CpoBrowserPanel() throws Exception {
     String server = CpoUtil.getServerFromUser();
@@ -78,25 +77,17 @@ public class CpoBrowserPanel extends JPanel  {
   private void jbInit() throws Exception {
     this.setLayout(borderLayout);
     this.setSize(new Dimension(800, 600));
-//    jPanelCenter.add(jScrollCenter);
-    jSplitPane1.add(jScrollWest, JSplitPane.LEFT);
-    jSplitPane1.add(jScrollCenter, JSplitPane.RIGHT);
-    this.add(jSplitPane1, BorderLayout.CENTER);
-//    this.add(jScrollCenter, BorderLayout.CENTER);
-//    this.add(jPanelCenter, BorderLayout.CENTER);
+    jSplitPane.add(jScrollWest, JSplitPane.LEFT);
+    jSplitPane.add(emptyPanel, JSplitPane.RIGHT);
+
+    emptyPanel.setPreferredSize(new Dimension(400,0));
+
+    this.add(jSplitPane, BorderLayout.CENTER);
     jScrollWest.getViewport().add(jTreeBrowser);
     jScrollWest.getViewport().setPreferredSize(new Dimension(200,0));
-//    this.add(jScrollWest, BorderLayout.WEST);
     jTreeBrowser.setModel(new DefaultTreeModel(new CpoServerNode(prox,jTreeBrowser)));
     jTreeBrowser.addTreeWillExpandListener(new TreeWillExpandListener() {
       public void treeWillExpand(TreeExpansionEvent tee) {
-//        TreePath pathParent = tee.getPath().getParentPath();
-//        Enumeration enum = jTreeBrowser.getExpandedDescendants(pathParent);
-//        if (enum != null) {
-//          while (enum.hasMoreElements()) {
-//            jTreeBrowser.collapsePath((TreePath)enum.nextElement());
-//          }
-//        }
         Object pathComp = tee.getPath().getLastPathComponent();
         if (pathComp instanceof AbstractCpoNode) {
 //          OUT.debug("Refreshing data in node: "+pathComp);
@@ -111,25 +102,28 @@ public class CpoBrowserPanel extends JPanel  {
       public void valueChanged(TreeSelectionEvent tse) {
         Object pathComp = tse.getPath().getLastPathComponent();
         if (pathComp instanceof AbstractCpoNode) {
-          jScrollCenter.getViewport().removeAll();
+          Component rightComp = jSplitPane.getRightComponent();
+          if (rightComp != null)
+            jSplitPane.remove(rightComp);
           JPanel panel = ((AbstractCpoNode)pathComp).getPanelForSelected();
-//          OUT.debug ("Panel retreived for view: "+panel);
-          if (panel != null)
-            jScrollCenter.getViewport().add(panel,null);
-          jScrollCenter.getViewport().revalidate();
-          jScrollCenter.getViewport().repaint();
+          if (panel == null)
+            panel = emptyPanel;
+
+          jSplitPane.setRightComponent(panel);
         }
       }
     });
-//    ToolTipManager.sharedInstance().registerComponent(jScrollWest);
     ToolTipManager.sharedInstance().registerComponent(jTreeBrowser);
   }
+
   String getServer() {
     return this.prox.toString();
   }
+
   String getDatabaseName() {
     return this.prox.getDatabaseName();
   }
+
   Proxy getProxy() {
     return this.prox;
   }
