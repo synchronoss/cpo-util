@@ -80,6 +80,9 @@ public class CpoBrowserPanel extends JPanel  {
     jSplitPane.add(jScrollWest, JSplitPane.LEFT);
     jSplitPane.add(emptyPanel, JSplitPane.RIGHT);
 
+    jScrollWest.setMinimumSize(new Dimension(200,0));
+    jScrollWest.setPreferredSize(new Dimension(200,0));
+    emptyPanel.setMinimumSize(new Dimension(400,0));
     emptyPanel.setPreferredSize(new Dimension(400,0));
 
     this.add(jSplitPane, BorderLayout.CENTER);

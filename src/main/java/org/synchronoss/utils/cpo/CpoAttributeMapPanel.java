@@ -117,7 +117,7 @@ public class CpoAttributeMapPanel extends JPanel  {
     if (result == 0) {
       String className = cncp.jTextClassName.getText();
       if (className.lastIndexOf(".") != -1)
-        CpoUtil.setDefaultPackageName(className.substring(0, className.lastIndexOf(".")));
+        cpoAttLabNode.getProxy().setDefaultPackageName(className.substring(0, className.lastIndexOf(".")));
       String sql = cncp.jTextAsql.getText();
       OUT.debug(sql);
       try {

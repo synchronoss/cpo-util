@@ -28,6 +28,7 @@ import org.synchronoss.cpo.jdbc.*;
 import javax.naming.*;
 import javax.sql.DataSource;
 import javax.swing.tree.*;
+import java.io.File;
 import java.lang.reflect.Method;
 import java.sql.*;
 import java.util.*;
@@ -88,6 +89,39 @@ public class Proxy implements Observer {
 
   public String getSqlDir() {
     return connProps.getProperty(Statics.PROP_JDBC_SQL_DIR + server);
+  }
+
+  public String getDefaultPackageName() {
+    // default to the package for the connection...if there isn't one, use the old style
+    String defPack = connProps.getProperty(Statics.PROP_JDBC_DEFPACK + server);
+    if (defPack == null)
+      defPack = CpoUtil.localProps.getProperty(Statics.LPROP_DEFPACK);
+    return defPack;
+  }
+
+  public void setDefaultPackageName(String pack) {
+    connProps.setProperty(Statics.PROP_JDBC_DEFPACK + server, pack);
+    CpoUtil.saveLocalProps();
+  }
+
+  public File getDefaultDir() {
+    File file = null;
+    try {
+      // default to the dir for the connection...if there isn't one, use the old style
+      if (connProps.getProperty(Statics.PROP_JDBC_DEFDIR + server) != null) {
+        file = new File(connProps.getProperty(Statics.PROP_JDBC_DEFDIR + server));
+      } else if (CpoUtil.localProps.getProperty(Statics.LPROP_DEFDIR) != null) {
+        file = new File(CpoUtil.localProps.getProperty(Statics.LPROP_DEFDIR));
+      }
+    } catch (Exception e) {
+      CpoUtil.showException(e);
+    }
+    return file;
+  }
+
+  public void setDefaultDir(File file) {
+    connProps.setProperty(Statics.PROP_JDBC_DEFDIR + server, file.toString());
+    CpoUtil.saveLocalProps();
   }
 
   void getConnection() throws Exception {

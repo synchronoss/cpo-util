@@ -323,16 +323,16 @@ public class CpoBrowserTree extends JTree  {
     Method methods[] = null;
     while (!happy) {
       CpoNewClassClassPanel cnccp = new CpoNewClassClassPanel();
-      if (CpoUtil.getDefaultPackageName() != null)
-        cnccp.jTextClassName.setText(CpoUtil.getDefaultPackageName());
+      if (menuNode.getProxy().getDefaultPackageName() != null)
+        cnccp.jTextClassName.setText(menuNode.getProxy().getDefaultPackageName());
       OUT.debug("opening joption pane ...");
       int result = JOptionPane.showConfirmDialog(this,cnccp,"Create new CPO Class from Class", JOptionPane.OK_CANCEL_OPTION);
       if (result == 0) {
         className = cnccp.jTextClassName.getText();
         if (className.lastIndexOf(".") != -1)
-          CpoUtil.setDefaultPackageName(className.substring(0,className.lastIndexOf(".")));
+          menuNode.getProxy().setDefaultPackageName(className.substring(0,className.lastIndexOf(".")));
         try {
-          System.out.println("CpoUtil: " + CpoUtil.getDefaultPackageName() + " "  + className);
+          System.out.println("CpoUtil: " + menuNode.getProxy().getDefaultPackageName() + " "  + className);
           methods = CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass(className).getMethods();
           happy = true;
         } catch (Exception pe) {
@@ -371,13 +371,13 @@ public class CpoBrowserTree extends JTree  {
     String classString = null;
     while (!happy) {
       CpoNewClassPanel cncp = new CpoNewClassPanel();
-      if (CpoUtil.getDefaultPackageName() != null)
-        cncp.jTextClassName.setText(CpoUtil.getDefaultPackageName());
+      if (menuNode.getProxy().getDefaultPackageName() != null)
+        cncp.jTextClassName.setText(menuNode.getProxy().getDefaultPackageName());
       int result = JOptionPane.showConfirmDialog(this,cncp,"Create new CPO Class", JOptionPane.OK_CANCEL_OPTION);
       if (result == 0) {
         className = cncp.jTextClassName.getText();
         if (className.lastIndexOf(".") != -1)
-          CpoUtil.setDefaultPackageName(className.substring(0,className.lastIndexOf(".")));
+          menuNode.getProxy().setDefaultPackageName(className.substring(0,className.lastIndexOf(".")));
         sql = cncp.jTextAsql.getText();
         try {
           classString = menuNode.getProxy().makeClassOuttaSql(className, sql);
@@ -414,8 +414,8 @@ public class CpoBrowserTree extends JTree  {
     if (className.indexOf(".") != -1)
       saveClassName = className.substring(className.lastIndexOf(".")+1);
     JFileChooser jFile = new JFileChooser();
-    if (CpoUtil.getDefaultDir() != null)
-      jFile.setCurrentDirectory(CpoUtil.getDefaultDir());
+    if (menuNode.getProxy().getDefaultDir() != null)
+      jFile.setCurrentDirectory(menuNode.getProxy().getDefaultDir());
     jFile.setDialogTitle("Choose a directory to save: "+saveClassName+".java");
     jFile.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
     int result = jFile.showSaveDialog(this);
@@ -423,7 +423,7 @@ public class CpoBrowserTree extends JTree  {
       CpoUtil.updateStatus("Aborted Class Creation: file not saved");
       return;
     }
-    CpoUtil.setDefaultDir(jFile.getCurrentDirectory());
+    menuNode.getProxy().setDefaultDir(jFile.getSelectedFile());
     try {
       FileWriter fw = new FileWriter(jFile.getSelectedFile()+File.separator+saveClassName+".java");
       fw.write(classString);
@@ -473,12 +473,12 @@ public class CpoBrowserTree extends JTree  {
     
     String sqlDir = menuNode.getProxy().getSqlDir();
     JFileChooser chooser = new JFileChooser();
-    if (CpoUtil.getDefaultDir() != null) {
-      // if there is a default dir, use that
-      chooser.setCurrentDirectory(CpoUtil.getDefaultDir());
-    } else if (sqlDir != null) {
-      // if there wasn't a default dir try the saved dir 
+    if (sqlDir != null) {
+      // if there is a sql dir, use that
       chooser.setCurrentDirectory(new File(sqlDir));
+    } else if (menuNode.getProxy().getDefaultDir() != null) {
+      // if there wasn't a sql dir try the default dir
+      chooser.setCurrentDirectory(menuNode.getProxy().getDefaultDir());
     }
     chooser.setApproveButtonText("Select");
     chooser.setDialogTitle("Select directory to save sql:");
@@ -489,10 +489,7 @@ public class CpoBrowserTree extends JTree  {
       
       if (OUT.isDebugEnabled())
         OUT.debug("Directory: " + dir.getPath());
-    
-      // Save the default dir for next time
-      CpoUtil.setDefaultDir(dir);
-    
+
       ExportClassSwingWorker exporter = new ExportClassSwingWorker(menuNode, dir);
       exporter.start();
     }

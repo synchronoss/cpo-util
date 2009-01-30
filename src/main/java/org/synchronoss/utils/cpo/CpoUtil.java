@@ -22,6 +22,7 @@ package org.synchronoss.utils.cpo;
 
 import org.apache.log4j.Logger;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -29,8 +30,6 @@ import java.net.*;
 import java.security.*;
 import java.util.*;
 import java.util.List;
-
-import javax.swing.*;
 
 public class CpoUtil {
   
@@ -290,32 +289,6 @@ public class CpoUtil {
     JOptionPane.showMessageDialog(frame, message);
   }
 
-  static File getDefaultDir() {
-    File file = null;
-    if (localProps.getProperty(Statics.LPROP_DEFDIR) != null) {
-      try {
-        file = new File(localProps.getProperty(Statics.LPROP_DEFDIR));
-      } catch (Exception e) {
-        showException(e);
-      }
-    }
-    return file;
-  }
-  
-  static void setDefaultDir(File file) {
-    localProps.setProperty(Statics.LPROP_DEFDIR,file.toString());
-    saveLocalProps();
-  }
-  
-  static String getDefaultPackageName() {
-    return localProps.getProperty(Statics.LPROP_DEFPACK);
-  }
-  
-  static void setDefaultPackageName(String pack) {
-    localProps.setProperty(Statics.LPROP_DEFPACK,pack);
-    saveLocalProps();
-  }
-  
   static void removeConnection(String server) {
     localProps.remove(Statics.PROP_CPONAME+server);
     localProps.remove(Statics.PROP_JDBC_DRIVER+server);
