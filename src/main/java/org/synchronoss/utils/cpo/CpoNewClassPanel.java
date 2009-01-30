@@ -19,15 +19,8 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import javax.swing.JPanel;
-import java.awt.Dimension;
-import java.awt.GridBagLayout;
-import javax.swing.JLabel;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import javax.swing.JTextField;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.*;
+import java.awt.*;
 
 public class CpoNewClassPanel extends JPanel  {
     /** Version Id for this class. */
@@ -48,17 +41,17 @@ public class CpoNewClassPanel extends JPanel  {
   }
 
   private void jbInit() throws Exception {
-    this.setSize(new Dimension(458, 306));
     this.setLayout(gridBagLayout1);
     jLabClassName.setText("New class Name:");
-    jTextClassName.setMinimumSize(new Dimension(200, 17));
-    jTextClassName.setPreferredSize(new Dimension(200, 17));
+    jTextClassName.setMinimumSize(new Dimension(300, 20));
+    jTextClassName.setPreferredSize(new Dimension(300, 20));
     jLabSQL.setText("Initialization SQL:");
     jTextAsql.setLineWrap(true);
-    this.add(jLabClassName, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
-    this.add(jTextClassName, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
-    this.add(jLabSQL, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+    this.add(jLabClassName, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
+    this.add(jTextClassName, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
+    this.add(jLabSQL, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
     jScrollPaneSQL.getViewport().add(jTextAsql, null);
-    this.add(jScrollPaneSQL, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 169, 112));
+    jScrollPaneSQL.setPreferredSize(new Dimension(300, 200));
+    this.add(jScrollPaneSQL, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0)); //169, 112));
   }
 }
