@@ -329,29 +329,4 @@ public class SQLExporter  {
     sqlDeleteAll.append(sqlDelimiter);
     return sqlDeleteAll.toString();
   }
-
-  /**
-   * Generates a create all with deletes string
-   */
-  public String exportCreateAll(CpoServerNode menuNode, ProgressEventListener pel) {
-    StringBuffer buf = new StringBuffer();
-
-    // create the delete all statements
-    String delSql = exportDeleteAll();
-    buf.append(delSql);
-
-    // make the class files
-    Enumeration<CpoClassNode> menuEnum = menuNode.children();
-    while (menuEnum.hasMoreElements()) {
-      CpoClassNode classNode = menuEnum.nextElement();
-      SQLClassExport classExport = exportSQL(classNode, true);
-
-      buf.append(classExport.getInsertQueryTextSql());
-      buf.append(classExport.getInsertSql());
-
-      pel.progressMade(new ProgressValueEvent(this, 1));
-    }
-
-    return buf.toString();
-  }
 }

@@ -101,22 +101,6 @@ public class ExportChangedSwingWorker extends SwingWorker {
               }
             }
 
-            /**
-             * Removing this per Dave's request...he's whining that 
-             * "Save Child Changes" is taking too long due to this
-            CpoServerNode serverNode = first.getProxy().getServerNode();
-            pf.progressMade(new ProgressMaxEvent(this, (serverNode.getChildCount() - 1)));
-            pf.setLabel("Generating create all sql...");
-            String createSql = sqlEx.exportCreateAll(serverNode, pf);
-
-            // write out the create all file
-            file = new File(dir, Statics.CREATE_ALL_FILE_NAME);
-            fw = new FileWriter(file);
-            fw.write(createSql);
-            fw.flush();
-            fw.close();
-            */
-
         } catch (Exception ex) {
             error = ex;
             logger.error("Exception caught", ex);

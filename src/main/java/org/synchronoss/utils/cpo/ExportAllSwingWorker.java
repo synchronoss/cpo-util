@@ -52,6 +52,9 @@ public class ExportAllSwingWorker extends SwingWorker {
 
         File file = null;
         FileWriter fw = null;
+        File allFile = null;
+        FileWriter allFw = null;
+
         try {
 
             String dir = menuNode.getProxy().getSqlDir();
@@ -74,9 +77,11 @@ public class ExportAllSwingWorker extends SwingWorker {
             }
 
             SQLExporter sqlEx = new SQLExporter(menuNode.getProxy().getTablePrefix(), menuNode.getProxy().getSqlDelimiter());
-            
-            StringBuffer createAllBuf = new StringBuffer();
-            createAllBuf.append(sqlEx.exportDeleteAll());
+
+            // write out the create all file
+            allFile = new File(dir, Statics.CREATE_ALL_FILE_NAME);
+            allFw = new FileWriter(allFile);
+            allFw.write(sqlEx.exportDeleteAll());
 
             // make the class files
             Enumeration<? extends AbstractCpoNode> menuEnum = menuNode.children();
@@ -87,32 +92,25 @@ public class ExportAllSwingWorker extends SwingWorker {
                     String fileName = classNode.getClassName() + ".sql";
                     SQLClassExport classExport = sqlEx.exportSQL(classNode);
 
-                    StringBuffer sql = new StringBuffer();
-                    sql.append(classExport.getDeleteSql());
-                    sql.append(classExport.getInsertQueryTextSql());
-                    sql.append(classExport.getInsertSql());
-                    
-                    // append this for the create all script
-                    createAllBuf.append(classExport.getInsertQueryTextSql());
-                    createAllBuf.append(classExport.getInsertSql());
+                    // write this for the create all script
+                    allFw.write(classExport.getInsertQueryTextSql());
+                    allFw.write(classExport.getInsertSql());
 
-                    // write the file
+                    // write the single class file
                     file = new File(dir, fileName);
                     fw = new FileWriter(file);
-                    fw.write(sql.toString());
+                    fw.write(classExport.getDeleteSql());
+                    fw.write(classExport.getInsertQueryTextSql());
+                    fw.write(classExport.getInsertSql());
+
                     fw.flush();
                     fw.close();
 
                     pf.progressMade(new ProgressValueEvent(this, 1));
                 }
             }
-
-            // write out the create all file
-            file = new File(dir, Statics.CREATE_ALL_FILE_NAME);
-            fw = new FileWriter(file);
-            fw.write(createAllBuf.toString());
-            fw.flush();
-            fw.close();
+            allFw.flush();
+            allFw.close();
         } catch (Exception ex) {
             error = ex;
             logger.error("Exception caught", ex);
@@ -120,6 +118,12 @@ public class ExportAllSwingWorker extends SwingWorker {
             try {
                 if (fw != null)
                     fw.close();
+            } catch (IOException ex) {
+                // ignore
+            }
+            try {
+                if (allFw != null)
+                    allFw.close();
             } catch (IOException ex) {
                 // ignore
             }
