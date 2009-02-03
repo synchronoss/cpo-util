@@ -3,7 +3,7 @@
   <groupId>org.synchronoss</groupId>
   <artifactId>cpoUtil</artifactId>
   <name>cpoUtil</name>
-  <version>2.5.1</version>
+  <version>2.5.2-SNAPSHOT</version>
   <description>cpoUtil is the utility that configures the metadata for cpo</description>
   <url>http://cpo.sourceforge.net/cpo-util-sourceforge/</url>  
   <licenses>
@@ -111,9 +111,9 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/tags/cpoUtil-2.5.1</connection>
-    <developerConnection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/tags/cpoUtil-2.5.1</developerConnection>
-    <url>https://cpo.svn.sourceforge.net/svnroot/cpo/util/tags/cpoUtil-2.5.1</url>
+    <connection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/branches/CpoUtil-2.5</connection>
+    <developerConnection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/branches/CpoUtil-2.5</developerConnection>
+    <url>https://cpo.svn.sourceforge.net/svnroot/cpo/util/branches/CpoUtil-2.5</url>
   </scm>
   <build>
     <extensions>
