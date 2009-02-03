@@ -106,7 +106,7 @@ public class CpoTesterResultsModel extends AbstractTableModel {
           if (methods[i].getName().equals(methodName) && methods[i].getParameterTypes().length == 0) {
             try {
 //              OUT.debug(methods[i].invoke(obj,null));
-              return methods[i].invoke(obj, (Object)null);
+              return methods[i].invoke(obj);
             } catch (Exception e) {
               e.printStackTrace();
               return e.getMessage();
