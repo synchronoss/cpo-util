@@ -1350,9 +1350,11 @@ public class Proxy implements Observer {
               Class<?> returnType = method.getReturnType();
               attClassName = returnType.getName();
 
-              // HACK - because byte[] comes back as [B
+              // HACK - because byte[] comes back as [B, and char[] comes back as [C
               if ("[B".equals(attClassName)) {
                 attClassName = "byte[]";
+              } else if ("[C".equals(attClassName)) {
+                attClassName = "char[]";
               }
             }
           }
