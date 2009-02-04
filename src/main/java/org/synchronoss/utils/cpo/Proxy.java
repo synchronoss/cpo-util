@@ -22,7 +22,7 @@ package org.synchronoss.utils.cpo;
 
 import gnu.regexp.*;
 import org.apache.log4j.Logger;
-import org.synchronoss.cpo.CpoAdapter;
+import org.synchronoss.cpo.*;
 import org.synchronoss.cpo.jdbc.*;
 
 import javax.naming.*;
@@ -1497,6 +1497,7 @@ public class Proxy implements Observer {
     sbClass.append("}\n");
     return sbTopClass.toString()+sbClass.toString();
   }
+
   public String makeClassOuttaNode(CpoClassNode node) throws Exception {
     //Method meth = cpoMan.getClass().getMethod("getSqlTypeClass",new Class[]{String.class});
     String className = node.getClassName();
@@ -1519,16 +1520,41 @@ public class Proxy implements Observer {
       //Class attClass = (Class) this.sqlTypeClassMeth.invoke(cpoMan,new Object[]{atMapNode.getColumnType()});
       Class<?> attClass = getSqlTypeClass(atMapNode.getColumnType());
       String attClassName = attClass.getName();
+
+      // if the attribute uses a transform, figure out what class it really is
+      if (atMapNode.getTransformClass() != null) {
+        try {
+          // need to use the CpoUtilClassLoader...and it needs to have the jar loaded for that class
+          Class<?> transformClass = CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass(atMapNode.getTransformClass());
+          for (Method method : transformClass.getMethods()) {
+            if (method.getName().equals("transformIn")) {
+              Class<?> returnType = method.getReturnType();
+              attClassName = returnType.getName();
+
+              // HACK - because byte[] comes back as [B
+              if ("[B".equals(attClassName)) {
+                attClassName = "byte[]";
+              }
+            }
+          }
+        } catch (Exception e) {
+          OUT.debug("Invalid Transform Class specified:<" + atMapNode.getTransformClass() + "> using default");
+        }
+      }
+
       if (attName.length() > 1)
         sbClass.append("  public void set"+attName.substring(0,1).toUpperCase()+attName.substring(1)+"("+attClassName+" "+attName+") {\n");
       else
         sbClass.append("  public void set"+attName.toUpperCase()+"("+attClassName+" "+attName+") {\n");
+
       sbClass.append("    this."+attName+" = "+attName+";\n");
       sbClass.append("  }\n");
+
       if (attName.length() > 1)
         sbClass.append("  public "+attClassName+" get"+attName.substring(0,1).toUpperCase()+attName.substring(1)+"() {\n");
       else
         sbClass.append("  public "+attClassName+" get"+attName.toUpperCase()+"() {\n");
+
       sbClass.append("    return this."+attName+";\n");
       sbClass.append("  }\n");
       sbTopClass.append("  private "+attClassName+" "+attName+";\n");      
@@ -1536,6 +1562,7 @@ public class Proxy implements Observer {
     sbClass.append("}\n");
     return sbTopClass.toString()+sbClass.toString();
   }
+
   String makeAttFromColName(String columnName) throws REException {
     columnName = columnName.toLowerCase();
     RE reFixCol = new RE("_.");
