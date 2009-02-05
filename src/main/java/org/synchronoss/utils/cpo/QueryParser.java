@@ -72,7 +72,9 @@ public class QueryParser {
             if (valParenStart == -1)
                 throw new ParseException("Unable to locate starting parenthesis for the column values.", -1);
 
-            int valParenEnd = query.indexOf(")", valParenStart);
+            // use the last close paren, this will make weird inner select stuff work,
+            // but it won't be able to guess the inner select values
+            int valParenEnd = query.lastIndexOf(")");
             if (valParenEnd == -1)
                 throw new ParseException("Unable to locate ending parenthesis for the column values.", -1);
 
@@ -146,5 +148,11 @@ public class QueryParser {
         }
 
         return colList;
+    }
+
+    public static void main(String[] args) throws Exception {
+        String query = args[0];
+        QueryParser parser = new QueryParser();
+        parser.parse(query);
     }
 }
