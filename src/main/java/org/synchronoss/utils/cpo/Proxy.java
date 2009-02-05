@@ -1285,10 +1285,8 @@ public class Proxy implements Observer {
         String attName = makeAttFromColName(rsmd.getColumnName(i));
         //String attClassName = rsmd.getColumnClassName(i);
         OUT.debug("Column Type = "+rsmd.getColumnType(i));
-        String attClassName = getSqlTypeClass(rsmd.getColumnType(i)).getName();
-        if ("[B".equals(attClassName)) {
-            attClassName = "byte[]";
-        }
+        Class<?> attClass = getSqlTypeClass(rsmd.getColumnType(i));
+        String attClassName = getRealClassName(attClass);
         if (attName.length() > 1)
           sbClass.append("  public void set"+attName.substring(0,1).toUpperCase()+attName.substring(1)+"("+attClassName+" "+attName+") {\n");
         else
@@ -1338,7 +1336,7 @@ public class Proxy implements Observer {
       String attName = makeAttFromColName(atMapNode.getColumnName());
       //Class attClass = (Class) this.sqlTypeClassMeth.invoke(cpoMan,new Object[]{atMapNode.getColumnType()});
       Class<?> attClass = getSqlTypeClass(atMapNode.getColumnType());
-      String attClassName = attClass.getName();
+      String attClassName = getRealClassName(attClass);
 
       // if the attribute uses a transform, figure out what class it really is
       if (atMapNode.getTransformClass() != null) {
@@ -1348,14 +1346,7 @@ public class Proxy implements Observer {
           for (Method method : transformClass.getMethods()) {
             if (method.getName().equals("transformIn")) {
               Class<?> returnType = method.getReturnType();
-              attClassName = returnType.getName();
-
-              // HACK - because byte[] comes back as [B, and char[] comes back as [C
-              if ("[B".equals(attClassName)) {
-                attClassName = "byte[]";
-              } else if ("[C".equals(attClassName)) {
-                attClassName = "char[]";
-              }
+              attClassName = getRealClassName(returnType);
             }
           }
         } catch (Exception e) {
@@ -1569,5 +1560,18 @@ public class Proxy implements Observer {
 
   public String getConnectionClassName() {
     return this.connectionClassName;
+  }
+
+  private String getRealClassName(Class<?> clazz) {
+    String clazzName = clazz.getName();
+    byte[] b = new byte[0];
+    char[] c = new char[0];
+
+    if (b.getClass().getName().equals(clazzName)) {
+      clazzName = "byte[]";
+    } else if (c.getClass().getName().equals(clazzName)) {
+      clazzName = "char[]";
+    }
+    return clazzName;
   }
 }
