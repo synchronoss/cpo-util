@@ -65,17 +65,19 @@ public class CpoTesterResultsModel extends AbstractTableModel {
 
   @Override
   public Class<?> getColumnClass(int columnIndex) {
+    /***
+     * Using the return type causes major issues when the return type is a byte[] or a char[]
+     * We can cheat a little and just say it's always going to be a string
 //    OUT.debug ("Getting return type for column: "+columnIndex);
     String columnName = getColumnName(columnIndex);
     String methodName = "get"+columnName.substring(0,1).toUpperCase()+columnName.substring(1);
 //    OUT.debug("getting return type for method: "+methodName);
     for (Object obj : results) {
-      Method[] methods = obj.getClass().getMethods();
-      for (int i = 0 ; i < methods.length ; i++) {
-        if (methods[i].getName().equals(methodName) && methods[i].getParameterTypes().length == 0) {
+      for (Method method : obj.getClass().getMethods()) {
+        if (method.getName().equals(methodName) && method.getParameterTypes().length == 0) {
           try {
 //            OUT.debug(methods[i].getReturnType());
-            return methods[i].getReturnType();
+            return method.getReturnType();
           } catch (Exception e) {
             e.printStackTrace();
           }
@@ -83,6 +85,7 @@ public class CpoTesterResultsModel extends AbstractTableModel {
       }
     }
     OUT.debug("Did not find column class you are looking for - returning String.class!");
+     ***/
     return String.class;
   }
 
@@ -97,16 +100,17 @@ public class CpoTesterResultsModel extends AbstractTableModel {
     String columnName = getColumnName(columnIndex);
     String methodName = "get"+columnName.substring(0,1).toUpperCase()+columnName.substring(1);
 //    OUT.debug("getting return type for method: "+methodName);
+
     Object rowObj = null;
     for (Object obj : results) {
       if (row == rowIndex) {
         rowObj = obj;
-        Method[] methods = obj.getClass().getMethods();
-        for (int i = 0 ; i < methods.length ; i++) {
-          if (methods[i].getName().equals(methodName) && methods[i].getParameterTypes().length == 0) {
+        for (Method method : rowObj.getClass().getMethods()) {
+          if (method.getName().equals(methodName) && method.getParameterTypes().length == 0) {
             try {
 //              OUT.debug(methods[i].invoke(obj,null));
-              return methods[i].invoke(obj);
+              Object returnObj = method.invoke(rowObj);
+              return returnObj == null ? "" : returnObj.toString();
             } catch (Exception e) {
               e.printStackTrace();
               return e.getMessage();
@@ -117,7 +121,7 @@ public class CpoTesterResultsModel extends AbstractTableModel {
       row++;
     }
     OUT.debug("Did not find column/row you are looking for - trying to return toString!");
-    return rowObj==null?"":rowObj.toString();
+    return rowObj == null ? "" : rowObj.toString();
   }
   @Override
   public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
