@@ -97,7 +97,7 @@ public class QueryParser {
             // filter out columns that we're not providing values for
             for (int i = 0; i < vals.length; i++) {
                 String val = vals[i];
-                if (val.trim().equals("?")) {
+                if (val.contains("?")) {
                     colList.add(cols[i].trim());
                 }
             }
