@@ -3,7 +3,7 @@
   <groupId>org.synchronoss</groupId>
   <artifactId>cpoUtil</artifactId>
   <name>cpoUtil</name>
-  <version>2.5.3-SNAPSHOT</version>
+  <version>2.6</version>
   <description>cpoUtil is the utility that configures the metadata for cpo</description>
   <url>http://cpo.sourceforge.net/cpo-util-sourceforge/</url>  
   <licenses>
@@ -48,16 +48,27 @@
   </profiles>
   <distributionManagement>
     <repository>
+      <!--
       <id>sncr-libs-releases</id>
       <name>SNCR Repository</name>
       <url>http://mavenrepo.synchronoss.net:8081/artifactory/libs-releases</url>
+      -->
+      <id>sf-cpo-releases</id>
+      <name>Sourceforge CPO Repository</name>
+      <url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/sf-cpo-releases</url>
     </repository>
     <snapshotRepository>
+      <!--
       <id>sncr-libs-snapshots</id>
       <name>SNCR Snapshot Repository</name>
       <url>http://mavenrepo.synchronoss.net:8081/artifactory/libs-snapshots</url>
+      -->
+      <id>sf-cpo-snapshots</id>
+      <name>Sourceforge CPO Snapshot Repository</name>
+      <url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/sf-cpo-snapshots</url>
     </snapshotRepository>
     <site>
+      <!-- must create a shell for your account at sourceforge by execing: ssh -t <username>,<project name>@shell.sf.net create-->
       <id>sf-cpo-site</id>
       <url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/cpo-util-sourceforge</url>
     </site>
@@ -111,9 +122,9 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/branches/CpoUtil-2.5</connection>
-    <developerConnection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/branches/CpoUtil-2.5</developerConnection>
-    <url>https://cpo.svn.sourceforge.net/svnroot/cpo/util/branches/CpoUtil-2.5</url>
+    <connection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/tags/cpoUtil-2.6</connection>
+    <developerConnection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/tags/cpoUtil-2.6</developerConnection>
+    <url>https://cpo.svn.sourceforge.net/svnroot/cpo/util/tags/cpoUtil-2.6</url>
   </scm>
   <build>
     <extensions>
