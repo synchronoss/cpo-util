@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2006  Jay Colson
+ *  Copyright (C) 2008 Michael Bellomo
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -33,6 +33,9 @@ import java.util.*;
 public class QueryParser {
 
     private Logger OUT = Logger.getLogger(this.getClass());
+
+    private final static String COMPARE_CHARS = " =<>!";
+    private final static String SEPARATOR_CHARS = " ,()";
 
     public QueryParser() {
         // do nothing
@@ -97,8 +100,13 @@ public class QueryParser {
             // filter out columns that we're not providing values for
             for (int i = 0; i < vals.length; i++) {
                 String val = vals[i];
-                if (val.contains("?")) {
+                if (val.trim().equals("?")) {
+                    // just a ?, use the col
                     colList.add(cols[i].trim());
+                } else if (val.contains("?")) {
+                    // more than just a ?, parse the val
+                    QueryParser qp = new QueryParser();
+                    colList.addAll(qp.parse(val));
                 }
             }
         } else {
@@ -106,9 +114,14 @@ public class QueryParser {
             // so we'll have to move left to right from the ? looking for the field name
 
             String[] chunks = query.split("\\?");
+            int chunkIdx = 0;
             for (String chunk : chunks) {
                 if (OUT.isDebugEnabled())
                     OUT.debug("Chunk: " + chunk);
+
+                // if it's the last chunk, check to see if the query ended w/ a ?, if not, we can ignore
+                if ((chunkIdx == (chunks.length - 1)) && !query.trim().endsWith("?"))
+                    continue;
 
                 int idx = chunk.length() - 1;
                 int fieldStartIdx = -1;
@@ -119,14 +132,14 @@ public class QueryParser {
                     char c = chunk.charAt(idx);
 
                     if (fieldEndIdx == -1) {
-                        // till we find the first char of the end of the field name, ignore spaces and equals
-                        if (!(c == ' ' || c == '=')) {
+                        // till we find the first char of the end of the field name, ignore compare chars
+                        if (COMPARE_CHARS.indexOf(c) == -1) {
                             // found a char, must be the end of the field name
                             fieldEndIdx = idx;
                         }
                     } else {
-                        // if we find a space or a comma, we've reached the beginning of the field name
-                        if (c == ' ' || c == ',') {
+                        // if we find a separator, we've reached the beginning of the field name
+                        if (SEPARATOR_CHARS.indexOf(c) >= 0) {
                             fieldStartIdx = idx + 1;
                             found = true;
                         }
@@ -137,13 +150,9 @@ public class QueryParser {
                     String col = chunk.substring(fieldStartIdx, fieldEndIdx + 1);
                     colList.add(col);
                 }
-            }
-        }
 
-        // at this point, the colList will only have columns that correspond to a ?
-        if (OUT.isDebugEnabled()) {
-            for (String s : colList) {
-                OUT.debug("Column [" + s + "]");
+                // increment
+                chunkIdx++;
             }
         }
 
@@ -151,8 +160,14 @@ public class QueryParser {
     }
 
     public static void main(String[] args) throws Exception {
-        String query = args[0];
+        String query = "select * from IMPL_EMAIL_CONFIG where REGION = ? and STATE = ? and REASON_CODE = ? and IS_DELETED = '0'";
+        //String query = "insert into lnp_order_curr_disp(transaction_id, category, revision, state, timestamp,disp_transaction_id, trx_seq, user_id, tn, trans_comment) (select transaction_id, category, revision, state, timestamp,disp_transaction_id, trx_seq, user_id, tn, trans_comment from lnp_order_curr_disp_v where transaction_id = (select transaction_id from lnp_order_disp_head where disp_transaction_id = ?) and category = ? and (tn = ? or ? is null))";
         QueryParser parser = new QueryParser();
-        parser.parse(query);
+        List<String> colList = parser.parse(query);
+        int count = 1;
+        for (String col : colList) {
+            System.out.println("Column[" + count + "] = " + col);
+            count++;
+        }
     }
 }

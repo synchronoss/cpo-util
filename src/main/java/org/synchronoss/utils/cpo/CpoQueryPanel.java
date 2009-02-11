@@ -20,6 +20,8 @@
  */
 package org.synchronoss.utils.cpo;
 
+import org.apache.log4j.Logger;
+
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
@@ -29,6 +31,8 @@ import java.util.*;
 import java.util.List;
 
 public class CpoQueryPanel extends JPanel {
+
+    private Logger OUT = Logger.getLogger(this.getClass());
 
     private static final long serialVersionUID = 1L;
     private BorderLayout borderLayout1 = new BorderLayout();
@@ -209,6 +213,15 @@ public class CpoQueryPanel extends JPanel {
 
         try {
             List<String> colList = parser.parse(query);
+
+            // at this point, the colList will only have columns that correspond to a ?
+            if (OUT.isDebugEnabled()) {
+                int count = 1;
+                for (String col : colList) {
+                  OUT.debug("Column[" + count + "] = " + col);
+                  count++;
+                }
+            }
 
             // if colList is null or empty, we're done
             if (colList == null || colList.isEmpty())
