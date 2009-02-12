@@ -231,8 +231,8 @@ public class SQLExporter  {
               sqlInsertBuffer.append("','");
               sqlInsertBuffer.append(queryNode.getGroupId());
               sqlInsertBuffer.append("','");
-              sqlInsertBuffer.append("','");
               sqlInsertBuffer.append(queryNode.getSeqNo());
+              sqlInsertBuffer.append("','");
               sqlInsertBuffer.append(queryTextSql);
               sqlInsertBuffer.append("',");
               sqlInsertBuffer.append(queryTextDesc == null ? null : "'" + queryTextDesc + "'");
