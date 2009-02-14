@@ -3,7 +3,7 @@
   <groupId>org.synchronoss</groupId>
   <artifactId>cpoUtil</artifactId>
   <name>cpoUtil</name>
-  <version>3.0-SNAPSHOT</version>
+  <version>4.0-SNAPSHOT</version>
   <description>cpoUtil is the utility that configures the metadata for cpo</description>
   <url>http://cpo.sourceforge.net/cpo-util-sourceforge/</url>  
   <licenses>
@@ -319,7 +319,7 @@
     <dependency>
       <groupId>org.synchronoss</groupId>
       <artifactId>cpo</artifactId>
-      <version>3.6-SNAPSHOT</version>
+      <version>4.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
   <reporting>
