@@ -19,17 +19,17 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import javax.swing.JPanel;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
+
+import java.awt.*;
+import java.util.ResourceBundle;
+
+import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
 
 public class MainFrame_AboutBoxPanel extends JPanel {
-    /** Version Id for this class. */
-    private static final long serialVersionUID=1L;
+  
+  /** Version Id for this class. */
+  private static final long serialVersionUID=1L;
 
   private Border border = BorderFactory.createEtchedBorder();
   private GridBagLayout layoutMain = new GridBagLayout();
@@ -37,9 +37,12 @@ public class MainFrame_AboutBoxPanel extends JPanel {
   private JLabel labelCopyright = new JLabel();
   private JLabel labelAuthor = new JLabel();
   private JLabel labelTitle = new JLabel();
+  private JLabel labelVersion = new JLabel();
+  private ResourceBundle resources;
 
   public MainFrame_AboutBoxPanel() {
     try {
+      resources = ResourceBundle.getBundle("cpoutil");
       jbInit();
     } catch(Exception e) {
       e.printStackTrace();
@@ -49,14 +52,15 @@ public class MainFrame_AboutBoxPanel extends JPanel {
   private void jbInit() throws Exception {
     this.setLayout(layoutMain);
     this.setBorder(border);
-    labelTitle.setText("Title: CPO Utility");
-    labelAuthor.setText("Author: Jay Colson");
-    String revision = "$Revision: 1.10 $";
-    labelCopyright.setText("Copyright: 2003,2004 "+revision.substring(1,revision.length()-1));
-    labelCompany.setText("Company: Synchronoss Technologies, Inc.");
+    labelTitle.setText("Title: " + resources.getString("cpoutil.title"));
+    labelVersion.setText("Version: " + resources.getString("cpoutil.version"));
+    labelAuthor.setText("Author: " + resources.getString("cpoutil.author"));
+    labelCopyright.setText("Copyright: " + resources.getString("cpoutil.copyright"));
+    labelCompany.setText("Company: " + resources.getString("cpoutil.company"));
     this.add(labelTitle, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 15, 0, 15), 0, 0));
-    this.add(labelAuthor, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 15, 0, 15), 0, 0));
-    this.add(labelCopyright, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 15, 0, 15), 0, 0));
-    this.add(labelCompany, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 15, 5, 15), 0, 0));
+    this.add(labelVersion, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 15, 0, 15), 0, 0));
+    this.add(labelAuthor, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 15, 0, 15), 0, 0));
+    this.add(labelCopyright, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 15, 0, 15), 0, 0));
+    this.add(labelCompany, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 15, 5, 15), 0, 0));
   }
 }

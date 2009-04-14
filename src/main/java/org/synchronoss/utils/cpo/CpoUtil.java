@@ -20,6 +20,8 @@
  */
 package org.synchronoss.utils.cpo;
 
+import org.apache.log4j.Logger;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -28,16 +30,16 @@ import java.net.*;
 import java.security.*;
 import java.util.*;
 import java.util.List;
-//import com.l2fprod.gui.plaf.skin.*;
-//import com.l2fprod.gui.*;
-//import com.l2fprod.util.*;
 
 public class CpoUtil {
+  
   static Properties props = new Properties();
   static Properties localProps = new Properties();
   static MainFrame frame;
   static List<File> files = new ArrayList<File>();
   static String username;
+  
+  private static Logger OUT = Logger.getLogger(CpoUtil.class);
   
   public CpoUtil(String propsLocation) {
     loadProps(propsLocation);
@@ -87,12 +89,18 @@ public class CpoUtil {
       propsLocation = args[0];
     new CpoUtil(propsLocation);
   }
+  
   static void showException(Throwable e) {
+    if (OUT.isDebugEnabled())
+      OUT.debug("Exception caught", e);
+    
     JOptionPane.showMessageDialog(frame, new ExceptionPanel(e), "Exception Caught!", JOptionPane.PLAIN_MESSAGE);
   }
+
   static void updateStatus(String status) {
     frame.statusBar.setText(status);
   }
+  
   private void loadProps(String propsLocation) {
     try {
       InputStream is;
@@ -127,6 +135,7 @@ public class CpoUtil {
       }
     }
   }
+  
   public static String getServerFromUser() {
     Vector<String> vec = new Vector<String>();
     // get default provided properties
@@ -160,6 +169,7 @@ public class CpoUtil {
     String selection = (String)JOptionPane.showInputDialog(frame,"Select server to connect to:","Server Selection",JOptionPane.PLAIN_MESSAGE,null,choices,null);
     return (selection==null)?null:selection.substring(0,selection.indexOf(":"));
   }
+  
   public static void setCustomClassPath(String message) {
     JOptionPane.showMessageDialog(frame,new CpoUtilClassPathPanel(files),message,JOptionPane.PLAIN_MESSAGE);
     StringBuffer sbClasspath = new StringBuffer();
@@ -170,6 +180,7 @@ public class CpoUtil {
     localProps.setProperty(Statics.LPROP_CLASSPATH,sbClasspath.toString());
     saveLocalProps();
   }
+  
   public static void saveLocalProps() {
     try {
       File propsFile = new File(System.getProperties().getProperty("user.home")+File.separator+".cpoutil.properties");
@@ -179,6 +190,7 @@ public class CpoUtil {
       showException(ioe);
     }
   }
+  
   public static void setNewWLConnection(String editServer) {
     CpoWLPropertyPanel pane = new CpoWLPropertyPanel();
     if (editServer != null) {
@@ -214,6 +226,7 @@ public class CpoUtil {
       }
     }
   }
+  
   static void setNewJDBCConnection(String editServer) {
     String msg = "Create new JDBC Connection";
     CpoJDBCPropertyPanel pane = new CpoJDBCPropertyPanel();
@@ -262,10 +275,11 @@ public class CpoUtil {
       }
     }
   }
+  
   static void editConnection() {
-    JOptionPane.showMessageDialog(frame,new CpoEditConnPanel(localProps),"Edit Connections",
-        JOptionPane.OK_OPTION);
+    JOptionPane.showMessageDialog(frame, new CpoEditConnPanel(localProps), "Edit Connections", JOptionPane.QUESTION_MESSAGE);
   }
+  
   static boolean showYesNo(String message) {
     int result = JOptionPane.showConfirmDialog(frame,message,"Yes or No",JOptionPane.YES_NO_OPTION);
     return (result == 0);
@@ -275,28 +289,6 @@ public class CpoUtil {
     JOptionPane.showMessageDialog(frame, message);
   }
 
-  static File getDefaultDir() {
-    File file = null;
-    if (localProps.getProperty(Statics.LPROP_DEFDIR) != null) {
-      try {
-        file = new File(localProps.getProperty(Statics.LPROP_DEFDIR));
-      } catch (Exception e) {
-        showException(e);
-      }
-    }
-    return file;
-  }
-  static void setDefaultDir(File file) {
-    localProps.setProperty(Statics.LPROP_DEFDIR,file.toString());
-    saveLocalProps();
-  }
-  static String getDefaultPackageName() {
-    return localProps.getProperty(Statics.LPROP_DEFPACK);
-  }
-  static void setDefaultPackageName(String pack) {
-    localProps.setProperty(Statics.LPROP_DEFPACK,pack);
-    saveLocalProps();
-  }
   static void removeConnection(String server) {
     localProps.remove(Statics.PROP_CPONAME+server);
     localProps.remove(Statics.PROP_JDBC_DRIVER+server);
@@ -311,6 +303,7 @@ public class CpoUtil {
     localProps.remove(Statics.PROP_JDBC_TABLE_PREFIX+server);
     saveLocalProps();
   }
+  
   static boolean checkUnsavedData(String message) {
     boolean unsavedData = false;
     int tabCount = frame.jTabbedPane.getTabCount();
@@ -324,12 +317,9 @@ public class CpoUtil {
         unsavedData = false;
       }
     }
-//    if (!unsavedData) {
-//      this.setVisible(false);
-//      System.exit(0);      
-//    }
     return unsavedData;
   }
+  
   static void clearMetaClassCacheOnConnectedServers() throws Exception {
     int tabCount = frame.jTabbedPane.getTabCount();
     for (int i = 0 ; i < tabCount ; i++) {

@@ -109,9 +109,6 @@ public class CpoJDBCPropertyPanel extends JPanel  {
     if (sqlDir != null) {
       // try the saved dir first
       chooser.setCurrentDirectory(sqlDir);
-    } else if (CpoUtil.getDefaultDir() != null) {
-      // if there wasn't a saved dir, use the default dir
-      chooser.setCurrentDirectory(CpoUtil.getDefaultDir());
     }
     chooser.setApproveButtonText("Select");
     chooser.setDialogTitle("Select directory to save sql:");

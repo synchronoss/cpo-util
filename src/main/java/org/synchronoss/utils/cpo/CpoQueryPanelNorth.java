@@ -126,11 +126,13 @@ public class CpoQueryPanelNorth extends JPanel  {
     this.add(jTextSeq, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
     this.add(jLabDesc, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
     jScrollDesc.getViewport().add(jTextAdesc, null);
+    jScrollDesc.getViewport().setMinimumSize(new Dimension(200,20));
     jScrollDesc.getViewport().setPreferredSize(new Dimension(200,20));
-    this.add(jScrollDesc, new GridBagConstraints(1, 4, 2, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 230, 25));
+    this.add(jScrollDesc, new GridBagConstraints(1, 4, 2, 1, 0.5, 0.5, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 230, 25));
     this.add(jLabSQL, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
     jScrollSQL.getViewport().add(jTextASQL, null);
-    jScrollSQL.getViewport().setPreferredSize(new Dimension(200,50));
+    jScrollSQL.getViewport().setMinimumSize(new Dimension(200,50));
+    jScrollSQL.getViewport().setPreferredSize(new Dimension(200,100));
     this.add(jScrollSQL, new GridBagConstraints(1, 5, 2, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 230, 45));
     this.add(jLabQueryText, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
     this.add(jTextQuerySeach, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));

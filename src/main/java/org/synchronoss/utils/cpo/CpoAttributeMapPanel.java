@@ -112,32 +112,28 @@ public class CpoAttributeMapPanel extends JPanel  {
   }
   
   private void addAttrToClassFromSQL() {
-      String className = null;
-      String sql = null;
-      CpoClassNode ccn = (CpoClassNode)cpoAttLabNode.getParent();
-      CpoNewClassPanel cncp = new CpoNewClassPanel();
-      if (ccn.getClassName() != null)
-          cncp.jTextClassName.setText(ccn.getClassName());
-      OUT.debug(cncp.jTextClassName.getText());
-      int result = JOptionPane.showConfirmDialog(this,cncp,"Add New Attributes based on SQL", JOptionPane.OK_CANCEL_OPTION);
-      if (result == 0) {
-          className = cncp.jTextClassName.getText();
-          if (className.lastIndexOf(".") != -1)
-              CpoUtil.setDefaultPackageName(className.substring(0,className.lastIndexOf(".")));
-          sql = cncp.jTextAsql.getText();
-          OUT.debug(sql);
-          try {
-              cpoAttLabNode.getProxy().addToAttributeMapFromSQL(model, sql);
-          } catch (Exception e) {
-              CpoUtil.showException(e);
-              return;
-          }
-      } else {
-          /**
-           * user wishes to cancel creation
-           */
-          CpoUtil.updateStatus("Aborted Attribute Creation");
-          return;
+    CpoClassNode ccn = (CpoClassNode)cpoAttLabNode.getParent();
+    CpoNewClassPanel cncp = new CpoNewClassPanel();
+    if (ccn.getClassName() != null)
+      cncp.jTextClassName.setText(ccn.getClassName());
+    OUT.debug(cncp.jTextClassName.getText());
+    int result = JOptionPane.showConfirmDialog(this, cncp, "Add New Attributes based on SQL", JOptionPane.OK_CANCEL_OPTION);
+    if (result == 0) {
+      String className = cncp.jTextClassName.getText();
+      if (className.lastIndexOf(".") != -1)
+        cpoAttLabNode.getProxy().setDefaultPackageName(className.substring(0, className.lastIndexOf(".")));
+      String sql = cncp.jTextAsql.getText();
+      OUT.debug(sql);
+      try {
+        cpoAttLabNode.getProxy().addToAttributeMapFromSQL(model, sql);
+      } catch (Exception e) {
+        CpoUtil.showException(e);
+      }
+    } else {
+      /**
+       * user wishes to cancel creation
+       */
+      CpoUtil.updateStatus("Aborted Attribute Creation");
       }
   }
   

@@ -20,6 +20,8 @@
  */
 package org.synchronoss.utils.cpo;
 
+import org.apache.log4j.Logger;
+
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
@@ -30,9 +32,8 @@ import java.util.List;
 
 public class CpoQueryPanel extends JPanel {
 
-    /**
-     * Version Id for this class.
-     */
+    private Logger OUT = Logger.getLogger(this.getClass());
+
     private static final long serialVersionUID = 1L;
     private BorderLayout borderLayout1 = new BorderLayout();
     private CpoQueryPanelNorth cpoQPnorth;
@@ -43,6 +44,7 @@ public class CpoQueryPanel extends JPanel {
     private JPopupMenu menu = new JPopupMenu();
     private TableCellEditor editor;
     private JComboBox jIOTypeBox;
+    private JSplitPane jSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
 //    private Logger OUT = Logger.getLogger(this.getClass());
 
@@ -71,8 +73,9 @@ public class CpoQueryPanel extends JPanel {
         jTableQueryParam.setDefaultEditor(JComboBox.class, editor);
 //    this.setSize(new Dimension(200, 500));
         this.setLayout(borderLayout1);
-        this.add(cpoQPnorth, BorderLayout.NORTH);
-        this.add(jScrollTable, BorderLayout.CENTER);
+        this.add(jSplitPane, BorderLayout.CENTER);
+        jSplitPane.setTopComponent(cpoQPnorth);
+        jSplitPane.setBottomComponent(jScrollTable);
         cpoQPnorth.jTextSeq.addKeyListener(new KeyListener() {
             public void keyTyped(KeyEvent ke) {
             }
@@ -226,7 +229,7 @@ public class CpoQueryPanel extends JPanel {
             queryNode.setDirty(true);
 //    jTableQueryParam.revalidate();
     }
-  
+
     private final static String sqlTooBigMsg =
       "The sql entered has lines containing more than 2000 characters.\n" +
       "This might cause some tools such as sql plus not to be able to execute it.\n\n" +
@@ -287,6 +290,15 @@ public class CpoQueryPanel extends JPanel {
 
         try {
             List<String> colList = parser.parse(query);
+
+            // at this point, the colList will only have columns that correspond to a ?
+            if (OUT.isDebugEnabled()) {
+                int count = 1;
+                for (String col : colList) {
+                  OUT.debug("Column[" + count + "] = " + col);
+                  count++;
+                }
+            }
 
             // if colList is null or empty, we're done
             if (colList == null || colList.isEmpty())

@@ -5,7 +5,7 @@
   <name>cpoUtil</name>
   <version>2.7-SNAPSHOT</version>
   <description>cpoUtil is the utility that configures the metadata for cpo</description>
-  <url>http://cpo.sourceforge.net/cpo-util-sourceforge/</url>  
+  <url>http://cpo.sourceforge.net/cpo-util-sourceforge/</url>
   <licenses>
     <license>
       <name>GNU Lesser General Public License</name>
@@ -45,34 +45,34 @@
         </plugins>
       </build>
     </profile>
-  </profiles>
-  <distributionManagement>
-    <repository>
-      <!--
-      <id>sncr-libs-releases</id>
-      <name>SNCR Repository</name>
-      <url>http://mavenrepo.synchronoss.net:8081/artifactory/libs-releases</url>
-      -->
-      <id>sf-cpo-releases</id>
-      <name>Sourceforge CPO Repository</name>
-      <url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/sf-cpo-releases</url>
-    </repository>
-    <snapshotRepository>
-      <!--
-      <id>sncr-libs-snapshots</id>
-      <name>SNCR Snapshot Repository</name>
-      <url>http://mavenrepo.synchronoss.net:8081/artifactory/libs-snapshots</url>
-      -->
-      <id>sf-cpo-snapshots</id>
-      <name>Sourceforge CPO Snapshot Repository</name>
-      <url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/sf-cpo-snapshots</url>
-    </snapshotRepository>
-    <site>
-      <!-- must create a shell for your account at sourceforge by execing: ssh -t <username>,<project name>@shell.sf.net create-->
-      <id>sf-cpo-site</id>
-      <url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/cpo-util-sourceforge</url>
-    </site>
-  </distributionManagement>
+    </profiles>
+    <distributionManagement>
+      <repository>
+        <!--
+        <id>sncr-libs-releases</id>
+        <name>SNCR Repository</name>
+        <url>http://mavenrepo.synchronoss.net:8081/artifactory/libs-releases</url>
+        -->
+        <id>sf-cpo-releases</id>
+        <name>Sourceforge CPO Repository</name>
+        <url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/sf-cpo-releases</url>
+      </repository>
+      <snapshotRepository>
+        <!--
+        <id>sncr-libs-snapshots</id>
+        <name>SNCR Snapshot Repository</name>
+        <url>http://mavenrepo.synchronoss.net:8081/artifactory/libs-snapshots</url>
+        -->
+        <id>sf-cpo-snapshots</id>
+        <name>Sourceforge CPO Snapshot Repository</name>
+        <url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/sf-cpo-snapshots</url>
+      </snapshotRepository>
+      <site>
+        <!-- must create a shell for your account at sourceforge by execing: ssh -t <username>,<project name>@shell.sf.net create-->
+        <id>sf-cpo-site</id>
+        <url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/cpo-util-sourceforge</url>
+      </site>
+    </distributionManagement>
   <issueManagement>
     <system>SourceForge</system>
     <url>http://sourceforge.net/projects/cpo</url>
@@ -127,6 +127,12 @@
     <url>https://cpo.svn.sourceforge.net/svnroot/cpo/util/branches/CpoUtil-2.5</url>
   </scm>
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
     <extensions>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
@@ -313,7 +319,7 @@
     <dependency>
       <groupId>org.synchronoss</groupId>
       <artifactId>cpo</artifactId>
-      <version>3.4</version>
+      <version>3.6</version>
     </dependency>
   </dependencies>
   <reporting>
