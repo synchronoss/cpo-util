@@ -310,7 +310,12 @@ public class CpoBrowserTree extends JTree  {
     CpoServerNode csn = new CpoServerNode(menuNode.getProxy(),this);
 //    menuNode.scrubNodes();
 //    ((DefaultTreeModel)this.getModel()).nodeStructureChanged(menuNode);
-    ((DefaultTreeModel)this.getModel()).setRoot(csn);    
+    ((DefaultTreeModel)this.getModel()).setRoot(csn);
+
+    // force a selection on the root node
+    TreePath tp = new TreePath(getModel().getRoot());
+    this.setSelectionPath(tp);
+
     CpoUtil.updateStatus("Cleared Local Application Cache");
     return true;
   }
