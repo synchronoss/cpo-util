@@ -59,7 +59,7 @@ public class CpoTesterPanel extends JPanel implements ClipboardOwner  {
   private void jbInit() throws Exception {
     this.setSize(new Dimension(754, 681));
     this.setLayout(borderLayout1);
-    jTableResults.setPreferredScrollableViewportSize(new Dimension(100, 100));
+    jTableResults.setPreferredScrollableViewportSize(new Dimension(300, 300));
     jTableResults.setCellSelectionEnabled(true);
     jTableResults.addKeyListener(new KeyListener() {
       public void keyPressed(KeyEvent e) {}

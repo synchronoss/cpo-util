@@ -113,6 +113,8 @@ public class CpoBrowserPanel extends JPanel  {
             panel = emptyPanel;
 
           jSplitPane.setRightComponent(panel);
+          panel.setMinimumSize(new Dimension(400,0));
+          panel.setPreferredSize(new Dimension(400,0));
         }
       }
     });

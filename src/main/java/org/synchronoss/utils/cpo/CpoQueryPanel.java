@@ -156,6 +156,8 @@ public class CpoQueryPanel extends JPanel {
         int index = -1, tokenCount = 0;
         while ((index = cpoQPnorth.jTextASQL.getText().indexOf("?", index + 1)) != -1) {
 //      OUT.debug ("index: "+index);
+          // only add an attribute if the character before the '?' isn't a '\'
+          if (index > 0 && (cpoQPnorth.jTextASQL.getText().charAt(index - 1) != '\\' ))
             tokenCount++;
         }
         int attRowCount = cpoQTM.getNonRemovedRows();
@@ -173,11 +175,14 @@ public class CpoQueryPanel extends JPanel {
             }
         }
         String newSql = cpoQPnorth.jTextASQL.getText();
+        /***
+         * Removed for now...causing problems
         if (newSql.trim().endsWith(";")) {
             // if the sql ends with a semicolon, strip it
             newSql = newSql.substring(0, newSql.lastIndexOf(";"));
             cpoQPnorth.jTextASQL.setText(newSql);
         }
+        ***/
         queryNode.setSQL(newSql);
     }
 

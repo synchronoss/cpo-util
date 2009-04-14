@@ -123,6 +123,10 @@ public class QueryParser {
                 if ((chunkIdx == (chunks.length - 1)) && !query.trim().endsWith("?"))
                     continue;
 
+                // if it's a backslash '\', we're going to ignore this question mark
+                if (chunk.endsWith("\\"))
+                    continue;
+
                 int idx = chunk.length() - 1;
                 int fieldStartIdx = -1;
                 int fieldEndIdx = -1;
