@@ -196,6 +196,8 @@ public class CpoQueryPanel extends JPanel {
         int index = -1, tokenCount = 0;
         while ((index = cpoQPnorth.jTextASQL.getText().indexOf("?", index + 1)) != -1) {
 //      OUT.debug ("index: "+index);
+          // only add an attribute if the character before the '?' isn't a '\'
+          if (index > 0 && (cpoQPnorth.jTextASQL.getText().charAt(index - 1) != '\\' ))
             tokenCount++;
         }
         int attRowCount = cpoQTM.getNonRemovedRows();
