@@ -136,6 +136,10 @@ public class CpoQueryPanel extends JPanel {
         cpoQPnorth.jTextASQL.addMouseListener(new MouseListener() {
             public void mouseClicked(MouseEvent e) {
                 if (e.isMetaDown()) {
+                    // This is an ugly hack for a focus issue with JTable.  Selecting the cell at 0, 0
+                    // will cause the table to realize it needs to stop editing the selected cell and
+                    // will cause the cell editor to end removing the combo box
+                    jTableQueryParam.editCellAt(0, 0);
                     showMenu(e.getPoint());
                 }
             }
@@ -150,6 +154,14 @@ public class CpoQueryPanel extends JPanel {
             }
 
             public void mouseReleased(MouseEvent e) {
+            }
+        });
+        cpoQPnorth.jTextASQL.addFocusListener(new FocusListener() {
+            public void focusGained(FocusEvent focusEvent) {
+            }
+
+            public void focusLost(FocusEvent focusEvent) {
+                checkSQLLength();
             }
         });
         cpoQPnorth.jComQueryText.addActionListener(new ActionListener() {
@@ -199,17 +211,40 @@ public class CpoQueryPanel extends JPanel {
         }
         String oldSql = queryNode.getQueryText().getSQL();
         String newSql = cpoQPnorth.jTextASQL.getText();
+        /***
+         * Removed for now
         if (newSql.trim().endsWith(";")) {
             // if the sql ends with a semicolon, strip it
             newSql = newSql.substring(0, newSql.lastIndexOf(";"));
             cpoQPnorth.jTextASQL.setText(newSql);
         }
+        ***/
         queryNode.getQueryText().setSQL(newSql);
         
         // if the sql changed, mark the node dirty
         if (!newSql.equals(oldSql))
             queryNode.setDirty(true);
 //    jTableQueryParam.revalidate();
+    }
+  
+    private final static String sqlTooBigMsg =
+      "The sql entered has lines containing more than 2000 characters.\n" +
+      "This might cause some tools such as sql plus not to be able to execute it.\n\n" +
+      "To solve this issue, add line breaks to the query.";
+
+    private void checkSQLLength() {
+      String sql = cpoQPnorth.jTextASQL.getText();
+
+      // check for length, over 2499 characters and sql plus won't handle the query
+      boolean hasBigChunk = false;
+      for (String chunk : sql.split("\n")) {
+        if (chunk.length() > 2000)
+          hasBigChunk = true;
+      }
+
+      if (hasBigChunk) {
+        JOptionPane.showMessageDialog(this, sqlTooBigMsg, "Warning", JOptionPane.WARNING_MESSAGE);
+      }
     }
 
     private void showMenu(Point p) {
