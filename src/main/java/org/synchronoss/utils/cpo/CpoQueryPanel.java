@@ -84,14 +84,12 @@ public class CpoQueryPanel extends JPanel {
             }
 
             public void keyReleased(KeyEvent ke) {
-                int newSeqNo = queryNode.getSeqNo();
                 try {
-                    newSeqNo = Integer.parseInt(cpoQPnorth.jTextSeq.getText());
+                    int newSeqNo = Integer.parseInt(cpoQPnorth.jTextSeq.getText());
+                    queryNode.setSeqNo(newSeqNo);
                 } catch (NumberFormatException nfe) {
                     cpoQPnorth.jTextSeq.setText(Integer.toString(queryNode.getSeqNo()));
-                    return;
                 }
-                queryNode.setSeqNo(newSeqNo);
             }
         });
         cpoQPnorth.jTextAdesc.addKeyListener(new KeyListener() {
@@ -184,15 +182,28 @@ public class CpoQueryPanel extends JPanel {
         }
         ***/
         queryNode.setSQL(newSql);
+
+        CpoUtil.updateStatus("SQL Length: " + newSql.length());
     }
 
-    private final static String sqlTooBigMsg =
+  private final static String sqlTooBigMsg =
+      "The sql entered has contains more than 4000 characters.\n" +
+      "This might cause some databases such as oracle not to be able to store it.\n\n" +
+      "To solve this issue, shorten the query.";
+
+    private final static String sqlLineTooBigMsg =
       "The sql entered has lines containing more than 2000 characters.\n" +
       "This might cause some tools such as sql plus not to be able to execute it.\n\n" +
       "To solve this issue, add line breaks to the query.";
 
     private void checkSQLLength() {
       String sql = cpoQPnorth.jTextASQL.getText();
+
+      // check for more than 4000 chars
+      if (sql.length() > 4000) {
+        JOptionPane.showMessageDialog(this, sqlTooBigMsg, "Warning", JOptionPane.WARNING_MESSAGE);
+        return;
+      }
 
       // check for length, over 2499 characters and sql plus won't handle the query
       boolean hasBigChunk = false;
@@ -202,7 +213,7 @@ public class CpoQueryPanel extends JPanel {
       }
 
       if (hasBigChunk) {
-        JOptionPane.showMessageDialog(this, sqlTooBigMsg, "Warning", JOptionPane.WARNING_MESSAGE);
+        JOptionPane.showMessageDialog(this, sqlLineTooBigMsg, "Warning", JOptionPane.WARNING_MESSAGE);
       }
     }
 
