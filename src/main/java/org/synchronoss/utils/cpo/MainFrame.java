@@ -153,6 +153,7 @@ public class MainFrame extends JFrame {
       CpoBrowserPanel browserPanel = new CpoBrowserPanel();
       this.jTabbedPane.addTab(browserPanel.getServer(),null,browserPanel,browserPanel.getDatabaseName()+" Revisions enabled: "+browserPanel.getProxy().revsEnabled);
       this.statusBar.setText("Connected to: "+browserPanel.getServer()+" using "+browserPanel.getProxy().getConnectionClassName());
+      this.jTabbedPane.setSelectedComponent(browserPanel);
     } catch(SqlDirRequiredException ex) {
       // the server selected doesn't have a sql dir selected, force the user to pick one
       JOptionPane.showMessageDialog(this, ex.getMessage(), "Warning", JOptionPane.WARNING_MESSAGE);
