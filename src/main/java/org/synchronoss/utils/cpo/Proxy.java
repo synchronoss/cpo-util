@@ -1548,7 +1548,8 @@ public class Proxy implements Observer {
     sbClass.append("  public "+className+"() {\n  }\n");
     List<CpoAttributeMapNode> alAttMap = this.getAttributeMap(node);
     for (CpoAttributeMapNode atMapNode : alAttMap) {
-      String attName = makeAttFromColName(atMapNode.getColumnName());
+      String attName = atMapNode.getAttribute();
+      //String attName = makeAttFromColName(atMapNode.getColumnName());
       //Class attClass = (Class) this.sqlTypeClassMeth.invoke(cpoMan,new Object[]{atMapNode.getColumnType()});
       Class<?> attClass = getSqlTypeClass(atMapNode.getColumnType());
       String attClassName = getRealClassName(attClass);
@@ -1599,6 +1600,7 @@ public class Proxy implements Observer {
     }
     return columnName;
   }
+
   void generateNewAttributeMap(CpoClassNode ccn, Method[] methods) throws Exception {
     CpoAttributeLabelNode attMapParent = null;
     Enumeration<AbstractCpoNode> enumChildren = ccn.children();
