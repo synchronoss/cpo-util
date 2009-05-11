@@ -106,6 +106,10 @@ public class CpoBrowserPanel extends JPanel  {
         Object pathComp = tse.getPath().getLastPathComponent();
         if (pathComp instanceof AbstractCpoNode) {
           Component rightComp = jSplitPane.getRightComponent();
+
+          // save the divider location
+          int divLoc = jSplitPane.getDividerLocation();
+
           if (rightComp != null)
             jSplitPane.remove(rightComp);
           JPanel panel = ((AbstractCpoNode)pathComp).getPanelForSelected();
@@ -113,8 +117,9 @@ public class CpoBrowserPanel extends JPanel  {
             panel = emptyPanel;
 
           jSplitPane.setRightComponent(panel);
-          panel.setMinimumSize(new Dimension(400,0));
-          panel.setPreferredSize(new Dimension(400,0));
+
+          // reset the divider location
+          jSplitPane.setDividerLocation(divLoc);
         }
       }
     });
