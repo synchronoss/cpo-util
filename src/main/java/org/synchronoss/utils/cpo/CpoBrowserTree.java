@@ -429,7 +429,7 @@ public class CpoBrowserTree extends JTree  {
       CpoUtil.updateStatus("Aborted Class Creation: file not saved");
       return;
     }
-    menuNode.getProxy().setDefaultDir(jFile.getSelectedFile());
+    menuNode.getProxy().setDefaultDir(jFile.getCurrentDirectory());
     try {
       FileWriter fw = new FileWriter(jFile.getSelectedFile()+File.separator+saveClassName+".java");
       fw.write(classString);
