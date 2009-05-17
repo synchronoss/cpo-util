@@ -35,7 +35,7 @@ public class QueryParser {
     private Logger OUT = Logger.getLogger(this.getClass());
 
     private final static String COMPARE_CHARS = " =<>!";
-    private final static String SEPARATOR_CHARS = " ,()";
+    private final static String SEPARATOR_CHARS = " .,()\n";
 
     public QueryParser() {
         // do nothing
