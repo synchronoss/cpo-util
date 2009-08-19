@@ -42,39 +42,28 @@ public class CpoBrowserTree extends JTree  {
 
   public CpoBrowserTree() {
     this.setCellRenderer(new DefaultTreeCellRenderer() {
-        /** Version Id for this class. */
-        private static final long serialVersionUID=1L;
+      /** Version Id for this class. */
+      private static final long serialVersionUID = 1L;
 
       @Override
-      public Component getTreeCellRendererComponent(JTree tree, Object value,
-          boolean sel,boolean expanded,boolean leaf,int row,boolean hasFocus) {
+      public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
         setText(value.toString());
-//        if (tree.getUI() instanceof BasicTreeUI ) {
-//          BasicTreeUI ui = (BasicTreeUI) tree.getUI();
-//          ui.setCollapsedIcon( null );
-//          ui.setExpandedIcon( null );
-          if (value instanceof AbstractCpoNode) {
-            AbstractCpoNode node = (AbstractCpoNode)value;
-            if (node.isDirty()||node.isRemove() || node.isNew()) {
-              this.setIcon(iconRed);
-            }
-            else if (node.isChildDirty()||node.isChildRemove()||node.isChildNew()) {
-              this.setIcon(iconYellow);
-            }
-            else {
-              this.setIcon(iconGreen);
-            }
+        if (value instanceof AbstractCpoNode) {
+          AbstractCpoNode node = (AbstractCpoNode)value;
+          if (node.isDirty()||node.isRemove() || node.isNew()) {
+            this.setIcon(iconRed);
           }
-//        }
-        if (hasFocus || sel) {
-//            this.setBackground(Color.cyan);
-//            this.setOpaque(true);
-//              this.setFont(new Font(this.getFont().getName(),Font.BOLD,this.getFont().getSize()));
-          this.setForeground(Color.red);
+          else if (node.isChildDirty()||node.isChildRemove()||node.isChildNew()) {
+            this.setIcon(iconYellow);
+          }
+          else {
+            this.setIcon(iconGreen);
+          }
         }
-        else {
+        if (hasFocus || sel) {
+          this.setForeground(Color.red);
+        } else {
           this.setForeground(Color.blue);
-//            this.setFont(new Font(this.getFont().getName(),Font.PLAIN,this.getFont().getSize()));
         }
         return this;
       }
@@ -266,8 +255,17 @@ public class CpoBrowserTree extends JTree  {
     int result = JOptionPane.showConfirmDialog(this, cgp, "Create new Query Group", JOptionPane.OK_CANCEL_OPTION);
     if (result == 0) {
       if (menuNode instanceof CpoQueryGroupLabelNode) {
-        ((CpoQueryGroupLabelNode)menuNode).addNewQueryGroup(
-            cgp.getGroupName().equals("")?null:cgp.getGroupName(), cgp.getGroupType());
+        CpoQueryGroupNode cqgn = ((CpoQueryGroupLabelNode)menuNode).addNewQueryGroup(cgp.getGroupName().equals("")?null:cgp.getGroupName(), cgp.getGroupType());
+        
+        // try to expand and select the node
+        if (cqgn != null) {
+          DefaultTreeModel model = (DefaultTreeModel)getModel();
+          this.expandPath(new TreePath(model.getPathToRoot(cqgn)));
+          CpoQueryNode cqn = cqgn.addNewQueryNode();
+          if (cqn != null) {
+            this.setSelectionPath(new TreePath(cqn));
+          }
+        }
       }
     }
   }
@@ -275,7 +273,14 @@ public class CpoBrowserTree extends JTree  {
   private void addQueryToGroup() {
     if (menuNode instanceof CpoQueryGroupNode) {
       CpoQueryGroupNode cqgn = (CpoQueryGroupNode)menuNode;
-      cqgn.addNewQueryNode();
+      CpoQueryNode cqn = cqgn.addNewQueryNode();
+      
+      // try to expand and select the node
+      if (cqn != null) {
+        DefaultTreeModel model = (DefaultTreeModel)getModel();
+        this.expandPath(new TreePath(model.getPathToRoot(cqgn)));
+        this.setSelectionPath(new TreePath(cqn));
+      }
     }
   }
 
