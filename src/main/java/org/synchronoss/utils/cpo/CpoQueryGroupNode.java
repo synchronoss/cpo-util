@@ -114,7 +114,7 @@ public class CpoQueryGroupNode extends AbstractCpoNode {
     return this.type;
   }
 
-  public void addNewQueryNode() {
+  public CpoQueryNode addNewQueryNode() {
     if (this.qNodes == null)
       this.refreshChildren();
     String queryId;
@@ -124,11 +124,12 @@ public class CpoQueryGroupNode extends AbstractCpoNode {
       seqNo = this.getNextQuerySeqNo();
     } catch (Exception pe) {
       CpoUtil.showException(pe);
-      return;
+      return null;
     }
     CpoQueryNode cqn = new CpoQueryNode(queryId, this.getGroupId(), seqNo, null, null, this);
     this.qNodes.add(cqn);
     cqn.setNew(true);
+    return cqn;
   }
 
   private int getNextQuerySeqNo() {

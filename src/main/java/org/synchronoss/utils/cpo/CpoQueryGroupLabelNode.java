@@ -83,7 +83,8 @@ public class CpoQueryGroupLabelNode extends AbstractCpoNode  {
       }
     };
   }
-  public void addNewQueryGroup(String groupName, String groupType) {
+
+  public CpoQueryGroupNode addNewQueryGroup(String groupName, String groupType) {
     if (this.qGroups == null)
       this.refreshChildren();
     CpoQueryGroupNode cqgn;
@@ -93,10 +94,11 @@ public class CpoQueryGroupLabelNode extends AbstractCpoNode  {
           this.getProxy().getNewGuid(), groupType, this);
     } catch (Exception pe) {
       CpoUtil.showException(pe);
-      return;
+      return null;
     }
     this.qGroups.add(cqgn);
     cqgn.setNew(true);
+    return cqgn;
   }
 
   @Override
