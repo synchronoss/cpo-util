@@ -275,6 +275,13 @@ public class CpoQueryPanel extends JPanel {
             }
         });
         menu.add(jMenuAddParams);
+        JMenuItem jMenuAddAttrs = new JMenuItem("Add All Attributes Here");
+        jMenuAddAttrs.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                insertAllAttributes();
+            }
+        });
+        menu.add(jMenuAddAttrs);
         JMenuItem jMenuGuessAttributes = new JMenuItem("Guess Attributes (Experimental)");
         jMenuGuessAttributes.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
@@ -295,6 +302,28 @@ public class CpoQueryPanel extends JPanel {
         }
         cpoQPnorth.jTextASQL.insert(sbParams.toString().substring(0, sbParams.toString().length() - 1), cpoQPnorth.jTextASQL.getCaretPosition());
         checkSQL();
+    }
+
+    private void insertAllAttributes() {
+      CpoClassNode classNode = (CpoClassNode)queryNode.getParent().getParent().getParent();
+      if (classNode != null) {
+        try {
+          boolean first = true;
+          StringBuilder buf = new StringBuilder();
+          List<CpoAttributeMapNode> attributeList = queryNode.getProxy().getAttributeMap(classNode);
+          for (CpoAttributeMapNode att : attributeList) {
+            String colName = att.getColumnName();
+            if (!first)
+              buf.append(", ");
+            buf.append(colName);
+            first = false;
+          }
+          cpoQPnorth.jTextASQL.insert(buf.toString().substring(0, buf.toString().length()), cpoQPnorth.jTextASQL.getCaretPosition());
+          checkSQL();
+        } catch (Exception ex) {
+          CpoUtil.showException(ex);
+        }
+      }
     }
 
     private void guessAttributes() {
