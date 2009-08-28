@@ -107,6 +107,7 @@ public class CpoQueryPanel extends JPanel {
             }
 
             public void keyReleased(KeyEvent ke) {
+              if (queryNode.getQueryText() != null) {
                 String desc = queryNode.getQueryText().getDesc();
                 String newDesc = cpoQPnorth.jTextAdesc.getText();
                 queryNode.getQueryText().setDesc(newDesc);
@@ -114,6 +115,7 @@ public class CpoQueryPanel extends JPanel {
                 // if the desc changed, dirty the node
                 if (!newDesc.equals(desc))
                   queryNode.setDirty(true);
+              }
             }
         });
         cpoQPnorth.jTextASQL.addKeyListener(new KeyListener() {
@@ -125,6 +127,7 @@ public class CpoQueryPanel extends JPanel {
 
             public void keyReleased(KeyEvent ke) {
 //        queryNode.getQueryText().setDirty(true);
+              if (queryNode.getQueryText() != null)
                 checkSQL();
 /*        try {
           SwingUtilities.invokeLater(new Runnable() {
@@ -143,7 +146,8 @@ public class CpoQueryPanel extends JPanel {
                     // will cause the table to realize it needs to stop editing the selected cell and
                     // will cause the cell editor to end removing the combo box
                     jTableQueryParam.editCellAt(0, 0);
-                    showMenu(e.getPoint());
+                    if (queryNode.getQueryText() != null)
+                        showMenu(e.getPoint());
                 }
             }
 
@@ -193,6 +197,7 @@ public class CpoQueryPanel extends JPanel {
     private void checkSQL() {
         if (cpoQPnorth.jTextASQL.getText().length() < 1)
             return;
+
         int index = -1, tokenCount = 0;
         while ((index = cpoQPnorth.jTextASQL.getText().indexOf("?", index + 1)) != -1) {
 //      OUT.debug ("index: "+index);
