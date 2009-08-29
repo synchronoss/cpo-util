@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.synchronoss</groupId>
@@ -45,34 +46,34 @@
         </plugins>
       </build>
     </profile>
-    </profiles>
-    <distributionManagement>
-      <repository>
-        <!--
+  </profiles>
+  <distributionManagement>
+    <repository>
+      <!--
         <id>sncr-libs-releases</id>
         <name>SNCR Repository</name>
         <url>http://mavenrepo.synchronoss.net:8081/artifactory/libs-releases</url>
         -->
-        <id>sf-cpo-releases</id>
-        <name>Sourceforge CPO Repository</name>
-        <url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/sf-cpo-releases</url>
-      </repository>
-      <snapshotRepository>
-        <!--
+      <id>sf-cpo-releases</id>
+      <name>Sourceforge CPO Repository</name>
+      <url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/sf-cpo-releases</url>
+    </repository>
+    <snapshotRepository>
+      <!--
         <id>sncr-libs-snapshots</id>
         <name>SNCR Snapshot Repository</name>
         <url>http://mavenrepo.synchronoss.net:8081/artifactory/libs-snapshots</url>
         -->
-        <id>sf-cpo-snapshots</id>
-        <name>Sourceforge CPO Snapshot Repository</name>
-        <url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/sf-cpo-snapshots</url>
-      </snapshotRepository>
-      <site>
-        <!-- must create a shell for your account at sourceforge by execing: ssh -t <username>,<project name>@shell.sf.net create-->
-        <id>sf-cpo-site</id>
-        <url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/cpo-util-sourceforge</url>
-      </site>
-    </distributionManagement>
+      <id>sf-cpo-snapshots</id>
+      <name>Sourceforge CPO Snapshot Repository</name>
+      <url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/sf-cpo-snapshots</url>
+    </snapshotRepository>
+    <site>
+      <!-- must create a shell for your account at sourceforge by execing: ssh -t <username>,<project name>@shell.sf.net create-->
+      <id>sf-cpo-site</id>
+      <url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/cpo-util-sourceforge</url>
+    </site>
+  </distributionManagement>
   <issueManagement>
     <system>SourceForge</system>
     <url>http://sourceforge.net/projects/cpo</url>
@@ -256,6 +257,7 @@
         <configuration>
           <mainClass>org.synchronoss.utils.cpo.CpoUtil</mainClass>
           <iconFile>${basedir}/src/main/resources/sync-logo-sm.icns</iconFile>
+          <javaApplicationStub>${basedir}/src/assemble/JavaApplicationStub</javaApplicationStub>
         </configuration>
         <executions>
           <execution>
@@ -361,7 +363,6 @@
           </reportSet>
         </reportSets>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
@@ -371,7 +372,6 @@
           <targetJdk>1.5</targetJdk>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>
