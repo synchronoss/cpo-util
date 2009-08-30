@@ -258,6 +258,7 @@
           <mainClass>org.synchronoss.utils.cpo.CpoUtil</mainClass>
           <iconFile>${basedir}/src/main/resources/sync-logo-sm.icns</iconFile>
           <javaApplicationStub>${basedir}/src/assemble/JavaApplicationStub</javaApplicationStub>
+          <bundleName>CpoUtil-${pom.version}</bundleName>
         </configuration>
         <executions>
           <execution>
