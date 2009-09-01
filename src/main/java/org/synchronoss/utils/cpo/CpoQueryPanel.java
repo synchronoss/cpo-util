@@ -312,6 +312,8 @@ public class CpoQueryPanel extends JPanel {
     private void insertAllAttributes() {
       CpoClassNode classNode = (CpoClassNode)queryNode.getParent().getParent().getParent();
       if (classNode != null) {
+        String sql = cpoQPnorth.jTextASQL.getText();
+        boolean isInsert = sql.toUpperCase().startsWith("INSERT");
         try {
           boolean first = true;
           StringBuilder buf = new StringBuilder();
@@ -321,6 +323,8 @@ public class CpoQueryPanel extends JPanel {
             if (!first)
               buf.append(", ");
             buf.append(colName);
+            if (!isInsert)
+              buf.append(" = ?");
             first = false;
           }
           cpoQPnorth.jTextASQL.insert(buf.toString().substring(0, buf.toString().length()), cpoQPnorth.jTextASQL.getCaretPosition());
