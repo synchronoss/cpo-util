@@ -198,13 +198,8 @@ public class CpoQueryPanel extends JPanel {
         if (cpoQPnorth.jTextASQL.getText().length() < 1)
             return;
 
-        int index = -1, tokenCount = 0;
-        while ((index = cpoQPnorth.jTextASQL.getText().indexOf("?", index + 1)) != -1) {
-//      OUT.debug ("index: "+index);
-          // only add an attribute if the character before the '?' isn't a '\'
-          if (index > 0 && (cpoQPnorth.jTextASQL.getText().charAt(index - 1) != '\\' ))
-            tokenCount++;
-        }
+				int tokenCount = QueryParser.countBindMarkers(cpoQPnorth.jTextASQL.getText());
+
         int attRowCount = cpoQTM.getNonRemovedRows();
 //    OUT.debug ("tokens: "+tokenCount+" and rows: "+attRowCount);
         // need to add rows if
