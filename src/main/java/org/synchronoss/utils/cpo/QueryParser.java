@@ -35,7 +35,7 @@ public class QueryParser {
 
   private static Logger OUT = Logger.getLogger(QueryParser.class);
 
-  private final static String COMPARE_CHARS = " =<>!";
+  private final static String COMPARE_CHARS = " =<>!()";
   private final static String SEPARATOR_CHARS = " .,()\n";
 
   public QueryParser() {
@@ -43,16 +43,22 @@ public class QueryParser {
   }
 
   public static int countBindMarkers(String query) {
-    StringReader reader = null;
-    int rc = -1;
-    int qMarks = 0;
-    boolean inDoubleQuotes = false;
-    boolean inSingleQuotes = false;
+    return getBindMarkerIndexes(query).size();
+  }
+
+  private static Collection<Integer> getBindMarkerIndexes(String query) {
+    Collection<Integer> indexes = new Vector<Integer>();
 
     if (query != null) {
-      reader = new StringReader(query);
+      StringReader reader = new StringReader(query);
 
       try {
+        
+        int idx = 0;
+        int rc = -1;
+        boolean inDoubleQuotes = false;
+        boolean inSingleQuotes = false;
+
         do {
           rc = reader.read();
           if (((char)rc) == '\'') {
@@ -60,14 +66,15 @@ public class QueryParser {
           } else if (((char)rc) == '"') {
             inDoubleQuotes = !inDoubleQuotes;
           } else if (!inSingleQuotes && !inDoubleQuotes && ((char)rc) == '?') {
-            qMarks++;
+            indexes.add(idx);
           }
+          idx++;
         } while (rc != -1);
       } catch (Exception e) {
         OUT.error("error counting bind markers");
       }
     }
-    return qMarks;
+    return indexes;
   }
 
   public List<String> parse(String query) throws ParseException {
@@ -141,31 +148,33 @@ public class QueryParser {
       // query is in the format of:  ...col1 = ? , col2 = ?...
       // so we'll have to move left to right from the ? looking for the field name
 
-      String[] chunks = query.split("\\?");
-      int chunkIdx = 0;
-      for (String chunk : chunks) {
+      int startIdx = 0;
+      Collection<Integer> indexes = getBindMarkerIndexes(query);
+      for (int qIdx : indexes) {
+        String chunk = query.substring(startIdx, qIdx);
+
         if (OUT.isDebugEnabled())
-          OUT.debug("Chunk: " + chunk);
-
-        // if it's the last chunk, check to see if the query ended w/ a ?, if not, we can ignore
-        if ((chunkIdx == (chunks.length - 1)) && !query.trim().endsWith("?"))
-          continue;
-
-        // if it's a backslash '\', we're going to ignore this question mark
-        if (chunk.endsWith("\\"))
-          continue;
+          OUT.debug("Chunk [" + chunk + "]");
 
         int idx = chunk.length() - 1;
         int fieldStartIdx = -1;
         int fieldEndIdx = -1;
 
         boolean found = false;
+        boolean inFunction = false;
         while (!found && (idx >= 0)) {
           char c = chunk.charAt(idx);
 
           if (fieldEndIdx == -1) {
+            // if the character is a ( this might be a function like UPPER(), try to parse that out
+            if (!inFunction && c == '(') {
+              inFunction = true;
+            } else if (inFunction && COMPARE_CHARS.indexOf(c) != -1) {
+              inFunction = false;
+            }
+
             // till we find the first char of the end of the field name, ignore compare chars
-            if (COMPARE_CHARS.indexOf(c) == -1) {
+            if (!inFunction && COMPARE_CHARS.indexOf(c) == -1) {
               // found a char, must be the end of the field name
               fieldEndIdx = idx;
             }
@@ -183,8 +192,8 @@ public class QueryParser {
           colList.add(col);
         }
 
-        // increment
-        chunkIdx++;
+        // move the starting index to where the ? was
+        startIdx = qIdx + 1;
       }
     }
 
@@ -192,8 +201,8 @@ public class QueryParser {
   }
 
   public static void main(String[] args) throws Exception {
-    String query = "select * from IMPL_EMAIL_CONFIG where REGION = ? and STATE = ? and REASON_CODE = ? and IS_DELETED = '0'";
-    //String query = "insert into lnp_order_curr_disp(transaction_id, category, revision, state, timestamp,disp_transaction_id, trx_seq, user_id, tn, trans_comment) (select transaction_id, category, revision, state, timestamp,disp_transaction_id, trx_seq, user_id, tn, trans_comment from lnp_order_curr_disp_v where transaction_id = (select transaction_id from lnp_order_disp_head where disp_transaction_id = ?) and category = ? and (tn = ? or ? is null))";
+    String query = "select * from IMPL_EMAIL_CONFIG where REGION = ? and UPPER(STATE) = ? and REASON_CODE = ? and IS_DELETED = '0'";
+//    String query = "insert into lnp_order_curr_disp(transaction_id, category, revision, state, timestamp,disp_transaction_id, trx_seq, user_id, tn, trans_comment) (select transaction_id, category, revision, state, timestamp,disp_transaction_id, trx_seq, user_id, tn, trans_comment from lnp_order_curr_disp_v where transaction_id = (select transaction_id from lnp_order_disp_head where disp_transaction_id = ?) and category = ? and (tn = ? or ? is null))";
     QueryParser parser = new QueryParser();
     List<String> colList = parser.parse(query);
     int count = 1;
