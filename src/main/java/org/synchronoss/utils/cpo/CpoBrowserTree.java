@@ -533,7 +533,7 @@ public class CpoBrowserTree extends JTree  {
   }
 
   private void renameCpoClassNode() {
-    String result = JOptionPane.showInputDialog(this,"Enter new class name","Edit Class Name",JOptionPane.INFORMATION_MESSAGE);
+    String result = (String)JOptionPane.showInputDialog(this,"Enter new class name","Edit Class Name",JOptionPane.INFORMATION_MESSAGE,null,null,((CpoClassNode)menuNode).getClassName());
     if (result == null) return;
     if (result.equals("")) result = null;
     ((CpoClassNode)menuNode).setClassName(result);
