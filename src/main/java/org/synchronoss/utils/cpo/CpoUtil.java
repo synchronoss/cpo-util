@@ -303,13 +303,23 @@ public class CpoUtil {
     localProps.remove(Statics.PROP_JDBC_TABLE_PREFIX+server);
     saveLocalProps();
   }
-  
+
   static boolean checkUnsavedData(String message) {
+    return checkUnsavedData(message, -1);
+  }
+
+  /**
+   * @param message Message to display if there is unsaved data.
+   * @param tabIdx The index of the tab to consider, if this is -1, all tabs will be checked
+   */
+  static boolean checkUnsavedData(String message, int tabIdx) {
     boolean unsavedData = false;
     int tabCount = frame.jTabbedPane.getTabCount();
     for (int i = 0 ; i < tabCount ; i++) {
       CpoBrowserPanel panel = (CpoBrowserPanel)frame.jTabbedPane.getComponentAt(i);
-      if (panel.getProxy().getAllChangedObjects().size() > 0) unsavedData = true;
+      if ((tabIdx == -1 || tabIdx == i) && panel.getProxy().getAllChangedObjects().size() > 0) {
+        unsavedData = true;
+      }
     }
     if (unsavedData) {
       int result = JOptionPane.showConfirmDialog(frame,message,"Cpo Utility - Unsaved Data",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
