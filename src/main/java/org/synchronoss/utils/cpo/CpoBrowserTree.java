@@ -306,12 +306,24 @@ public class CpoBrowserTree extends JTree  {
   }
 
   private boolean refreshFromDB() {
-    if (CpoUtil.checkUnsavedData("There is unsaved data, are you sure you wish to refresh over it??"))
+    // figure out the index of this tab, so we only check unsaved data on this tab.
+    int idx = -1;
+
+    Component parent = this.getParent();
+    while (idx == -1 && parent != null) {
+      if (parent instanceof CpoBrowserPanel) {
+        idx = CpoUtil.frame.jTabbedPane.indexOfComponent(parent);
+      }
+      parent = parent.getParent();
+    }
+
+    if (CpoUtil.checkUnsavedData("There is unsaved data, are you sure you wish to refresh over it??", idx))
       return false;
+    
     menuNode.getProxy().removeObjectsFromAllCache();
     CpoServerNode csn = new CpoServerNode(menuNode.getProxy(),this);
 //    menuNode.scrubNodes();
-//    ((DefaultTreeModel)this.getModel()).nodeStructureChanged(menuNode);
+//    ((DefaultTreeModel)this.getModel()).nodeStructureChanged(menuNode);n
     ((DefaultTreeModel)this.getModel()).setRoot(csn);
 
     // force a selection on the root node
