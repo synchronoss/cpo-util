@@ -27,17 +27,6 @@
     <url>http://continuous.synchronoss.net:8111/viewType.html?buildTypeId=bt4</url>
   </ciManagement>
   <profiles>
-    <!--
-    <profile>
-      <id>dev</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <properties>
-        <cpoutil.bootstrapUrl/>
-      </properties>
-    </profile>
-    -->
     <profile>
       <id>DEPLOY</id>
       <build>
