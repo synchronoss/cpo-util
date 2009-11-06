@@ -34,8 +34,10 @@ public class CpoQueryGroupNode extends AbstractCpoNode {
     this.class_id = class_id;
     this.group_id = group_id;
     this.parent = parent;
-    if (parent != null)
+    if (parent != null) {
       this.addObserver(parent.getProxy());
+      this.setProtected(parent.isProtected());
+    }
   }
 
   @Override

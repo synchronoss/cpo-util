@@ -95,6 +95,13 @@ public class CpoBrowserPanel extends JPanel  {
         if (pathComp instanceof AbstractCpoNode) {
 //          OUT.debug("Refreshing data in node: "+pathComp);
           ((AbstractCpoNode)pathComp).refreshChildren();
+
+          // if the node is a protected class node, warn them
+          if (pathComp instanceof CpoClassNode) {
+            if (((CpoClassNode)pathComp).isProtected()) {
+              CpoUtil.showProtectedWarning();
+            }
+          }
         }
       }
       public void treeWillCollapse(TreeExpansionEvent tee) {
@@ -103,23 +110,25 @@ public class CpoBrowserPanel extends JPanel  {
     });
     jTreeBrowser.addTreeSelectionListener(new TreeSelectionListener() {
       public void valueChanged(TreeSelectionEvent tse) {
-        Object pathComp = tse.getPath().getLastPathComponent();
-        if (pathComp instanceof AbstractCpoNode) {
-          Component rightComp = jSplitPane.getRightComponent();
+        if (tse.isAddedPath()) {
+          Object pathComp = tse.getPath().getLastPathComponent();
+          if (pathComp instanceof AbstractCpoNode) {
+            Component rightComp = jSplitPane.getRightComponent();
 
-          // save the divider location
-          int divLoc = jSplitPane.getDividerLocation();
+            // save the divider location
+            int divLoc = jSplitPane.getDividerLocation();
 
-          if (rightComp != null)
-            jSplitPane.remove(rightComp);
-          JPanel panel = ((AbstractCpoNode)pathComp).getPanelForSelected();
-          if (panel == null)
-            panel = emptyPanel;
+            if (rightComp != null)
+              jSplitPane.remove(rightComp);
+            JPanel panel = ((AbstractCpoNode)pathComp).getPanelForSelected();
+            if (panel == null)
+              panel = emptyPanel;
 
-          jSplitPane.setRightComponent(panel);
+            jSplitPane.setRightComponent(panel);
 
-          // reset the divider location
-          jSplitPane.setDividerLocation(divLoc);
+            // reset the divider location
+            jSplitPane.setDividerLocation(divLoc);
+          }
         }
       }
     });

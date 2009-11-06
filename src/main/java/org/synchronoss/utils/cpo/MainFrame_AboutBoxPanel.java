@@ -20,11 +20,9 @@
  */
 package org.synchronoss.utils.cpo;
 
-import java.awt.*;
-import java.util.ResourceBundle;
-
 import javax.swing.*;
 import javax.swing.border.Border;
+import java.awt.*;
 
 public class MainFrame_AboutBoxPanel extends JPanel {
   
@@ -38,11 +36,9 @@ public class MainFrame_AboutBoxPanel extends JPanel {
   private JLabel labelAuthor = new JLabel();
   private JLabel labelTitle = new JLabel();
   private JLabel labelVersion = new JLabel();
-  private ResourceBundle resources;
 
   public MainFrame_AboutBoxPanel() {
     try {
-      resources = ResourceBundle.getBundle("cpoutil");
       jbInit();
     } catch(Exception e) {
       e.printStackTrace();
@@ -52,11 +48,11 @@ public class MainFrame_AboutBoxPanel extends JPanel {
   private void jbInit() throws Exception {
     this.setLayout(layoutMain);
     this.setBorder(border);
-    labelTitle.setText("Title: " + resources.getString("cpoutil.title"));
-    labelVersion.setText("Version: " + resources.getString("cpoutil.version"));
-    labelAuthor.setText("Author: " + resources.getString("cpoutil.author"));
-    labelCopyright.setText("Copyright: " + resources.getString("cpoutil.copyright"));
-    labelCompany.setText("Company: " + resources.getString("cpoutil.company"));
+    labelTitle.setText("Title: " + CpoUtil.props.getProperty("cpoutil.title"));
+    labelVersion.setText("Version: " + CpoUtil.props.getProperty("cpoutil.version"));
+    labelAuthor.setText("Author: " + CpoUtil.props.getProperty("cpoutil.author"));
+    labelCopyright.setText("Copyright: " + CpoUtil.props.getProperty("cpoutil.copyright"));
+    labelCompany.setText("Company: " + CpoUtil.props.getProperty("cpoutil.company"));
     this.add(labelTitle, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 15, 0, 15), 0, 0));
     this.add(labelVersion, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 15, 0, 15), 0, 0));
     this.add(labelAuthor, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 15, 0, 15), 0, 0));

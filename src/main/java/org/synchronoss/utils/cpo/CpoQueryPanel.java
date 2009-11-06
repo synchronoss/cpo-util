@@ -52,6 +52,16 @@ public class CpoQueryPanel extends JPanel {
         this.queryNode = queryNode;
         try {
             jbInit();
+
+            // if the query is used in more than one place, warn them
+            CpoQueryTextNode cqtn = queryNode.getQueryText();
+            if (cqtn != null && cqtn.getUsageCount() > 1) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        CpoUtil.showMultipleQueryTextWarning();
+                    }
+                });
+            }
         } catch (Exception e) {
             CpoUtil.showException(e);
         }

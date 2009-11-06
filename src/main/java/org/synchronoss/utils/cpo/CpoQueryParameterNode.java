@@ -20,9 +20,9 @@
  */
 package org.synchronoss.utils.cpo;
 
-import javax.swing.JPanel;
-import java.util.Enumeration;
+import javax.swing.*;
 import javax.swing.tree.TreeNode;
+import java.util.Enumeration;
 
 public class CpoQueryParameterNode extends AbstractCpoNode {
   private int seqNo;
@@ -35,7 +35,8 @@ public class CpoQueryParameterNode extends AbstractCpoNode {
     this.cpoAMB = cpoAMB;
     this.inOutType = type;
     this.addObserver(parent.getProxy());
-    
+    this.setProtected(qNode.isProtected());
+
 //    this.addObserver(parent);
   }
   public String getType() {

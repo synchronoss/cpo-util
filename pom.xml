@@ -4,7 +4,7 @@
   <groupId>org.synchronoss</groupId>
   <artifactId>cpoUtil</artifactId>
   <name>cpoUtil</name>
-  <version>2.9-SNAPSHOT</version>
+  <version>3.0-SNAPSHOT</version>
   <description>cpoUtil is the utility that configures the metadata for cpo</description>
   <url>http://cpo.sourceforge.net/cpo-util-sourceforge/</url>
   <licenses>
@@ -14,19 +14,30 @@
       <distribution>repo,manual</distribution>
       <comments>This library is free software; you can redistribute it and/or
         modify it under the terms of the GNU Lesser General Public
-        License as published by the Free Software Foundation; either
         version 2.1 of the License, or (at your option) any later version.
       </comments>
     </license>
   </licenses>
   <properties>
     <currentVersion>${project.version}</currentVersion>
+    <cpoutil.bootstrapUrl/>
   </properties>
   <ciManagement>
     <system>teamcity</system>
     <url>http://continuous.synchronoss.net:8111/viewType.html?buildTypeId=bt4</url>
   </ciManagement>
   <profiles>
+    <!--
+    <profile>
+      <id>dev</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <cpoutil.bootstrapUrl/>
+      </properties>
+    </profile>
+    -->
     <profile>
       <id>DEPLOY</id>
       <build>
@@ -219,7 +230,6 @@
         <executions>
           <execution>
             <configuration>
-              <!--<mainClass>com.synchronoss.fileposter.FilePosterGui</mainClass>-->
               <!-- Optional -->
               <onejarVersion>0.96</onejarVersion>
             </configuration>
