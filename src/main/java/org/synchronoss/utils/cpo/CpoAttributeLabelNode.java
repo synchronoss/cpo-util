@@ -34,6 +34,7 @@ public class CpoAttributeLabelNode extends AbstractCpoNode  {
     this.parent = parent;
     this.addObserver(parent.getProxy());
 //    this.addObserver(parent);
+    this.setProtected(parent.isProtected());
   }
 
   @Override

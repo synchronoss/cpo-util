@@ -21,6 +21,7 @@
   </licenses>
   <properties>
     <currentVersion>${project.version}</currentVersion>
+    <cpoutil.bootstrapUrl/>
   </properties>
   <ciManagement>
     <system>teamcity</system>
@@ -219,7 +220,6 @@
         <executions>
           <execution>
             <configuration>
-              <!--<mainClass>com.synchronoss.fileposter.FilePosterGui</mainClass>-->
               <!-- Optional -->
               <onejarVersion>0.96</onejarVersion>
             </configuration>

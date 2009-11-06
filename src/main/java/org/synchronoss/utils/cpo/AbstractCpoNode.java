@@ -31,6 +31,8 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
   private boolean dirty = false;
   private boolean remove = false;
   private boolean isnew = false;
+  private boolean isProtected = false;
+
   protected Proxy prox;
   protected JTree jtree;
   protected AbstractCpoNode parent;
@@ -60,7 +62,15 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
   public TreeNode getParent() {
     return parent;
   }
-  
+
+  public boolean isProtected() {
+    return isProtected;
+  }
+
+  public void setProtected(boolean b) {
+    isProtected = b;
+  }
+
   public void setDirty(boolean dirty) {
     if (this.dirty == dirty) return;
     this.dirty = dirty;

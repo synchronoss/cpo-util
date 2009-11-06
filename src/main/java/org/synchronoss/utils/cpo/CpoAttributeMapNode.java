@@ -40,6 +40,7 @@ public class CpoAttributeMapNode extends AbstractCpoNode {
     this.parent = parent;
     this.type = param_type;
     this.addObserver(parent.getProxy());
+    this.setProtected(parent.isProtected());
 //    this.addObserver(parent);
   }
   public String getAttributeId() {

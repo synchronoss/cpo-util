@@ -30,14 +30,18 @@ import java.io.*;
 import java.lang.reflect.Method;
 import java.util.List;
 
-public class CpoBrowserTree extends JTree  {
-    /** Version Id for this class. */
-    private static final long serialVersionUID=1L;
+public class CpoBrowserTree extends JTree {
+
+  /** Version Id for this class. */
+  private static final long serialVersionUID=1L;
+
 	private JPopupMenu menu;
   private AbstractCpoNode menuNode;            
   private static ImageIcon iconRed = new ImageIcon(CpoBrowserTree.class.getResource("/red.gif"));
   private static ImageIcon iconYellow = new ImageIcon(CpoBrowserTree.class.getResource("/yellow.gif"));
   private static ImageIcon iconGreen = new ImageIcon(CpoBrowserTree.class.getResource("/green.gif"));
+  private static ImageIcon iconBlue = new ImageIcon(CpoBrowserTree.class.getResource("/blue.gif"));
+
   private Logger OUT = Logger.getLogger(this.getClass());
 
   public CpoBrowserTree() {
@@ -54,6 +58,8 @@ public class CpoBrowserTree extends JTree  {
             this.setIcon(iconRed);
           } else if (node.isChildDirty() || node.isChildRemove() || node.isChildNew()) {
             this.setIcon(iconYellow);
+          } else if (node.isProtected()) {
+            this.setIcon(iconBlue);
           } else {
             this.setIcon(iconGreen);
           }
