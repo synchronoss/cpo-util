@@ -20,7 +20,7 @@
   </licenses>
   <properties>
     <currentVersion>${project.version}</currentVersion>
-    <cpoutil.bootstrapUrl/>
+    <cpoutil.bootstrapUrl />
   </properties>
   <ciManagement>
     <system>teamcity</system>
@@ -123,9 +123,9 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/branches/CpoUtil-2.5</connection>
-    <developerConnection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/branches/CpoUtil-2.5</developerConnection>
-    <url>https://cpo.svn.sourceforge.net/svnroot/cpo/util/branches/CpoUtil-2.5</url>
+    <connection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/branches/CpoUtil-branch-3.0</connection>
+    <developerConnection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/branches/CpoUtil-branch-3.0</developerConnection>
+    <url>https://cpo.svn.sourceforge.net/svnroot/cpo/util/branches/CpoUtil-branch-3.0</url>
   </scm>
   <build>
     <resources>
