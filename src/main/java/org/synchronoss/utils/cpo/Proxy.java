@@ -28,7 +28,7 @@ import org.synchronoss.cpo.jdbc.*;
 import javax.naming.*;
 import javax.sql.DataSource;
 import javax.swing.tree.*;
-import java.io.*;
+import java.io.File;
 import java.lang.reflect.Method;
 import java.sql.*;
 import java.util.*;
@@ -64,9 +64,6 @@ public class Proxy implements Observer {
   private String connectionClassName = null;
   //org.synchronoss.cpo.JdbcCpoAdapter
 
-  // connection based protected classes
-  private HashSet<String> protectedClasses = new HashSet<String>();
-
   public Proxy(Properties props, String server, CpoBrowserTree cpoTree) throws Exception {
     if (server == null || props == null) throw new Exception("No Server Selected!");
     this.defProps = props;
@@ -74,7 +71,6 @@ public class Proxy implements Observer {
     this.cpoTree = cpoTree;
     getConnection();
     checkForRevsEnabled();
-    loadProtectedClasses();
   }
   
   public String getTablePrefix() {
@@ -291,57 +287,6 @@ public class Proxy implements Observer {
       } catch (Exception e) {}
     }
   }
-
-  private void loadProtectedClasses() {
-    String url = connProps.getProperty("cpoutil.protectedClasses." + server);
-    if (OUT.isDebugEnabled()) OUT.debug("Connection Protected Classes Url: " + url);
-
-    if (url != null) {
-      Set<String> protClasses = CpoUtil.loadProtectedClassesFromUrl(url);
-      if (protClasses != null) {
-        // updated from url, use them and save them locally
-        OUT.debug("Connected to url, loading classes");
-        protectedClasses.addAll(protClasses);
-        saveProtectedClasses();
-      } else {
-        // if the set was null, it couldn't be read, so use the local copy
-        OUT.debug("Couldn't connect to url, so loading local copy");
-        try {
-          File protFile = new File(System.getProperties().getProperty("user.home") + File.separator + CpoUtil.PROTECTED_CLASS_FILE + "." + server);
-          BufferedReader br = new BufferedReader(new FileReader(protFile));
-          String line;
-          while ((line = br.readLine()) != null) {
-            protectedClasses.add(line);
-          }
-          br.close();
-        } catch (IOException ioe) {
-          CpoUtil.showException(ioe);
-        }
-      }
-    }
-
-    // add globally protected classes
-    protectedClasses.addAll(CpoUtil.globallyProtectedClasses);
-  }
-
-  protected void saveProtectedClasses() {
-
-    if (protectedClasses == null)
-      return;
-
-    try {
-      File protFile = new File(System.getProperties().getProperty("user.home") + File.separator + CpoUtil.PROTECTED_CLASS_FILE + "." + server);
-      PrintWriter pw = new PrintWriter(protFile);
-      for (String s : protectedClasses) {
-        pw.println(s);
-      }
-      pw.flush();
-      pw.close();
-    } catch (IOException ioe) {
-      CpoUtil.showException(ioe);
-    }
-  }
-
   public String getDatabaseName() {
     return this.databaseName;
   }
@@ -396,7 +341,6 @@ public class Proxy implements Observer {
           cpoClassNode.setUserName(rs.getString("userid"));
           cpoClassNode.setCreateDate(rs.getTimestamp("createdate"));
         }
-        cpoClassNode.setProtected(this.isClassProtected(cpoClassNode.getClassName()));
         al.add(cpoClassNode);
         classCacheById.put(cpoClassNode.getClassId(),cpoClassNode);
       }
@@ -1838,27 +1782,5 @@ public class Proxy implements Observer {
       clazzName = "char[]";
     }
     return clazzName;
-  }
-
-  /**
-   * Returns true if a class is protected.  This will match exact class names as well as packages
-   * for example:
-   * org.synchronoss.utils.cpo.CpoClassNode - would match that exact class
-   * org.synchronoss.utils.cpo - would match all classes in the cpo package
-   */
-  public boolean isClassProtected(String className) {
-
-    // exact match
-    if (protectedClasses.contains(className))
-      return true;
-
-    // partial match
-    for (String s : protectedClasses) {
-      if (className.startsWith(s)) {
-        return true;
-      }
-    }
-
-    return false;
   }
 }

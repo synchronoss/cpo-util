@@ -37,7 +37,6 @@ public class CpoQueryNode extends AbstractCpoNode {
     this.seqNo = seqNo;
     this.parent = parent;
     this.addObserver(parent.getProxy());
-    this.setProtected(parent.isProtected());
 //    this.addObserver(parent);
   }
 

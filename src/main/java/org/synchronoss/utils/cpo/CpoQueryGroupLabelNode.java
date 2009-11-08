@@ -31,7 +31,6 @@ public class CpoQueryGroupLabelNode extends AbstractCpoNode  {
     this.parent = parent;
     this.addObserver(parent.getProxy());
 //    this.addObserver(parent);
-    this.setProtected(parent.isProtected());
   }
 
   @Override
@@ -93,7 +92,6 @@ public class CpoQueryGroupLabelNode extends AbstractCpoNode  {
       cqgn = new CpoQueryGroupNode(groupName,
           ((CpoClassNode)this.getParent()).getClassId(),
           this.getProxy().getNewGuid(), groupType, this);
-      cqgn.setProtected(this.isProtected());
     } catch (Exception pe) {
       CpoUtil.showException(pe);
       return null;

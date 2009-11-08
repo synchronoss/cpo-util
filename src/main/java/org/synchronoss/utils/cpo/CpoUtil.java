@@ -32,26 +32,17 @@ import java.util.*;
 import java.util.List;
 
 public class CpoUtil {
-
-  public static final String PROPERTIES_FILE = ".cpoutil.properties";
-  public static final String PROTECTED_CLASS_FILE = ".cpoutil.protected";
   
   static Properties props = new Properties();
   static Properties localProps = new Properties();
   static MainFrame frame;
   static List<File> files = new ArrayList<File>();
   static String username;
-
-  // globally protected classes
-  static HashSet<String> globallyProtectedClasses = new HashSet<String>();
-
+  
   private static Logger OUT = Logger.getLogger(CpoUtil.class);
   
   public CpoUtil(String propsLocation) {
     loadProps(propsLocation);
-    checkKillSwitch();
-    loadGloballyProtectedClasses();
-
     username = System.getProperty("user.name");
     //makeSysTray();
     frame = new MainFrame();
@@ -75,110 +66,6 @@ public class CpoUtil {
       }
     });
     frame.setVisible(true);
-  }
-
-  protected void checkKillSwitch() {
-    String minimumVersion = props.getProperty("cpoutil.minimumVersion");
-    if (OUT.isDebugEnabled()) OUT.debug("Minimum version: " + minimumVersion);
-    if (minimumVersion != null) {
-      // if it's a snapshot, strip the -SNAPSHOT
-      String version = props.getProperty("cpoutil.version");
-      if (version.endsWith("-SNAPSHOT")) {
-        version = version.substring(0, version.length() - 9);
-      }
-
-      // if the version is something like 2.9.1, use 2.9 as the version, the .1 is a minor rev
-      int idxFirstDot = version.indexOf(".");
-      if (idxFirstDot != -1) {
-        int idxSecondDot = version.indexOf(".", idxFirstDot + 1);
-        if (idxSecondDot != -1) {
-          version = version.substring(0, idxSecondDot);
-        }
-      }
-
-      if (OUT.isDebugEnabled()) OUT.debug("Version: " + version);
-      try {
-        double min = Double.parseDouble(minimumVersion);
-        double actual = Double.parseDouble(version);
-        if (actual < min) {
-          // kill it
-          showMessage("Your version (" + props.getProperty("cpoutil.version") + ") is outdated.\nPlease upgrade to at least version " + minimumVersion);
-          System.exit(2);
-        }
-      } catch (NumberFormatException ex) {
-        // ignore
-      }
-    }
-  }
-
-  private void loadGloballyProtectedClasses() {
-    if (props == null)
-        return;
-
-    String url = props.getProperty("cpoutil.protectedClasses");
-    if (OUT.isDebugEnabled()) OUT.debug("Globally Protected Classes Url: " + url);
-
-    if (url != null) {
-      Set<String> protClasses = loadProtectedClassesFromUrl(url);
-      if (protClasses != null) {
-        // updated from url, use them and save them locally
-        OUT.debug("Connected to url, loading classes");
-        globallyProtectedClasses.addAll(protClasses);
-        saveGloballyProtectedClasses();
-      } else {
-        // if the set was null, it couldn't be read, so use the local copy
-        OUT.debug("Couldn't connect to url, so loading local copy");
-        try {
-          File protFile = new File(System.getProperties().getProperty("user.home") + File.separator + PROTECTED_CLASS_FILE);
-          BufferedReader br = new BufferedReader(new FileReader(protFile));
-          String line;
-          while ((line = br.readLine()) != null) {
-            globallyProtectedClasses.add(line);
-          }
-          br.close();
-        } catch (IOException ioe) {
-          showException(ioe);
-        }
-      }
-    }
-  }
-
-  /**
-   * Returns the set of protected classes from the url provided.
-   * This will return null if there was a timeout issue, otherwise a set of
-   * classes will be returned.
-   *
-   * @param url The url
-   * @return the set of classes
-   */
-  public static Set<String> loadProtectedClassesFromUrl(String url) {
-
-    Set<String> result = new HashSet<String>();
-
-    if (url == null)
-      return result;
-
-    try {
-      URL u = new URL(url);
-      URLConnection conn = u.openConnection();
-      conn.setConnectTimeout(3000);
-      conn.connect();
-
-      BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-
-      String inputLine;
-      while ((inputLine = in.readLine()) != null) {
-        result.add(inputLine);
-      }
-
-      in.close();
-
-      return result;
-    } catch (Exception ex) {
-      OUT.debug("Exception caught reading from url: " + ex);
-    }
-
-    return null;
   }
 
   public static void main(String[] args) {
@@ -218,35 +105,18 @@ public class CpoUtil {
     try {
       InputStream is;
       if (propsLocation == null)
-        is = getClass().getResourceAsStream("/cpoutil.properties");
+        is = getClass().getResourceAsStream("/Default.properties");
       else
         is = new URL(propsLocation).openStream();
       if (is == null) {
         throw new IOException("Could not find properties file!  propsLocation passed to me: "+propsLocation+"\nCPU Util will exit now.");
       }
       props.load(is);
-      File propsFile = new File(System.getProperties().getProperty("user.home") + File.separator + PROPERTIES_FILE);
+      File propsFile = new File(System.getProperties().getProperty("user.home")+File.separator+".cpoutil.properties");
       if (propsFile.exists() && propsFile.canRead()) {
         is = new FileInputStream(propsFile);
         localProps.load(is);
-      }
-
-      // bootstrapping
-      String bootstrapUrl = props.getProperty("cpoutil.bootstrapUrl");
-      if (bootstrapUrl != null) {
-        try {
-          URL u = new URL(bootstrapUrl);
-          URLConnection conn = u.openConnection();
-          conn.setConnectTimeout(3000);
-          conn.connect();
-
-          InputStream connInputStream = conn.getInputStream();
-          props.load(connInputStream);
-          connInputStream.close();
-        } catch (Exception ex) {
-          OUT.debug("Exception caught reading bootstrap properties: " + ex);
-        }
-      }
+      }      
     } catch (MalformedURLException mue) {
       frame = new MainFrame();
       showException(mue);
@@ -313,32 +183,14 @@ public class CpoUtil {
   
   public static void saveLocalProps() {
     try {
-      File propsFile = new File(System.getProperties().getProperty("user.home") + File.separator + PROPERTIES_FILE);
+      File propsFile = new File(System.getProperties().getProperty("user.home")+File.separator+".cpoutil.properties");
       FileOutputStream os = new FileOutputStream(propsFile);
       localProps.store(os,"Cpo Util Local Properties");
     } catch (IOException ioe) {
       showException(ioe);
     }
   }
-
-  protected void saveGloballyProtectedClasses() {
-
-    if (globallyProtectedClasses == null)
-      return;
-
-    try {
-      File protFile = new File(System.getProperties().getProperty("user.home") + File.separator + PROTECTED_CLASS_FILE);
-      PrintWriter pw = new PrintWriter(protFile);
-      for (String s : globallyProtectedClasses) {
-        pw.println(s);
-      }
-      pw.flush();
-      pw.close();
-    } catch (IOException ioe) {
-      showException(ioe);
-    }
-  }
-
+  
   public static void setNewWLConnection(String editServer) {
     CpoWLPropertyPanel pane = new CpoWLPropertyPanel();
     if (editServer != null) {
@@ -427,7 +279,7 @@ public class CpoUtil {
   static void editConnection() {
     JOptionPane.showMessageDialog(frame, new CpoEditConnPanel(localProps), "Edit Connections", JOptionPane.QUESTION_MESSAGE);
   }
-
+  
   static boolean showYesNo(String message) {
     int result = JOptionPane.showConfirmDialog(frame,message,"Yes or No",JOptionPane.YES_NO_OPTION);
     return (result == 0);
@@ -435,14 +287,6 @@ public class CpoUtil {
 
   static void showMessage(String message) {
     JOptionPane.showMessageDialog(frame, message);
-  }
-
-  static void showMultipleQueryTextWarning() {
-    showMessage("This query text is used by another query group.  Be careful what you do.");
-  }
-
-  static void showProtectedWarning() {
-    showMessage("This is a protected class.  Be careful what you do.");
   }
 
   static void removeConnection(String server) {
@@ -493,4 +337,5 @@ public class CpoUtil {
       panel.getProxy().clearMetaClassCache();
     }
   }
+
 }
