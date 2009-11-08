@@ -159,20 +159,23 @@ public class CpoUtil {
       return result;
 
     try {
-      URL u = new URL(url);
-      URLConnection conn = u.openConnection();
-      conn.setConnectTimeout(3000);
-      conn.connect();
+      if (OUT.isDebugEnabled()) OUT.debug("Url: " + url);
+      UrlLoader loader = new UrlLoader(url);
+      Thread thread = new Thread(loader);
+      thread.start();
+      thread.join(3000);
 
-      BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+      InputStream in = loader.getInputStream();
+      if (in != null) {
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
-      String inputLine;
-      while ((inputLine = in.readLine()) != null) {
-        result.add(inputLine);
+        String inputLine;
+        while ((inputLine = br.readLine()) != null) {
+          result.add(inputLine);
+        }
+        br.close();
+        in.close();
       }
-
-      in.close();
-
       return result;
     } catch (Exception ex) {
       OUT.debug("Exception caught reading from url: " + ex);
@@ -234,17 +237,20 @@ public class CpoUtil {
       // bootstrapping
       String bootstrapUrl = props.getProperty("cpoutil.bootstrapUrl");
       if (bootstrapUrl != null) {
+        if (OUT.isDebugEnabled()) OUT.debug("Bootstrap Url: " + bootstrapUrl);
         try {
-          URL u = new URL(bootstrapUrl);
-          URLConnection conn = u.openConnection();
-          conn.setConnectTimeout(3000);
-          conn.connect();
+          UrlLoader loader = new UrlLoader(bootstrapUrl);
+          Thread thread = new Thread(loader);
+          thread.start();
+          thread.join(3000);
 
-          InputStream connInputStream = conn.getInputStream();
-          props.load(connInputStream);
-          connInputStream.close();
+          InputStream in = loader.getInputStream();
+          if (in != null) {
+            props.load(in);
+            in.close();
+          }
         } catch (Exception ex) {
-          OUT.debug("Exception caught reading bootstrap properties: " + ex);
+          OUT.error("Exception caught reading bootstrap properties: " + ex);
         }
       }
     } catch (MalformedURLException mue) {
