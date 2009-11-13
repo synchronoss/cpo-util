@@ -39,6 +39,7 @@ public class Statics  {
   public static final String PROP_JDBC_SQL_DIR ="cpoutil.jdbc.sqlDir.";
   public static final String PROP_JDBC_DEFDIR="cpoutil.jdbc.defaultdir.";
   public static final String PROP_JDBC_DEFPACK="cpoutil.jdbc.defaultpackage.";
+  public static final String PROP_JDBC_IGNORE_PROTECTED ="cpoutil.jdbc.ignoreProtected.";
 
   public static final String LPROP_CLASSPATH="cpoutil.classpath";
   public static final String LPROP_DEFDIR="cpoutil.defaultdir";

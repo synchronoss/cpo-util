@@ -1848,6 +1848,13 @@ public class Proxy implements Observer {
    */
   public boolean isClassProtected(String className) {
 
+    // ability to bypass protected classes
+    if (CpoUtil.localProps.containsKey(Statics.PROP_JDBC_IGNORE_PROTECTED + server)) {
+      if (Boolean.valueOf(CpoUtil.localProps.getProperty(Statics.PROP_JDBC_IGNORE_PROTECTED + server))) {
+        return false;
+      }
+    }
+
     // exact match
     if (protectedClasses.contains(className))
       return true;
