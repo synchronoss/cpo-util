@@ -97,6 +97,16 @@ public class Proxy implements Observer {
     return connProps.getProperty(Statics.PROP_JDBC_SQL_DIR + server);
   }
 
+  public boolean isIgnoreProtected() {
+    // ability to bypass protected classes
+    if (CpoUtil.localProps.containsKey(Statics.PROP_JDBC_IGNORE_PROTECTED + server)) {
+      if (Boolean.valueOf(CpoUtil.localProps.getProperty(Statics.PROP_JDBC_IGNORE_PROTECTED + server))) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public String getDefaultPackageName() {
     // default to the package for the connection...if there isn't one, use the old style
     String defPack = connProps.getProperty(Statics.PROP_JDBC_DEFPACK + server);
@@ -1847,13 +1857,6 @@ public class Proxy implements Observer {
    * org.synchronoss.utils.cpo - would match all classes in the cpo package
    */
   public boolean isClassProtected(String className) {
-
-    // ability to bypass protected classes
-    if (CpoUtil.localProps.containsKey(Statics.PROP_JDBC_IGNORE_PROTECTED + server)) {
-      if (Boolean.valueOf(CpoUtil.localProps.getProperty(Statics.PROP_JDBC_IGNORE_PROTECTED + server))) {
-        return false;
-      }
-    }
 
     // exact match
     if (protectedClasses.contains(className))
