@@ -98,7 +98,7 @@ public class CpoBrowserPanel extends JPanel  {
 
           // if the node is a protected class node, warn them
           if (pathComp instanceof CpoClassNode) {
-            if (((CpoClassNode)pathComp).isProtected()) {
+            if (((CpoClassNode)pathComp).isProtected() && !prox.isIgnoreProtected()) {
               CpoUtil.showProtectedWarning();
             }
           }
