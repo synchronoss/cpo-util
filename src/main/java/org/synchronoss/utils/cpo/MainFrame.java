@@ -32,8 +32,8 @@ public class MainFrame extends JFrame {
   private JMenuItem menuFileBrowser = new JMenuItem();
   private JMenuItem menuFileClassPath = new JMenuItem();
   private JMenuItem menuFileExit = new JMenuItem();
-  private JMenuItem menuFileNewJdbc = new JMenuItem();
-//  private JMenuItem menuFileNewWL = new JMenuItem();
+  //private JMenuItem menuFileNewJdbc = new JMenuItem();
+  //private JMenuItem menuFileNewWL = new JMenuItem();
   private JMenuItem menuFileEditCon = new JMenuItem();
   private JMenuItem menuFileUnloadLoader = new JMenuItem();
   private JMenu menuFile = new JMenu();
@@ -71,6 +71,7 @@ public class MainFrame extends JFrame {
           menuFileClassPath_ActionPerformed(ae);
         }
       });
+    /*
     menuFileNewJdbc.setText("New JDBC Connection");
     menuFileNewJdbc.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent ae) {
@@ -81,6 +82,7 @@ public class MainFrame extends JFrame {
           }
         }
       });
+      */
       /*
     menuFileNewWL.setText("New WebLogic Connection");
     menuFileNewWL.addActionListener(new ActionListener() {
@@ -134,7 +136,7 @@ public class MainFrame extends JFrame {
     menuFile.add(menuFileBrowser);
     menuFile.add(menuFileClassPath);
     menuFile.add(menuFileEditCon);
-    menuFile.add(menuFileNewJdbc);
+    //menuFile.add(menuFileNewJdbc);
     //menuFile.add(menuFileNewWL);
     menuFile.add(menuFileUnloadLoader);
     menuFile.add(menuFileExit);
