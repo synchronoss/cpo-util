@@ -195,8 +195,7 @@ public class Proxy implements Observer {
 //        e.printStackTrace();
 //        throw new ProxyException("Caught unknown exception while creating Proxy",e);
 //      }
-    }
-    else {
+    } else {
       Class<?> driverClass;
       try {
         driverClass = Class.forName(connProps.getProperty(Statics.PROP_JDBC_DRIVER+server));
@@ -261,6 +260,7 @@ public class Proxy implements Observer {
 //        throw new ProxyException("InvocationTargetException thrown",ite);
 //      }
   }
+  
   private void getInitialContext() throws Exception {
 //    try {
       Properties h = new Properties();
@@ -283,6 +283,7 @@ public class Proxy implements Observer {
 //      throw new ProxyException("Could not connect to weblogic for some reason",e);
 //    }
   }
+
   private void checkForRevsEnabled() {
     StringBuffer sql = new StringBuffer("select distinct userid from ");
     sql.append(tablePrefix);
@@ -365,24 +366,30 @@ public class Proxy implements Observer {
   public String toString() {
     return server;
   }
+  
   /**
    * returns sql types that this instance of cpo supports
    */
   public String[] getCpoSqlTypes() {
     return this.sqlTypes;
   }
+
   /**
    * returns CpoClassNode(s)
    */
   public CpoClassNode getClassNode(String classId) throws Exception {
     return classCacheById.get(classId);
   }
+
   public Hashtable<String, CpoClassNode> getClassesById() {
     return this.classCacheById;
   }
+
   public List<CpoClassNode> getClasses(AbstractCpoNode parent) throws Exception {
     if (this.classCache.containsKey(parent)) {
-      return this.classCache.get(parent);
+      List<CpoClassNode> al = this.classCache.get(parent);
+      Collections.sort(al, new CpoClassNodeComparator());
+      return al;
     }
     List<CpoClassNode> al = new ArrayList<CpoClassNode>();
     PreparedStatement pstmt = null;
@@ -410,21 +417,23 @@ public class Proxy implements Observer {
         al.add(cpoClassNode);
         classCacheById.put(cpoClassNode.getClassId(),cpoClassNode);
       }
-//    } catch (SQLException se) {
-//      se.printStackTrace();
-//      throw new ProxyException("getClasses()",se);
-    }
-    finally {
+      Collections.sort(al, new CpoClassNodeComparator());
+    } finally {
       try {
         if (rs != null) rs.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+        // ignore
+      }
       try {
         if (pstmt != null) pstmt.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+        // ignore
+      }
     }
     this.classCache.put(parent,al);
     return al;
   }
+
   public CpoQueryTextLabelNode getCpoQueryTextLabelNode(CpoServerNode serverNode) {
     Enumeration<AbstractCpoNode> serverNodeEnum = serverNode.children();
     while (serverNodeEnum.hasMoreElements()) {
@@ -594,6 +603,7 @@ public class Proxy implements Observer {
     }
     return null;
   }
+
   /**
    * returns CpoQueryNode(s)
    */
@@ -644,6 +654,7 @@ public class Proxy implements Observer {
     this.queryCache.put(parent,al);
     return al;
   }
+
   /**
    * returns CpoQueryParameterNode(s)
    */
@@ -812,6 +823,7 @@ public class Proxy implements Observer {
     }
     return result;
   }
+
   /**
    * lets try to close this oracle connection b4 we take a hike
    */
@@ -822,6 +834,7 @@ public class Proxy implements Observer {
       conn.close();
     } catch (Exception e) {}
   }
+
   /**
    * observer method
    */
@@ -894,18 +907,21 @@ public class Proxy implements Observer {
 //      this.removeObjectFromAllCache(canChild);
     }
   }
+
   /**
    * get a list of all changed objects
    */
   public List<AbstractCpoNode> getAllChangedObjects() {
     return this.allChangedObjects;
   }
+
   /**
    * retreives a new guid to use for newly created objects
    */
   public String getNewGuid() throws Exception {
     return GUID.getGUID();
   }
+
   /**
    * saves all nodes passed to it to the db
    */
@@ -1413,6 +1429,7 @@ public class Proxy implements Observer {
       } catch (Exception e) {}
     }
   }
+
   /**
    * cleans ALL cache elements completely out
    */
@@ -1427,6 +1444,7 @@ public class Proxy implements Observer {
     queryGroupByTextCache.clear();
     classCacheById.clear();
   }
+
   /**
    * removes a particular object from all caches, including changed object cache
    */
@@ -1485,6 +1503,7 @@ public class Proxy implements Observer {
     }
     if (this.queryGroupByTextCache.contains(obj)) this.queryGroupByTextCache.remove(obj);
   }
+
   /**
    * get a particular querytextnode
    */
@@ -1495,6 +1514,7 @@ public class Proxy implements Observer {
     }
     return null;
   }
+
   /**
    * get an arraylist of querytextnodes that match a certain string
    */
@@ -1509,6 +1529,7 @@ public class Proxy implements Observer {
     }
     return al;
   }
+
   public void clearMetaClassCache() throws Exception {
 //    try {
       //Method cpoManClearMetaClassMeth = this.cpoMan.getClass().getMethod("clearMetaClass",null);
@@ -1518,6 +1539,7 @@ public class Proxy implements Observer {
 //      throw new ProxyException("clearMetaClassCache()",re);
 //    }
   }
+
   public void clearMetaClassCache(String className) throws Exception {
 //    try {
 //      Method cpoManClearMetaClassMeth = this.cpoMan.getClass().getMethod("clearMetaClass",new Class[]{String.class});
@@ -1690,6 +1712,7 @@ public class Proxy implements Observer {
       }
     }
   }
+  
   void generateNewAttributeMap(CpoClassNode ccn, String sql) throws Exception {
     CpoAttributeLabelNode attMapParent = null;
     Enumeration<AbstractCpoNode> enumChildren = ccn.children();
@@ -1720,17 +1743,17 @@ public class Proxy implements Observer {
       try {
         if (pstmt != null) pstmt.close();
       } catch (Exception e) {}
-    }
-    
+    }    
   }
+
   public Collection<?> executeQueryGroup(Object obj, Object objReturnType, CpoQueryGroupNode cpoQGnode, boolean persist) throws Exception {
 //    try {
       List<Object> result = new ArrayList<Object>();
       if (cpoQGnode.getType().equals(Statics.CPO_TYPE_CREATE)) {
-//insert
+        //insert
         Method meth = cpoMan.getClass().getMethod("insertObject",new Class[]{String.class,Object.class});
         meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
-// retrieve from cpo, so we can verify insertion
+        // retrieve from cpo, so we can verify insertion
         meth = cpoMan.getClass().getMethod("retrieveObject",new Class[]{String.class,Object.class});
         Object resultObj = meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
         if (resultObj != null)
@@ -1738,7 +1761,7 @@ public class Proxy implements Observer {
       } else if (cpoQGnode.getType().equals(Statics.CPO_TYPE_DELETE)) {
         Method meth = cpoMan.getClass().getMethod("deleteObject",new Class[]{String.class,Object.class});
         meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
-// retrieve from cpo, so we can verify deletion
+        // retrieve from cpo, so we can verify deletion
         meth = cpoMan.getClass().getMethod("retrieveObject",new Class[]{String.class,Object.class});
         Object resultObj = meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
         if (resultObj != null)
@@ -1800,6 +1823,7 @@ public class Proxy implements Observer {
 //    }
     return result;
   }
+  
   public void addToAttributeMapFromSQL(CpoAttMapTableModel model, String sql) throws Exception {
       PreparedStatement pstmt = null;
       ResultSet rs = null;
@@ -1827,12 +1851,15 @@ public class Proxy implements Observer {
           CpoUtil.updateStatus(message);
       }
   }
+
   public void toggleClassNames() {
     this.classNameToggle = !classNameToggle;
   }
+
   public boolean getClassNameToggle() {
     return this.classNameToggle;
   }
+
   public String getConnectionClassName() {
     return this.connectionClassName;
   }
@@ -1871,4 +1898,11 @@ public class Proxy implements Observer {
 
     return false;
   }
+
+  public class CpoClassNodeComparator implements Comparator<CpoClassNode> {
+    public int compare(CpoClassNode c1, CpoClassNode c2) {
+      return c1.getDisplayClassName().compareTo(c2.getDisplayClassName());
+    }
+  }
+
 }

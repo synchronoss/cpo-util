@@ -19,17 +19,17 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-
-import javax.swing.*;
 
 public class CpoEditConnPanel extends JPanel  {
     /** Version Id for this class. */
     private static final long serialVersionUID=1L;
   private GridBagLayout gridBagLayout1 = new GridBagLayout();
   private JComboBox jComConn = new JComboBox();
+  private JButton jButNew = new JButton();
   private JButton jButEdit = new JButton();
   private JButton jButDelete = new JButton();
   Properties props;
@@ -45,21 +45,31 @@ public class CpoEditConnPanel extends JPanel  {
 
   private void jbInit() throws Exception {
     this.setLayout(gridBagLayout1);
+    jButNew.setText("New");
+    jButNew.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        jButNew_actionPerformed(e);
+      }
+    });
+
     jButEdit.setText("Edit");
     jButEdit.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          jButEdit_actionPerformed(e);
-        }
-      });
+      public void actionPerformed(ActionEvent e) {
+        jButEdit_actionPerformed(e);
+      }
+    });
+
     jButDelete.setText("Delete");
     jButDelete.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          jButDelete_actionPerformed(e);
-        }
-      });
-    this.add(jComConn, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
-    this.add(jButEdit, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
-    this.add(jButDelete, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+      public void actionPerformed(ActionEvent e) {
+        jButDelete_actionPerformed(e);
+      }
+    });
+
+    this.add(jComConn, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+    this.add(jButNew, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+    this.add(jButEdit, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+    this.add(jButDelete, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
     populateCombo();
   }
   
@@ -78,6 +88,12 @@ public class CpoEditConnPanel extends JPanel  {
       }
     }
   }
+
+  private void jButNew_actionPerformed(ActionEvent e) {
+    CpoUtil.setNewJDBCConnection(null);
+    populateCombo();
+  }
+
   private void jButEdit_actionPerformed(ActionEvent e) {
     String selectedVal = (String)jComConn.getSelectedItem();
     if (selectedVal == null) return;

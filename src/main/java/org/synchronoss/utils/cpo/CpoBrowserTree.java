@@ -550,6 +550,7 @@ public class CpoBrowserTree extends JTree {
 
   private void toggleClassnames() {
     menuNode.getProxy().toggleClassNames();
+    menuNode.refreshChildren();
     menuNode.refreshMe();
   }
 
