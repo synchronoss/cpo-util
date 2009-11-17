@@ -41,6 +41,12 @@ public class Statics  {
   public static final String PROP_JDBC_DEFPACK="cpoutil.jdbc.defaultpackage.";
   public static final String PROP_JDBC_IGNORE_PROTECTED ="cpoutil.jdbc.ignoreProtected.";
 
+  public static final String LOAD_JDBC_URL="cpoutil.jdbc.url";
+  public static final String LOAD_JDBC_DRIVER="cpoutil.jdbc.driver";
+  public static final String LOAD_JDBC_PARAMS="cpoutil.jdbc.params";
+  public static final String LOAD_JDBC_TABLE_PREFIX="cpoutil.jdbc.tablePrefix";
+  public static final String LOAD_JDBC_SQL_STATEMENT_DELIMITER="cpoutil.jdbc.sqlStatementDelimiter";
+
   public static final String LPROP_CLASSPATH="cpoutil.classpath";
   public static final String LPROP_DEFDIR="cpoutil.defaultdir";
   public static final String LPROP_DEFPACK="cpoutil.defaultpackage";

@@ -23,9 +23,11 @@ package org.synchronoss.utils.cpo;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
+import java.io.*;
+import java.util.Properties;
 
 public class CpoJDBCPropertyPanel extends JPanel  {
   /** Version Id for this class. */
@@ -50,6 +52,7 @@ public class CpoJDBCPropertyPanel extends JPanel  {
   private JScrollPane jScrollParams = new JScrollPane();
   private JTextArea jTextAJDBCParams = new JTextArea();
   private JButton sqlDirBrowseButton = new JButton();
+  private JButton loadButton = new JButton();
 
   private File sqlDir = null;
 
@@ -77,6 +80,13 @@ public class CpoJDBCPropertyPanel extends JPanel  {
     jTextSqlDir.setText("Select a directory");
     jTextSqlDir.setEditable(false);
 
+    loadButton.setText("Load");
+    loadButton.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        loadButtonActionPerformed(e);
+      }
+    });
+
     sqlDirBrowseButton.setText("Browse");
     sqlDirBrowseButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
@@ -86,14 +96,16 @@ public class CpoJDBCPropertyPanel extends JPanel  {
 
     jScrollParams.setPreferredSize(new Dimension(300, 100));
     jScrollParams.setMinimumSize(new Dimension(300, 100));
+    jScrollParams.getViewport().add(jTextAJDBCParams, null);
+
     this.add(jLabCpoUtilName, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
-    this.add(jTextCpoUtilName, new GridBagConstraints(1, 0, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
+    this.add(jTextCpoUtilName, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
+    this.add(loadButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
     this.add(jLabJdbcUrl, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
     this.add(jTextJdbcUrl, new GridBagConstraints(1, 1, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
     this.add(jLabJdbcDriver, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
     this.add(jTextJdbcDriver, new GridBagConstraints(1, 2, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
     this.add(jLabJdbcParams, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
-    jScrollParams.getViewport().add(jTextAJDBCParams, null);
     this.add(jScrollParams, new GridBagConstraints(1, 3, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
     this.add(jLabTablePrefix, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
     this.add(jTextTablePrefix, new GridBagConstraints(1, 4, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
@@ -101,7 +113,40 @@ public class CpoJDBCPropertyPanel extends JPanel  {
     this.add(jTextSQLStatementDelimiter, new GridBagConstraints(1, 5, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
     this.add(jLabSqlDir, new GridBagConstraints(0, 6, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
     this.add(jTextSqlDir, new GridBagConstraints(1, 6, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
-    this.add(sqlDirBrowseButton, new GridBagConstraints(2, 6, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
+    this.add(sqlDirBrowseButton, new GridBagConstraints(2, 6, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
+  }
+
+  private void loadButtonActionPerformed(ActionEvent e) {
+    JFileChooser chooser = new JFileChooser();
+    chooser.setApproveButtonText("Select");
+    chooser.setDialogTitle("Select configuration to load:");
+    chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    chooser.setFileFilter(new FileFilter() {
+      public String getDescription() {
+        return "Properties files";
+      }
+      public boolean accept(File f) {
+        return (f.getName().toLowerCase().endsWith(".properties"));
+      }
+    });
+    int option = chooser.showOpenDialog(this);
+    if (option == JFileChooser.APPROVE_OPTION) {
+      File file = chooser.getSelectedFile();
+      if (OUT.isDebugEnabled())
+        OUT.debug("File: " + file.getPath());
+
+      try {
+        Properties configProps = new Properties();
+        configProps.load(new FileInputStream(file));
+        setJdbcDriver(configProps.getProperty(Statics.LOAD_JDBC_DRIVER));
+        setJdbcUrl(configProps.getProperty(Statics.LOAD_JDBC_URL));
+        setJDBCParams(configProps.getProperty(Statics.LOAD_JDBC_PARAMS));
+        setTablePrefix(configProps.getProperty(Statics.LOAD_JDBC_TABLE_PREFIX));
+        setSQLStatementDelimiter(configProps.getProperty(Statics.LOAD_JDBC_SQL_STATEMENT_DELIMITER));
+      } catch (Exception ex) {
+        CpoUtil.showException(ex);
+      }
+    }
   }
 
   private void sqlDirBrowseButtonActionPerformed(ActionEvent e) {
