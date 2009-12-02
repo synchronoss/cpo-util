@@ -77,16 +77,20 @@ public class CpoEditConnPanel extends JPanel  {
   private void populateCombo() {
     this.jComConn.removeAllItems();
     Enumeration propsEnum = props.keys();
+    Vector<String> vals = new Vector<String>();
     while (propsEnum.hasMoreElements()) {
       String name = (String)propsEnum.nextElement();
       if (name.startsWith(Statics.PROP_JDBC_URL)) {
         String server = name.substring(Statics.PROP_JDBC_URL.length());
-        this.jComConn.addItem(server+":*JDBC*");
-      }else if (name.startsWith(Statics.PROP_WLSURL)) {
+        vals.add(server+":*JDBC*");
+      } else if (name.startsWith(Statics.PROP_WLSURL)) {
         String server = name.substring(Statics.PROP_WLSURL.length());
-        this.jComConn.addItem(server+":*WEBLOGIC*");        
+        vals.add(server+":*WEBLOGIC*");
       }
     }
+    // sort the list
+    Collections.sort(vals);
+    jComConn.setModel(new DefaultComboBoxModel(vals));
   }
 
   private void jButNew_actionPerformed(ActionEvent e) {

@@ -299,7 +299,9 @@ public class CpoUtil {
         String server = name.substring(Statics.PROP_JDBC_URL.length());
         vec.add(server+":*JDBC ONLY*");
       }
-    }    
+    }
+    // sort the list
+    Collections.sort(vec);
     String[] choices = new String[vec.size()];
     vec.toArray(choices);
     String selection = (String)JOptionPane.showInputDialog(frame,"Select server to connect to:","Server Selection",JOptionPane.PLAIN_MESSAGE,null,choices,null);
