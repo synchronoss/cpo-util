@@ -47,33 +47,14 @@
         </plugins>
       </build>
     </profile>
-    <profile>
-      <id>sncr</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <properties>
-        <cpoutil.bootstrapUrl>http://wiki.synchronoss.net/~components/sncrcpoutil/bootstrap.properties</cpoutil.bootstrapUrl>
-      </properties>
-    </profile>
   </profiles>
   <distributionManagement>
     <repository>
-      <!--
-        <id>sncr-libs-releases</id>
-        <name>SNCR Repository</name>
-        <url>http://mavenrepo.synchronoss.net:8081/artifactory/libs-releases</url>
-        -->
       <id>sf-cpo-releases</id>
       <name>Sourceforge CPO Repository</name>
       <url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/sf-cpo-releases</url>
     </repository>
     <snapshotRepository>
-      <!--
-        <id>sncr-libs-snapshots</id>
-        <name>SNCR Snapshot Repository</name>
-        <url>http://mavenrepo.synchronoss.net:8081/artifactory/libs-snapshots</url>
-        -->
       <id>sf-cpo-snapshots</id>
       <name>Sourceforge CPO Snapshot Repository</name>
       <url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/sf-cpo-snapshots</url>
@@ -392,10 +373,12 @@
         <artifactId>maven-surefire-report-plugin</artifactId>
         <version>2.4.3</version>
       </plugin>
-      <!--	      <plugin>
-             <groupId>org.codehaus.mojo</groupId>
-             <artifactId>changelog-maven-plugin</artifactId>
-           </plugin>-->
+      <!--
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>changelog-maven-plugin</artifactId>
+      </plugin>
+      -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>taglist-maven-plugin</artifactId>
@@ -439,11 +422,13 @@
         <artifactId>cobertura-maven-plugin</artifactId>
         <version>2.2</version>
       </plugin>
-      <!--<plugin>
-           <groupId>net.sf</groupId>
-           <artifactId>stat-scm</artifactId>
-           <version>1.0.0</version>
-         </plugin>-->
+      <!--
+      <plugin>
+        <groupId>net.sf</groupId>
+        <artifactId>stat-scm</artifactId>
+        <version>1.0.0</version>
+      </plugin>
+      -->
     </plugins>
   </reporting>
 </project>
