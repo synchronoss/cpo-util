@@ -1,11 +1,28 @@
+CpoUtil v3.0 Release Notes
+--------------------------
+
+Protected Classes
+-----------------
+There's now a protected class ability.  The protected class list is loaded dynamically at startup.  Protected classes will show up with blue icons, and will warn you when you try to make a change to a protected class.  Unprotected classes will show up green and will work as before.
+
+Shared Connection Properties
+----------------------------
+There's now the ability to load a configuration for a jdbc connection.  This allows a config file to be set up in a project and then easily loaded by developers to setup the necessary jdbc connection info.
+
+Bug Fixes
+---------
+-Sort Classes by name - classes will now sort based on the display name, not the full classpath name
+-Server selection list boxes now sort alphabetically
+-Tab refresh bug
+
+
+
 CpoUtil v2.5 Release Notes
 --------------------------
 
-
-
 Source Control for CPO...sorta
 ------------------------------
-JDBC Connections now require you to specify a sql output directory.  You'll be prompted to do so upon opening a cpo browser, or when you edit a connection.  On all exports and "Save Child Changes" operations, CpoUtil will output sql files for every class (same sql that's generated when you do "Export SQL for Class") to the sql output directory.  These files allow you to save them in subversion (or other source control system) to allow a way to enable storing cpo changes in source control.  The resulting files will be named after the fully qualified class name.  
+JDBC Connections now require you to specify a sql output directory.  You'll be prompted to do so upon opening a cpo browser, or when you edit a connection.  On all exports and "Save Child Changes" operations, CpoUtil will output sql files for every class (same sql that's generated when you do "Export SQL for Class") to the sql output directory.  These files allow you to save them in subversion (or other source control system) to allow a way to enable storing cpo changes in source control.  The resulting files will be named after the fully qualified class name.
 
 If the sql output directory is empty, CpoUtil will 'prime' the directory by creating all of the export files for you.
 
