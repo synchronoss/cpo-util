@@ -329,7 +329,7 @@
     <dependency>
       <groupId>org.synchronoss</groupId>
       <artifactId>cpo</artifactId>
-      <version>4.0-SNAPSHOT</version>
+      <version>4.0</version>
     </dependency>
   </dependencies>
   <reporting>
