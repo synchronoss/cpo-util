@@ -11,6 +11,7 @@ There's now the ability to load a configuration for a jdbc connection.  This all
 
 Bug Fixes
 ---------
+-Populate rename class dialog
 -Sort Classes by name - classes will now sort based on the display name, not the full classpath name
 -Server selection list boxes now sort alphabetically
 -Tab refresh bug
