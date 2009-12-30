@@ -27,7 +27,8 @@ import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.util.Properties;
+import java.sql.*;
+import java.util.*;
 
 public class CpoJDBCPropertyPanel extends JPanel  {
   /** Version Id for this class. */
@@ -53,6 +54,7 @@ public class CpoJDBCPropertyPanel extends JPanel  {
   private JTextArea jTextAJDBCParams = new JTextArea();
   private JButton sqlDirBrowseButton = new JButton();
   private JButton loadButton = new JButton();
+  private JButton testConnectionButton = new JButton();
 
   private File sqlDir = null;
 
@@ -94,6 +96,13 @@ public class CpoJDBCPropertyPanel extends JPanel  {
       }
     });
 
+    testConnectionButton.setText("Test");
+    testConnectionButton.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        testConnectionButtonActionPerformed(e);
+      }
+    });
+
     jScrollParams.setPreferredSize(new Dimension(300, 100));
     jScrollParams.setMinimumSize(new Dimension(300, 100));
     jScrollParams.getViewport().add(jTextAJDBCParams, null);
@@ -101,16 +110,23 @@ public class CpoJDBCPropertyPanel extends JPanel  {
     this.add(jLabCpoUtilName, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
     this.add(jTextCpoUtilName, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
     this.add(loadButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
+
     this.add(jLabJdbcUrl, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
     this.add(jTextJdbcUrl, new GridBagConstraints(1, 1, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
+
     this.add(jLabJdbcDriver, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
-    this.add(jTextJdbcDriver, new GridBagConstraints(1, 2, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
+    this.add(jTextJdbcDriver, new GridBagConstraints(1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
+    this.add(testConnectionButton, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
+
     this.add(jLabJdbcParams, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
     this.add(jScrollParams, new GridBagConstraints(1, 3, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
+
     this.add(jLabTablePrefix, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
     this.add(jTextTablePrefix, new GridBagConstraints(1, 4, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
+
     this.add(jLabSQLStatementDelimiter, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
     this.add(jTextSQLStatementDelimiter, new GridBagConstraints(1, 5, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
+
     this.add(jLabSqlDir, new GridBagConstraints(0, 6, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
     this.add(jTextSqlDir, new GridBagConstraints(1, 6, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
     this.add(sqlDirBrowseButton, new GridBagConstraints(2, 6, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
@@ -164,6 +180,35 @@ public class CpoJDBCPropertyPanel extends JPanel  {
       if (OUT.isDebugEnabled())
         OUT.debug("Directory: " + dir.getPath());
       setSqlDir(dir);
+    }
+  }
+
+  private void testConnectionButtonActionPerformed(ActionEvent e) {
+    try {
+      try {
+        Class.forName(getJdbcDriver());
+      } catch (Exception ex) {
+        CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass(getJdbcDriver());
+      }
+      Properties connectionProperties = new Properties();
+      if (getJDBCParams() != null && getJDBCParams().length() > 0) {
+        StringTokenizer st = new StringTokenizer(getJDBCParams(),";");
+        while (st.hasMoreTokens()) {
+          String token = st.nextToken();
+          StringTokenizer stNameValue = new StringTokenizer(token,"=");
+          String name = null, value = null;
+          if (stNameValue.hasMoreTokens())
+            name = stNameValue.nextToken();
+          if (stNameValue.hasMoreTokens())
+            value = stNameValue.nextToken();
+          connectionProperties.setProperty(name,value);
+        }
+      }
+      Connection conn = DriverManager.getConnection(getJdbcUrl(), connectionProperties);
+      conn.close();
+      JOptionPane.showMessageDialog(this, "Connection successful", "Test Connection", JOptionPane.INFORMATION_MESSAGE);
+    } catch (Exception ex) {
+      JOptionPane.showMessageDialog(this, ex.getMessage(), "Test Connection", JOptionPane.ERROR_MESSAGE);
     }
   }
 
