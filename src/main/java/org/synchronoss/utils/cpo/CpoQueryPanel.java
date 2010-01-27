@@ -26,6 +26,7 @@ import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.*;
 import java.text.ParseException;
 import java.util.*;
 import java.util.List;
@@ -33,6 +34,9 @@ import java.util.List;
 public class CpoQueryPanel extends JPanel {
 
     private Logger OUT = Logger.getLogger(this.getClass());
+
+    // location of the divider
+    private static int divLocation = -1;
 
     private static final long serialVersionUID = 1L;
     private BorderLayout borderLayout1 = new BorderLayout();
@@ -52,6 +56,11 @@ public class CpoQueryPanel extends JPanel {
         this.queryNode = queryNode;
         try {
             jbInit();
+
+            // adjust divider
+            if (divLocation != -1)
+                jSplitPane.setDividerLocation(divLocation);
+                
         } catch (Exception e) {
             CpoUtil.showException(e);
         }
@@ -76,6 +85,11 @@ public class CpoQueryPanel extends JPanel {
         this.add(jSplitPane, BorderLayout.CENTER);
         jSplitPane.setTopComponent(cpoQPnorth);
         jSplitPane.setBottomComponent(jScrollTable);
+        jSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+          public void propertyChange(PropertyChangeEvent e) {
+            divLocation = jSplitPane.getDividerLocation();
+          }
+        });
         cpoQPnorth.jTextSeq.addKeyListener(new KeyListener() {
             public void keyTyped(KeyEvent ke) {
             }
