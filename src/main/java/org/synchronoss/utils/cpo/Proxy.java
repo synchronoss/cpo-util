@@ -49,9 +49,6 @@ public class Proxy implements Observer {
   private List<AbstractCpoNode> allChangedObjects = new ArrayList<AbstractCpoNode>();
   private CpoAdapter cpoMan;
   private String[] sqlTypes;
-//  private Method sqlTypeClassMeth = null;
-//  private Method sqlTypeClassMethInt = null;
-//  private HashMap cpoTypeMap = new HashMap();
   private CpoBrowserTree cpoTree;
   private String databaseName;
   private String tablePrefix;
@@ -60,7 +57,6 @@ public class Proxy implements Observer {
   private boolean classNameToggle = false;
   private Logger OUT = Logger.getLogger(this.getClass());
   private String connectionClassName = null;
-  //org.synchronoss.cpo.JdbcCpoAdapter
 
   // connection based protected classes
   private HashSet<String> protectedClasses = new HashSet<String>();
@@ -148,12 +144,6 @@ public class Proxy implements Observer {
     this.tablePrefix = connProps.getProperty(Statics.PROP_JDBC_TABLE_PREFIX+server);
     this.sqlDelimiter = connProps.getProperty(Statics.PROP_JDBC_SQL_STATEMENT_DELIMITER+server);
 
-//    Class cpoSqlTypesClass =  CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass("org.synchronoss.cpo.jdbc.JavaSqlTypes");
-    //javaSqlTypes = cpoSqlTypesClass.newInstance();
-//    Method cpoManGetSqlTypesMeth = cpoSqlTypesClass.getMethod("getSqlTypes",null);
-//    sqlTypeClassMeth = cpoSqlTypesClass.getMethod("getSqlTypeClass",new Class[]{String.class});
-//    sqlTypeClassMethInt = cpoSqlTypesClass.getMethod("getSqlTypeClass",new Class[]{Integer.class});
-//    Collection coll = (Collection)cpoManGetSqlTypesMeth.invoke(null,null);
     Collection<String> coll = JavaSqlTypes.getSqlTypes();
     sqlTypes = new String[coll.size()];
     coll.toArray(sqlTypes);
@@ -161,7 +151,6 @@ public class Proxy implements Observer {
     if (CpoUtil.props.getProperty(Statics.PROP_JDBC_URL+server) == null
         && CpoUtil.localProps.getProperty(Statics.PROP_JDBC_URL+server) == null) {
      getInitialContext();
-//      try {
         conn = ((DataSource)ctx.lookup(connProps.getProperty(Statics.PROP_WLSCONNPOOL+server))).getConnection();
         conn.setAutoCommit(false);
         databaseName = conn.getMetaData().getURL();
@@ -169,30 +158,6 @@ public class Proxy implements Observer {
 
         // Replace the dynamic link with a hard link.
         cpoMan = new JdbcCpoAdapter(new JdbcDataSourceInfo(connProps.getProperty(Statics.PROP_WLSCONNPOOL+server),getTablePrefix()));
-//        this.getClass().getClassLoader().loadClass("javax.ejb.EJBHome");
-//        connectionClassName = "org.synchronoss.cpo.CpoManagerHome";
-//  /      Class cpoManHomeClass = CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass(connectionClassName);
-
-//        Object cpoManHome = ctx.lookup(connProps.getProperty(Statics.PROP_CPONAME+server));
-//        Method cpoManHomeCreateMeth = cpoManHome.getClass().getMethod("create",null);
-//        cpoMan = cpoManHomeCreateMeth.invoke(cpoManHome,null);
-//        Method cpoManGetSqlTypesMeth = cpoMan.getClass().getMethod("getSqlTypes",null);
-//        Collection coll = (Collection)cpoManGetSqlTypesMeth.invoke(cpoMan,null);
-//        sqlTypes = new String[coll.size()];
-//        coll.toArray(sqlTypes);
-         
-//      } catch (NamingException ne) {
-//        throw new ProxyException("Could not find context lookup at weblogic instance",ne);
-//      } catch (SQLException se) {
-//        throw new ProxyException("Caught a sql exception while creating Proxy",se);
-//      } catch (NoClassDefFoundError cdfe) {
-//        throw new ClassNotFoundException (cdfe.getMessage());
-//      } catch (ClassNotFoundException cnfe) {
-//        throw cnfe;
-//      } catch (Exception e) {
-//        e.printStackTrace();
-//        throw new ProxyException("Caught unknown exception while creating Proxy",e);
-//      }
     } else {
       Class<?> driverClass;
       try {
@@ -220,47 +185,10 @@ public class Proxy implements Observer {
         databaseName = conn.getMetaData().getURL();
         // Replace the dynamic link with a hard link.
         cpoMan = new JdbcCpoAdapter(new JdbcDataSourceInfo(connProps.getProperty(Statics.PROP_JDBC_DRIVER+server),connProps.getProperty(Statics.PROP_JDBC_URL+server),connectionProperties,1,1,false,getTablePrefix()));
-/*  Removed DB060223
-         Class jdbcCpoAdapter;
-        try {
-          connectionClassName = "org.synchronoss.cpo.jdbc.JdbcCpoAdapter";
-          jdbcCpoAdapter = CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass(connectionClassName);
-        } catch (Exception e) {
-          connectionClassName = "org.synchronoss.cpo.JdbcCpoAdapter";        
-          jdbcCpoAdapter = CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass(connectionClassName);
-        }
-//        Method createMeth = jdbcCpoAdapter.getMethod("createAdapter",new Class[]{Connection.class});
-//        cpoMan = createMeth.invoke(null,new Object[]{conn});
-        try {
-          Constructor classCtor = jdbcCpoAdapter.getConstructor(new Class[]{Connection.class});
-          cpoMan = classCtor.newInstance(new Object[]{conn});          
-        } catch (Exception e) {
-          OUT.error("Caught exception instantiating JdbcCpoAdapter ...  will try something different: "+e.getMessage(),e);
-          Constructor classCtor = jdbcCpoAdapter.getConstructor(new Class[]{String.class,String.class,Properties.class});
-          cpoMan = classCtor.newInstance(new Object[]{connProps.getProperty(Statics.PROP_JDBC_DRIVER+server),connProps.getProperty(Statics.PROP_JDBC_URL+server),connectionProperties});
-        }
-*/
-        //Class cpoSqlTypesClass =  CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass("org.synchronoss.cpo.jdbc.JavaSqlTypes");
-        //Method cpoManGetSqlTypesMeth = cpoSqlTypesClass.getMethod("getSqlTypes",null);
-        //Method cpoManGetSqlTypesMeth = cpoMan.getClass().getMethod("getSqlTypes",null);
-        //Collection coll = (Collection)cpoManGetSqlTypesMeth.invoke(cpoMan,null);
-        //sqlTypes = new String[coll.size()];
-        //coll.toArray(sqlTypes);
     }
-//      } catch (SQLException se) {
-//        throw new ProxyException("SQL Exception thrown",se);
-//      } catch (NoSuchMethodException nsme) {
-//        nsme.printStackTrace();
-//        throw new ProxyException("Couldn't find method name",nsme);
-//      } catch (IllegalAccessException iae) {
-//        throw new ProxyException("Illegal Access: is the method private?  package?",iae);
-//      } catch (InvocationTargetException ite) {
-//        throw new ProxyException("InvocationTargetException thrown",ite);
-//      }
   }
   
   private void getInitialContext() throws Exception {
-//    try {
       Properties h = new Properties();
       h.put(Context.INITIAL_CONTEXT_FACTORY, connProps.getProperty(Statics.PROP_WLSINITCTXFCTRY+server));
       h.put(Context.PROVIDER_URL, connProps.getProperty(Statics.PROP_WLSURL+server));
@@ -273,17 +201,10 @@ public class Proxy implements Observer {
       }
       ctx = new InitialContext(h);
       OUT.debug("About to return initial context");
-//    } catch (NamingException ne) {
-//      ne.printStackTrace();
-//      throw new ProxyException("Could not connect to weblogic instance",ne);
-//    } catch (Exception e) {
-//      e.printStackTrace();
-//      throw new ProxyException("Could not connect to weblogic for some reason",e);
-//    }
   }
 
   private void checkForRevsEnabled() {
-    StringBuffer sql = new StringBuffer("select distinct userid from ");
+    StringBuilder sql = new StringBuilder("select distinct userid from ");
     sql.append(tablePrefix);
     sql.append("cpo_class_rev");
     
@@ -293,8 +214,7 @@ public class Proxy implements Observer {
       pstmt.executeQuery();
       revsEnabled = true;
     } catch (Exception e) {
-    }
-    finally {
+    } finally {
       try {
         if (pstmt != null) pstmt.close();
       } catch (Exception e) {}
@@ -393,7 +313,7 @@ public class Proxy implements Observer {
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
-      StringBuffer sql = new StringBuffer();
+      StringBuilder sql = new StringBuilder();
       if (revsEnabled) {
         sql.append("select class_id, name, userid, createdate from ");
         sql.append(tablePrefix);
@@ -440,7 +360,7 @@ public class Proxy implements Observer {
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
-    	StringBuffer sql = new StringBuffer();
+    	StringBuilder sql = new StringBuilder();
       if (revsEnabled) {
     	  sql.append("select group_id, class_id, group_type, name, userid, createdate from ");
         sql.append(tablePrefix);
@@ -461,10 +381,7 @@ public class Proxy implements Observer {
         }
         al.add(cpoQueryGroupNode);
       }
-//    } catch (SQLException se) {
-//      throw new ProxyException("getQueryGroups()",se);
-    }
-    finally {
+    } finally {
       try {
         if (rs != null) rs.close();
       } catch (Exception e) {}
@@ -508,7 +425,7 @@ public class Proxy implements Observer {
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
-    	StringBuffer sql = new StringBuffer();
+    	StringBuilder sql = new StringBuilder();
       if (revsEnabled) {
         sql.append("select q.query_id, q.group_id, q.seq_no, q.sql_text, q.description, q.userid, q.createdate from ");
         sql.append(tablePrefix);
@@ -536,10 +453,7 @@ public class Proxy implements Observer {
         }
         al.add(cpoQueryNode);
       }
-//    } catch (SQLException se) {
-//      throw new ProxyException("getQueries",se);
-    }
-    finally {
+    } finally {
       try {
         if (rs != null) rs.close();
       } catch (Exception e) {}
@@ -562,7 +476,7 @@ public class Proxy implements Observer {
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
-    	StringBuffer sql = new StringBuffer();
+    	StringBuilder sql = new StringBuilder();
       if (revsEnabled) {
         sql.append("select qp.attribute_id, qp.query_id, qp.seq_no, qp.param_type, qp.userid, qp.createdate from ");
         sql.append(tablePrefix);
@@ -575,7 +489,6 @@ public class Proxy implements Observer {
       pstmt = conn.prepareStatement(sql.toString());
       pstmt.setString(1,qNode.getQueryId());
       rs = pstmt.executeQuery();
-//      OUT.debug ("Parent for "+qNode+": "+qNode.getParent());
       while (rs.next()) {
         CpoQueryParameterNode cpoQPB = new CpoQueryParameterNode(qNode, rs.getInt("seq_no"),
             getAttributeMap((CpoServerNode)qNode.getParent().getParent().getParent().getParent(),rs.getString("attribute_id")),
@@ -587,10 +500,7 @@ public class Proxy implements Observer {
         }
         al.add(cpoQPB);
       }
-//    } catch (SQLException se) {
-//      throw new ProxyException("getQueryParameters",se);
-    }
-    finally {
+    } finally {
       try {
         if (rs != null) rs.close();
       } catch (Exception e) {}
@@ -651,7 +561,7 @@ public class Proxy implements Observer {
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
-    	StringBuffer sql = new StringBuffer();
+    	StringBuilder sql = new StringBuilder();
       if (revsEnabled) {
         sql.append("select am.attribute_id, am.class_id, am.column_name, am.attribute, am.column_type, ");
         sql.append("am.transform_class, am.db_table, am.db_column, am.userid, am.createdate from ");
@@ -677,8 +587,6 @@ public class Proxy implements Observer {
         }
         al.add(cpoAB);
       }
-//    } catch (SQLException se) {
-//      throw new ProxyException("getAttributeMap",se);
     } finally {
       try {
         if (rs != null) rs.close();
@@ -699,7 +607,7 @@ public class Proxy implements Observer {
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
-    	StringBuffer sql = new StringBuffer("select count(*) from ");
+    	StringBuilder sql = new StringBuilder("select count(*) from ");
       sql.append(tablePrefix);
       sql.append("cpo_query where text_id = ?");
       pstmt = conn.prepareStatement(sql.toString());
@@ -707,8 +615,6 @@ public class Proxy implements Observer {
       rs = pstmt.executeQuery();
       rs.next();
       result = rs.getInt(1);
-//    } catch (SQLException se) {
-//      throw new ProxyException("getQueryTextUsageCount",se);
     } finally {
       try {
         if (rs != null) rs.close();
@@ -797,9 +703,7 @@ public class Proxy implements Observer {
     Enumeration<? extends AbstractCpoNode> childEnum = can.children();
     while (childEnum != null && childEnum.hasMoreElements()) {
       AbstractCpoNode canChild = childEnum.nextElement();
-//      this.removeAllChildrenFromAllCache(canChild);
       canChild.setRemove(true);
-//      this.removeObjectFromAllCache(canChild);
     }
   }
 
@@ -832,7 +736,7 @@ public class Proxy implements Observer {
         if (node instanceof CpoClassNode) {
           CpoClassNode ccn = (CpoClassNode)node;
           if (ccn.isNew()) {
-        	  StringBuffer sql = new StringBuffer();
+        	  StringBuilder sql = new StringBuilder();
             if (revsEnabled) {
               sql.append("insert into ");
               sql.append(tablePrefix);
@@ -849,10 +753,8 @@ public class Proxy implements Observer {
             pstmt.setString(1,ccn.getClassId());
             pstmt.setString(2,ccn.getClassName());
             pstmt.executeUpdate();
-//            int result = pstmt.executeUpdate();
-//            OUT.debug("Inserted Class Node: "+ccn.getClassId()+" "+result);
           } else if (ccn.isRemove()) {
-        	  StringBuffer sqlDelQueryParam=new StringBuffer("delete from ");
+        	  StringBuilder sqlDelQueryParam=new StringBuilder("delete from ");
             sqlDelQueryParam.append(tablePrefix);
             sqlDelQueryParam.append("cpo_query_parameter where query_id in ");
             sqlDelQueryParam.append("(select query_id from ");
@@ -862,22 +764,22 @@ public class Proxy implements Observer {
             sqlDelQueryParam.append(tablePrefix);
             sqlDelQueryParam.append("cpo_query_group where class_id = ?))");
             
-        	  StringBuffer sqlDelAttMap=new StringBuffer("delete from ");
+        	  StringBuilder sqlDelAttMap=new StringBuilder("delete from ");
         	  sqlDelAttMap.append(tablePrefix);
         	  sqlDelAttMap.append("cpo_attribute_map where class_id = ?");
             
-        	  StringBuffer sqlDelQuery=new StringBuffer("delete from ");
+        	  StringBuilder sqlDelQuery=new StringBuilder("delete from ");
         	  sqlDelQuery.append(tablePrefix);
         	  sqlDelQuery.append("cpo_query where group_id in ");
             sqlDelQuery.append("(select group_id from ");
             sqlDelQuery.append(tablePrefix);
             sqlDelQuery.append("cpo_query_group where class_id = ?)");
 
-        	  StringBuffer sqlDelQueryGroup=new StringBuffer("delete from ");
+        	  StringBuilder sqlDelQueryGroup=new StringBuilder("delete from ");
             sqlDelQueryGroup.append(tablePrefix);
             sqlDelQueryGroup.append("cpo_query_group where class_id = ?");
 
-        	  StringBuffer sqlDelClass=new StringBuffer("delete from ");
+        	  StringBuilder sqlDelClass=new StringBuilder("delete from ");
             sqlDelClass.append(tablePrefix);
             sqlDelClass.append("cpo_class where class_id = ?");
 		
@@ -905,7 +807,7 @@ public class Proxy implements Observer {
             pstmt.setString(1,ccn.getClassId());
             pstmt.execute();
           } else if (ccn.isDirty()) {
-        	  StringBuffer sql = new StringBuffer();
+        	  StringBuilder sql = new StringBuilder();
             if (revsEnabled) {
               sql.append("update ");
               sql.append(tablePrefix);
@@ -935,7 +837,7 @@ public class Proxy implements Observer {
         if (node instanceof CpoAttributeMapNode) {
           CpoAttributeMapNode camn = (CpoAttributeMapNode)node;
           if (camn.isNew()) {
-        	  StringBuffer sql = new StringBuffer();
+        	  StringBuilder sql = new StringBuilder();
             if (revsEnabled) {
               sql.append("insert into ");
               sql.append(tablePrefix);
@@ -961,10 +863,8 @@ public class Proxy implements Observer {
             pstmt.setString(7,camn.getDbColumn());
             pstmt.setString(8,camn.getTransformClass());
             pstmt.executeUpdate();
-//            int result = pstmt.executeUpdate();
-//            OUT.debug("Inserted attribute map node: "+camn.getAttributeId()+" "+result);
           } else if (camn.isRemove()) {
-            StringBuffer sql = new StringBuffer("delete from ");
+            StringBuilder sql = new StringBuilder("delete from ");
             sql.append(tablePrefix);
             sql.append("cpo_attribute_map where attribute_id = ?");
             pstmt = conn.prepareStatement(sql.toString());
@@ -972,7 +872,7 @@ public class Proxy implements Observer {
             pstmt.execute();
           } else if (camn.isDirty()) {
             //  update everything except class_id - might want to change this later...
-            StringBuffer sql = new StringBuffer();
+            StringBuilder sql = new StringBuilder();
             if (revsEnabled) {
               sql.append("update ");
               sql.append(tablePrefix);
@@ -1011,7 +911,7 @@ public class Proxy implements Observer {
         if (node instanceof CpoQueryGroupNode) {
           CpoQueryGroupNode cqgn = (CpoQueryGroupNode)node;
           if (cqgn.isNew()) {
-        	  StringBuffer sql = new StringBuffer();
+        	  StringBuilder sql = new StringBuilder();
             if (revsEnabled) {
               sql.append("insert into ");
               sql.append(tablePrefix);
@@ -1030,21 +930,19 @@ public class Proxy implements Observer {
             pstmt.setString(3,cqgn.getType());
             pstmt.setString(4,cqgn.getGroupName());
             pstmt.executeUpdate();
-//            int result = pstmt.executeUpdate();
-//            OUT.debug("Inserted query group: "+cqgn.getGroupId()+" "+result);
           } else if (cqgn.isRemove()) {
-            StringBuffer sqlDelQueryParam = new StringBuffer("delete from ");
+            StringBuilder sqlDelQueryParam = new StringBuilder("delete from ");
             sqlDelQueryParam.append(tablePrefix);
             sqlDelQueryParam.append("cpo_query_parameter where query_id in ");
             sqlDelQueryParam.append("(select query_id from ");
             sqlDelQueryParam.append(tablePrefix);
             sqlDelQueryParam.append("cpo_query where group_id = ?)");
                         
-            StringBuffer sqlDelQuery = new StringBuffer("delete from ");
+            StringBuilder sqlDelQuery = new StringBuilder("delete from ");
             sqlDelQuery.append(tablePrefix);
             sqlDelQuery.append("cpo_query where group_id = ?");
                         
-            StringBuffer sqlDelQueryGroup = new StringBuffer("delete from ");
+            StringBuilder sqlDelQueryGroup = new StringBuilder("delete from ");
             sqlDelQueryGroup.append(tablePrefix);
             sqlDelQueryGroup.append("cpo_query_group where group_id = ?");
                         
@@ -1062,7 +960,7 @@ public class Proxy implements Observer {
             pstmt.setString(1,cqgn.getGroupId());
             pstmt.execute();
           } else if (cqgn.isDirty()) {
-            StringBuffer sql = new StringBuffer();
+            StringBuilder sql = new StringBuilder();
             if (revsEnabled) {
               sql.append("update ");
               sql.append(tablePrefix);
@@ -1107,7 +1005,7 @@ public class Proxy implements Observer {
           }
           
           if (cqn.isNew()) {
-        	  StringBuffer sql = new StringBuffer();
+        	  StringBuilder sql = new StringBuilder();
             if (revsEnabled) {
               sql.append("insert into ");
               sql.append(tablePrefix);
@@ -1128,14 +1026,12 @@ public class Proxy implements Observer {
             pstmt.setString(4, sqlText);
             pstmt.setString(5, cqn.getDesc());
             pstmt.executeUpdate();
-//            int result = pstmt.executeUpdate();
-//            OUT.debug("Inserted query node: "+cqn.getQueryId()+" "+result);
           } else if (cqn.isRemove()) {
-            StringBuffer sqlDelQueryParam=new StringBuffer("delete from ");
+            StringBuilder sqlDelQueryParam=new StringBuilder("delete from ");
             sqlDelQueryParam.append(tablePrefix);
             sqlDelQueryParam.append("cpo_query_parameter where query_id = ?");
                     	  
-            StringBuffer sqlDelQuery=new StringBuffer("delete from ");
+            StringBuilder sqlDelQuery=new StringBuilder("delete from ");
             sqlDelQuery.append(tablePrefix);
             sqlDelQuery.append("cpo_query where query_id = ?");
                 
@@ -1149,7 +1045,7 @@ public class Proxy implements Observer {
             pstmt.execute();
           } else if (cqn.isDirty()) {
             // not updating group_id ... could change later
-        	  StringBuffer sql = new StringBuffer();
+        	  StringBuilder sql = new StringBuilder();
             if (revsEnabled) {
               sql.append("update ");
               sql.append(tablePrefix);
@@ -1180,7 +1076,7 @@ public class Proxy implements Observer {
         if (node instanceof CpoQueryParameterNode) {
           CpoQueryParameterNode cqpn = (CpoQueryParameterNode)node;
           if (cqpn.isNew()) {
-        	  StringBuffer sql = new StringBuffer();
+        	  StringBuilder sql = new StringBuilder();
             if (revsEnabled) {
               sql.append("insert into ");
               sql.append(tablePrefix);
@@ -1199,12 +1095,9 @@ public class Proxy implements Observer {
             pstmt.setString(2,cqpn.getQueryId());
             pstmt.setInt(3,cqpn.getSeqNo());
             pstmt.setString(4,cqpn.getType());
-//            OUT.debug("Inserting query attribute parameter: "+cqpn.getSeqNo()+" for query node: "+cqpn.getQueryId()+" and attribute map node: "+cqpn.getAttributeId());
             pstmt.executeUpdate();
-//            int result = pstmt.executeUpdate();
-//            OUT.debug("Inserted query attribute parameter: "+cqpn.getSeqNo()+" for query node: "+cqpn.getQueryId()+" and attribute map node: "+cqpn.getAttributeId()+" "+result);
           } else if (cqpn.isRemove()) {
-              StringBuffer sql = new StringBuffer("delete from ");
+              StringBuilder sql = new StringBuilder("delete from ");
               sql.append(tablePrefix);
               sql.append("cpo_query_parameter where query_id = ? and seq_no = ?");
               pstmt = conn.prepareStatement(sql.toString());
@@ -1212,7 +1105,7 @@ public class Proxy implements Observer {
               pstmt.setInt(2,cqpn.getSeqNo());
               pstmt.execute();
           } else if (cqpn.isDirty()) {
-        	  StringBuffer sql = new StringBuffer();
+        	  StringBuilder sql = new StringBuilder();
             if (revsEnabled) {
               sql.append("update ");
               sql.append(tablePrefix);
@@ -1254,10 +1147,7 @@ public class Proxy implements Observer {
       } catch (Exception e) {
       }
       throw se;
-//      CpoUtil.showException(se);
-//      return;
-    }
-    finally {
+    } finally {
       try {
         pstmt.close();
       } catch (Exception e) {}
@@ -1343,47 +1233,24 @@ public class Proxy implements Observer {
   }
 
   public String makeClassOuttaSql(String className, String sql) throws Exception {
-    StringBuffer sbTopClass = new StringBuffer();
-    StringBuffer sbClass = new StringBuffer();
-    String packageName;
-    if (className.lastIndexOf(".") != -1) {
-      packageName = className.substring(0,className.lastIndexOf("."));
-      className = className.substring(className.lastIndexOf(".")+1);
-      sbTopClass.append("package "+packageName+";\n");
-    }
-    sbTopClass.append("import java.sql.*;\n");
-    sbTopClass.append("import java.io.Serializable;\n");
-    sbTopClass.append("public class "+className+" implements Serializable {\n");
-    sbClass.append("  public "+className+"() {\n  }\n");
+
+    TreeMap<String, String> attributes = new TreeMap<String, String>();
+
     PreparedStatement pstmt = null;
     ResultSet rs = null;
     try {
-        pstmt = conn.prepareStatement(sql);
+      pstmt = conn.prepareStatement(sql);
       rs = pstmt.executeQuery();
       ResultSetMetaData rsmd = rs.getMetaData();
       int columns = rsmd.getColumnCount();
       for (int i = 1 ; i <= columns ; i++) {
         String attName = makeAttFromColName(rsmd.getColumnName(i));
-        //String attClassName = rsmd.getColumnClassName(i);
         OUT.debug("Column Type = "+rsmd.getColumnType(i));
         Class<?> attClass = getSqlTypeClass(rsmd.getColumnType(i));
         String attClassName = getRealClassName(attClass);
-        if (attName.length() > 1)
-          sbClass.append("  public void set"+attName.substring(0,1).toUpperCase()+attName.substring(1)+"("+attClassName+" "+attName+") {\n");
-        else
-          sbClass.append("  public void set"+attName.toUpperCase()+"("+attClassName+" "+attName+") {\n");
-        sbClass.append("    this."+attName+" = "+attName+";\n");
-        sbClass.append("  }\n");
-        if (attName.length() > 1)
-          sbClass.append("  public "+attClassName+" get"+attName.substring(0,1).toUpperCase()+attName.substring(1)+"() {\n");
-        else
-          sbClass.append("  public "+attClassName+" get"+attName.toUpperCase()+"() {\n");
-        sbClass.append("    return this."+attName+";\n");
-        sbClass.append("  }\n");
-        sbTopClass.append("  private "+attClassName+" "+attName+";\n");
+
+        attributes.put(attName, attClassName);
       }
-//    } catch (SQLException se) {
-//      throw new ProxyException("makeClassOuttaSql",se);
     } finally {
       try {
         if (rs != null) rs.close();
@@ -1392,31 +1259,18 @@ public class Proxy implements Observer {
         if (pstmt != null) pstmt.close();
       } catch (Exception e) {}
     }
-    sbClass.append("}\n");
-    return sbTopClass.toString()+sbClass.toString();
+
+    return generateClass(className, attributes);
   }
 
   public String makeClassOuttaNode(CpoClassNode node) throws Exception {
-    //Method meth = cpoMan.getClass().getMethod("getSqlTypeClass",new Class[]{String.class});
     String className = node.getClassName();
-    StringBuffer sbTopClass = new StringBuffer();
-    StringBuffer sbClass = new StringBuffer();
-    String packageName;
-    sbTopClass.append("/** This class auto-generated by "+this.getClass().getName()+" **/\n\n");
-    if (className.lastIndexOf(".") != -1) {
-      packageName = className.substring(0,className.lastIndexOf("."));
-      className = className.substring(className.lastIndexOf(".")+1);
-      sbTopClass.append("package "+packageName+";\n");
-    }
-    sbTopClass.append("import java.sql.*;\n");
-    sbTopClass.append("import java.io.Serializable;\n");
-    sbTopClass.append("public class "+className+" implements Serializable {\n");
-    sbClass.append("  public "+className+"() {\n  }\n");
+
+    TreeMap<String, String> attributes = new TreeMap<String, String>();
+
     List<CpoAttributeMapNode> alAttMap = this.getAttributeMap(node);
     for (CpoAttributeMapNode atMapNode : alAttMap) {
       String attName = atMapNode.getAttribute();
-      //String attName = makeAttFromColName(atMapNode.getColumnName());
-      //Class attClass = (Class) this.sqlTypeClassMeth.invoke(cpoMan,new Object[]{atMapNode.getColumnType()});
       Class<?> attClass = getSqlTypeClass(atMapNode.getColumnType());
       String attClassName = getRealClassName(attClass);
 
@@ -1435,26 +1289,119 @@ public class Proxy implements Observer {
           OUT.debug("Invalid Transform Class specified:<" + atMapNode.getTransformClass() + "> using default");
         }
       }
-
-      if (attName.length() > 1)
-        sbClass.append("  public void set"+attName.substring(0,1).toUpperCase()+attName.substring(1)+"("+attClassName+" "+attName+") {\n");
-      else
-        sbClass.append("  public void set"+attName.toUpperCase()+"("+attClassName+" "+attName+") {\n");
-
-      sbClass.append("    this."+attName+" = "+attName+";\n");
-      sbClass.append("  }\n");
-
-      if (attName.length() > 1)
-        sbClass.append("  public "+attClassName+" get"+attName.substring(0,1).toUpperCase()+attName.substring(1)+"() {\n");
-      else
-        sbClass.append("  public "+attClassName+" get"+attName.toUpperCase()+"() {\n");
-
-      sbClass.append("    return this."+attName+";\n");
-      sbClass.append("  }\n");
-      sbTopClass.append("  private "+attClassName+" "+attName+";\n");      
+      attributes.put(attName, attClassName);
     }
-    sbClass.append("}\n");
-    return sbTopClass.toString()+sbClass.toString();
+
+    return generateClass(className, attributes);
+  }
+
+  private String generateClass(String className, Map<String, String> attributes) {
+    StringBuilder buf = new StringBuilder();
+
+    // generate class header
+    buf.append("/** This class auto-generated by " + this.getClass().getName() + " **/\n\n");
+    if (className.lastIndexOf(".") != -1) {
+      String packageName = className.substring(0, className.lastIndexOf("."));
+      className = className.substring(className.lastIndexOf(".") + 1);
+      buf.append("package " + packageName + ";\n\n");
+    }
+
+    // generate class declaration
+    buf.append("public class " + className + " implements java.io.Serializable {\n");
+    buf.append("\n");
+
+    // generate property declarations
+    buf.append("  /* Properties */\n");
+    for (String attName : attributes.keySet()) {
+      String attClassName = attributes.get(attName);
+      buf.append("  private " + attClassName + " " + attName + ";\n");
+    }
+    buf.append("\n");
+
+    // generate constructor
+    buf.append("  public " + className + "() {\n");
+    buf.append("  }\n\n");
+
+    // generate getters and setters
+    buf.append("  /* Getters and Setters */\n");
+    for (String attName : attributes.keySet()) {
+      String attClassName = attributes.get(attName);
+
+      // generate getter
+      buf.append(generateClassGetter(attClassName, attName));
+
+      // generate setter
+      buf.append(generateClassSetter(attClassName, attName));
+    }
+    buf.append("\n");
+
+    // generate equals()
+    buf.append("  public boolean equals(Object o) {\n");
+    buf.append("    if (this == o)\n");
+    buf.append("      return true;\n");
+    buf.append("    if (o == null || getClass() != o.getClass())\n");
+    buf.append("      return false;\n");
+    buf.append("\n");
+    buf.append("    " + className + " that = (" + className + ")o;\n");
+    buf.append("\n");
+    for (String attName : attributes.keySet()) {
+      buf.append("    if (" + attName + " != null ? !" + attName + ".equals(that." + attName + ") : that." + attName + " != null)\n");
+      buf.append("      return false;\n");
+    }
+    buf.append("\n");
+    buf.append("    return true;\n");
+    buf.append("  }\n\n");
+
+    // generate hashCode()
+    buf.append("  public int hashCode() {\n");
+    buf.append("    int result = 0;\n");
+    for (String attName : attributes.keySet()) {
+      buf.append("    result = 31 * result + (" + attName + " != null ? " + attName + ".hashCode() : 0);\n");
+    }
+    buf.append("    return result;\n");
+    buf.append("  }\n\n");
+
+    // generate toString()
+    buf.append("  public String toString() {\n");
+    buf.append("    StringBuilder str = new StringBuilder();\n");
+    for (String attName : attributes.keySet()) {
+      buf.append("    str.append(\"" + attName + " = \" + " + attName + " + \"\\n\");\n");
+    }
+    buf.append("    return str.toString();\n");
+    buf.append("  }\n");
+
+    // end class
+    buf.append("}\n");
+
+    return buf.toString();
+  }
+
+  private String generateClassGetter(String attClassName, String attName) {
+    StringBuilder buf = new StringBuilder();
+    if (attName.length() > 1) {
+      buf.append("  public " + attClassName + " get" + attName.substring(0, 1).toUpperCase() + attName.substring(1) + "() {\n");
+    } else {
+      buf.append("  public " + attClassName + " get" + attName.toUpperCase() + "() {\n");
+    }
+
+    buf.append("    return this." + attName + ";\n");
+    buf.append("  }\n");
+
+    return buf.toString();
+  }
+
+  private String generateClassSetter(String attClassName, String attName) {
+    StringBuilder buf = new StringBuilder();
+    if (attName.length() > 1) {
+      buf.append("  public void set" + attName.substring(0, 1).toUpperCase() + attName.substring(1) + "(" + attClassName + " " + attName + ") {\n");
+    } else {
+      buf.append("  public void set" + attName.toUpperCase() + "(" + attClassName + " " + attName + ") {\n");
+    }
+
+    buf.append("    this." + attName + " = " + attName + ";\n");
+    buf.append("  }\n");
+
+    return buf.toString();
   }
 
   String makeAttFromColName(String columnName) throws REException {
@@ -1478,7 +1425,6 @@ public class Proxy implements Observer {
     if (attMapParent == null) throw new Exception ("Can't find the Attribute Label for this node: "+ccn);
     for (Method method : methods) {
       if (method.getName().startsWith("get")) {
-        //Class<?> returnClass = method.getReturnType();
         String columnTypeName = "VARCHAR"; // this needs to be fixed!!!!
         String attributeName = method.getName().substring(3);
         String columnName = attributeName;
@@ -1527,7 +1473,6 @@ public class Proxy implements Observer {
   }
 
   public Collection<?> executeQueryGroup(Object obj, Object objReturnType, CpoQueryGroupNode cpoQGnode, boolean persist) throws Exception {
-//    try {
       List<Object> result = new ArrayList<Object>();
       if (cpoQGnode.getType().equals(Statics.CPO_TYPE_CREATE)) {
         //insert
@@ -1548,28 +1493,19 @@ public class Proxy implements Observer {
           result.add(resultObj);
       } else if (cpoQGnode.getType().equals(Statics.CPO_TYPE_LIST)) {
         Collection<?> coll = null;
-        //Class c = CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass("org.synchronoss.cpo.CpoWhere");
         CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass("org.synchronoss.cpo.CpoWhere");
         Method[] meth = cpoMan.getClass().getMethods();
         for (int i = 0 ; i < meth.length ; i++) {
           if (meth[i].getName().equals("retrieveObjects")) {
-//            OUT.debug(meth[i]);
             Class<?>[] paramClasses = meth[i].getParameterTypes();
-//            for (int j = 0 ; j < paramClasses.length ; j++) {
-//             OUT.debug("reflect loader: "+paramClasses[j].getClassLoader());
-//              OUT.debug("my loader:"+c.getClassLoader());
-//            }
             if (paramClasses.length == 5) {
               coll = (Collection<?>)meth[i].invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj,objReturnType,null,null});
             }
           }
         }
-//        Method methRO = cpoMan.getClass().getMethod("retrieveObjects",new Class[]{String.class,Object.class,Object.class,c,Collection.class});
         if (coll == null)
           return new ArrayList<Object>();
         return coll;
-//        return (Object[])methRO.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj,obj,null,null});      
-//        return null;
       } else if (cpoQGnode.getType().equals(Statics.CPO_TYPE_RETRIEVE)) {
         Method meth = cpoMan.getClass().getMethod("retrieveObject",new Class[]{String.class,Object.class});
         Object resultObj = meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
@@ -1578,7 +1514,7 @@ public class Proxy implements Observer {
       } else if (cpoQGnode.getType().equals(Statics.CPO_TYPE_UPDATE)) {
         Method meth = cpoMan.getClass().getMethod("updateObject",new Class[]{String.class,Object.class});
         meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
-// retrieve from cpo, so we can verify update
+        // retrieve from cpo, so we can verify update
         meth = cpoMan.getClass().getMethod("retrieveObject",new Class[]{String.class,Object.class});
         Object resultObj = meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
         if (resultObj != null)
@@ -1586,7 +1522,7 @@ public class Proxy implements Observer {
       } else if (cpoQGnode.getType().equals(Statics.CPO_TYPE_EXIST) && persist) {
         Method meth = cpoMan.getClass().getMethod("persistObject",new Class[]{String.class,Object.class});
         meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
-// retrieve from cpo, so we can verify update
+        // retrieve from cpo, so we can verify update
         meth = cpoMan.getClass().getMethod("retrieveObject",new Class[]{String.class,Object.class});
         Object resultObj = meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
         if (resultObj != null)
@@ -1597,10 +1533,6 @@ public class Proxy implements Observer {
         if (resultObj != null)
           result.add(resultObj);
       }
-//    } catch (Exception e) {
-//      e.printStackTrace();
-//      throw new ProxyException("executeQueryGroup()",e);
-//    }
     return result;
   }
 
