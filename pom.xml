@@ -114,9 +114,9 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/branches/CpoUtil_Without_Query_Text</connection>
-    <developerConnection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/branches/CpoUtil_Without_Query_Text</developerConnection>
-    <url>https://cpo.svn.sourceforge.net/svnroot/cpo/util/branches/CpoUtil_Without_Query_Text</url>
+    <connection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/trunk</connection>
+    <developerConnection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/trunk</developerConnection>
+    <url>https://cpo.svn.sourceforge.net/svnroot/cpo/util/trunk</url>
   </scm>
   <build>
     <resources>
