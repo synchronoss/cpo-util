@@ -1435,6 +1435,7 @@ public class Proxy implements Observer {
   public String makeClassOuttaSql(String className, String sql) throws Exception {
 
     TreeMap<String, String> attributes = new TreeMap<String, String>();
+    TreeMap<String, Class> attClasses = new TreeMap<String, Class>();
 
     PreparedStatement pstmt = null;
     ResultSet rs = null;
@@ -1451,6 +1452,7 @@ public class Proxy implements Observer {
         String attClassName = getRealClassName(attClass);
 
         attributes.put(attName, attClassName);
+        attClasses.put(attName, attClass);
       }
     } finally {
       try {
@@ -1461,13 +1463,14 @@ public class Proxy implements Observer {
       } catch (Exception e) {}
     }
 
-    return generateClass(className, attributes);
+    return generateClass(className, attributes, attClasses);
   }
 
   public String makeClassOuttaNode(CpoClassNode node) throws Exception {
     String className = node.getClassName();
 
     TreeMap<String, String> attributes = new TreeMap<String, String>();
+    TreeMap<String, Class> attClasses = new TreeMap<String, Class>();
 
     List<CpoAttributeMapNode> alAttMap = this.getAttributeMap(node);
     for (CpoAttributeMapNode atMapNode : alAttMap) {
@@ -1491,12 +1494,13 @@ public class Proxy implements Observer {
         }
       }
       attributes.put(attName, attClassName);
+      attClasses.put(attName, attClass);
     }
 
-    return generateClass(className, attributes);
+    return generateClass(className, attributes, attClasses);
   }
 
-  private String generateClass(String className, Map<String, String> attributes) {
+  private String generateClass(String className, Map<String, String> attributes, Map<String, Class> attClasses) {
     StringBuilder buf = new StringBuilder();
 
     // generate class header
@@ -1545,8 +1549,17 @@ public class Proxy implements Observer {
     buf.append("\n");
     buf.append("    " + className + " that = (" + className + ")o;\n");
     buf.append("\n");
+
     for (String attName : attributes.keySet()) {
-      buf.append("    if (" + attName + " != null ? !" + attName + ".equals(that." + attName + ") : that." + attName + " != null)\n");
+      // need to look at the classes here
+      Class attClass = attClasses.get(attName);
+      if (attClass.isPrimitive()) {
+        // primitive type, use ==
+        buf.append("    if (" + attName + " != that." + attName + ")\n");
+      } else {
+        // object, use .equals
+        buf.append("    if (" + attName + " != null ? !" + attName + ".equals(that." + attName + ") : that." + attName + " != null)\n");
+      }
       buf.append("      return false;\n");
     }
     buf.append("\n");
@@ -1557,7 +1570,14 @@ public class Proxy implements Observer {
     buf.append("  public int hashCode() {\n");
     buf.append("    int result = 0;\n");
     for (String attName : attributes.keySet()) {
-      buf.append("    result = 31 * result + (" + attName + " != null ? " + attName + ".hashCode() : 0);\n");
+      // need to look at the classes here
+      Class attClass = attClasses.get(attName);
+      if (attClass.isPrimitive()) {
+        // primitive type, need some magic
+        buf.append("    result = 31 * result + (String.valueOf(" + attName + ").hashCode());\n");
+      } else {
+        buf.append("    result = 31 * result + (" + attName + " != null ? " + attName + ".hashCode() : 0);\n");
+      }
     }
     buf.append("    return result;\n");
     buf.append("  }\n\n");
