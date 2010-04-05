@@ -383,7 +383,7 @@ public class CpoQueryPanel extends JPanel {
                 for (CpoAttributeMapNode att : attributeList) {
                     String colName = att.getColumnName();
                     if (colName != null)
-                        hash.put(colName, att);
+                        hash.put(colName.toUpperCase(), att);
                 }
             }
 
