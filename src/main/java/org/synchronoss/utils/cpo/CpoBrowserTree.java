@@ -241,7 +241,8 @@ public class CpoBrowserTree extends JTree {
       }
       if (!(menuNode instanceof CpoServerNode) 
           && (!(menuNode instanceof CpoAttributeLabelNode))
-          && (!(menuNode instanceof CpoQueryGroupLabelNode))) {
+          && (!(menuNode instanceof CpoQueryGroupLabelNode))
+          && (!(menuNode instanceof CpoQueryTextLabelNode))) {
         JMenuItem jMenuRemove = new JMenuItem("Remove this object!");
         jMenuRemove.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae) {
@@ -259,7 +260,7 @@ public class CpoBrowserTree extends JTree {
     if (result == 0) {
       if (menuNode instanceof CpoQueryGroupLabelNode) {
         CpoQueryGroupNode cqgn = ((CpoQueryGroupLabelNode)menuNode).addNewQueryGroup(cgp.getGroupName().equals("") ? null : cgp.getGroupName(), cgp.getGroupType());
-
+        
         // try to expand and select the node
         if (cqgn != null) {
           DefaultTreeModel model = (DefaultTreeModel)getModel();
@@ -277,7 +278,7 @@ public class CpoBrowserTree extends JTree {
     if (menuNode instanceof CpoQueryGroupNode) {
       CpoQueryGroupNode cqgn = (CpoQueryGroupNode)menuNode;
       CpoQueryNode cqn = cqgn.addNewQueryNode();
-
+      
       // try to expand and select the node
       if (cqn != null) {
         DefaultTreeModel model = (DefaultTreeModel)getModel();
@@ -335,7 +336,7 @@ public class CpoBrowserTree extends JTree {
     // force a selection on the root node
     TreePath tp = new TreePath(getModel().getRoot());
     this.setSelectionPath(tp);
-    
+
     CpoUtil.updateStatus("Cleared Local Application Cache");
     return true;
   }

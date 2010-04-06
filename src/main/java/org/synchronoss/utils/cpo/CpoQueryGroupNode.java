@@ -128,7 +128,7 @@ public class CpoQueryGroupNode extends AbstractCpoNode {
       CpoUtil.showException(pe);
       return null;
     }
-    CpoQueryNode cqn = new CpoQueryNode(queryId, this.getGroupId(), seqNo, null, null, this);
+    CpoQueryNode cqn = new CpoQueryNode(queryId, this.getGroupId(), seqNo, null, this);
     this.qNodes.add(cqn);
     cqn.setNew(true);
     return cqn;

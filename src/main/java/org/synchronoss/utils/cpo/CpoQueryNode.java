@@ -25,16 +25,16 @@ import javax.swing.JPanel;
 import java.util.*;
 
 public class CpoQueryNode extends AbstractCpoNode {
-  private String queryId, groupId, sql, desc;
+  private String queryId, groupId;
   private int seqNo;
+  private CpoQueryTextNode cQTnode;
   private List<CpoQueryParameterNode> cpoQueryParam; // collection of CpoQueryParameterNode(s)
   
-  public CpoQueryNode(String queryId, String groupId, int seqNo, String sql, String desc, AbstractCpoNode parent) {
+  public CpoQueryNode(String queryId, String groupId, int seqNo, CpoQueryTextNode cQTnode, AbstractCpoNode parent) {
+    this.cQTnode = cQTnode;
     this.queryId = queryId;
     this.groupId = groupId;
     this.seqNo = seqNo;
-    this.sql = sql;
-    this.desc = desc;
     this.parent = parent;
     this.addObserver(parent.getProxy());
     this.setProtected(parent.isProtected());
@@ -84,7 +84,6 @@ public class CpoQueryNode extends AbstractCpoNode {
       }
     };
   }
-
   @Override
   public void refreshChildren() {
     try {
@@ -93,52 +92,39 @@ public class CpoQueryNode extends AbstractCpoNode {
       CpoUtil.showException(pe);
     }        
   }
-  
   @Override
   public String toString() {
-    if (getDesc() == null || getDesc().equals(""))
-      return this.getSeqNo()+" (NO DESCRIPTION)";
+    if (this.getQueryText() != null) {
+      if (this.getQueryText().getDesc() == null || this.getQueryText().getDesc().equals(""))
+        return this.getSeqNo()+" (NO DESCRIPTION)";
       
-    return this.getSeqNo()+" (" + getDesc() + ")";
+      return this.getSeqNo()+" ("+this.getQueryText().getDesc()+")";
+    }
+    return this.getSeqNo()+" (NO QUERY TEXT ASSOC)";
   }
-  
   public String getGroupId() {
     return this.groupId;
   }
-  
   public String getQueryId() {
     return this.queryId;
   }
-  
   public int getSeqNo() {
     return this.seqNo;
   }
-  
+  public String getTextId() {
+    return this.cQTnode.getTextId();
+  }
+  public CpoQueryTextNode getQueryText() {
+    return this.cQTnode;
+  }
+  public void setQueryText(CpoQueryTextNode cQTnode) {
+    if ((cQTnode == null && this.cQTnode == null) || (this.cQTnode != null && this.cQTnode.equals(cQTnode))) return;
+    this.cQTnode = cQTnode;
+    this.setDirty(true);
+  }
   public void setSeqNo(int seqNo) {
     if (this.seqNo == seqNo) return;
     this.seqNo = seqNo;
     this.setDirty(true);
-  }
-  
-  public String getSQL() {
-    return sql;
-  }
-  
-  public void setSQL(String sql) {
-    // if the sql changed, mark the node dirty
-    if (!sql.equals(this.sql))
-      setDirty(true);
-    this.sql = sql;
-  }
-  
-  public String getDesc() {
-    return desc;
-  }
-  
-  public void setDesc(String desc) {
-    // if the desc changed, dirty the node
-    if (!desc.equals(this.desc))
-      setDirty(true);
-    this.desc = desc;
   }
 }

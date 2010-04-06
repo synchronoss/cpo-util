@@ -60,7 +60,16 @@ public class CpoQueryPanel extends JPanel {
             // adjust divider
             if (divLocation != -1)
                 jSplitPane.setDividerLocation(divLocation);
-                
+
+            // if the query is used in more than one place, warn them
+            CpoQueryTextNode cqtn = queryNode.getQueryText();
+            if (cqtn != null && cqtn.getUsageCount() > 1) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        CpoUtil.showMultipleQueryTextWarning();
+                    }
+                });
+            }
         } catch (Exception e) {
             CpoUtil.showException(e);
         }
@@ -98,12 +107,19 @@ public class CpoQueryPanel extends JPanel {
             }
 
             public void keyReleased(KeyEvent ke) {
+                int oldSeqNo = queryNode.getSeqNo();
+                int newSeqNo = queryNode.getSeqNo();
                 try {
-                    int newSeqNo = Integer.parseInt(cpoQPnorth.jTextSeq.getText());
-                    queryNode.setSeqNo(newSeqNo);
+                    newSeqNo = Integer.parseInt(cpoQPnorth.jTextSeq.getText());
                 } catch (NumberFormatException nfe) {
                     cpoQPnorth.jTextSeq.setText(Integer.toString(queryNode.getSeqNo()));
+                    return;
                 }
+                queryNode.setSeqNo(newSeqNo);
+                
+                // if the seq changed, dirty the node
+                if (oldSeqNo != newSeqNo)
+                    queryNode.setDirty(true);
             }
         });
         cpoQPnorth.jTextAdesc.addKeyListener(new KeyListener() {
@@ -114,8 +130,15 @@ public class CpoQueryPanel extends JPanel {
             }
 
             public void keyReleased(KeyEvent ke) {
+              if (queryNode.getQueryText() != null) {
+                String desc = queryNode.getQueryText().getDesc();
                 String newDesc = cpoQPnorth.jTextAdesc.getText();
-                queryNode.setDesc(newDesc);
+                queryNode.getQueryText().setDesc(newDesc);
+                
+                // if the desc changed, dirty the node
+                if (!newDesc.equals(desc))
+                  queryNode.setDirty(true);
+              }
             }
         });
         cpoQPnorth.jTextASQL.addKeyListener(new KeyListener() {
@@ -126,7 +149,17 @@ public class CpoQueryPanel extends JPanel {
             }
 
             public void keyReleased(KeyEvent ke) {
+//        queryNode.getQueryText().setDirty(true);
+              if (queryNode.getQueryText() != null)
                 checkSQL();
+/*        try {
+          SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+              cpoQPnorth.jTextASQL.requestFocus();
+            }
+          });
+        } catch (Exception e) {}
+*/
             }
         });
         cpoQPnorth.jTextASQL.addMouseListener(new MouseListener() {
@@ -136,7 +169,8 @@ public class CpoQueryPanel extends JPanel {
                     // will cause the table to realize it needs to stop editing the selected cell and
                     // will cause the cell editor to end removing the combo box
                     jTableQueryParam.editCellAt(0, 0);
-                    showMenu(e.getPoint());
+                    if (queryNode.getQueryText() != null)
+                        showMenu(e.getPoint());
                 }
             }
 
@@ -160,13 +194,34 @@ public class CpoQueryPanel extends JPanel {
                 checkSQLLength();
             }
         });
+        cpoQPnorth.jComQueryText.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                if (cpoQPnorth.jComQueryText.getSelectedItem() != null) {
+                    queryNode.setQueryText((CpoQueryTextNode)cpoQPnorth.jComQueryText.getSelectedItem());
+                    cpoQPnorth.jTextAdesc.setText(queryNode.getQueryText().getDesc());
+                    cpoQPnorth.jTextASQL.setText(queryNode.getQueryText().getSQL());
+                    checkSQL();
+                }
+            }
+        });
+        cpoQPnorth.jComQueryText.setSelectedItem(queryNode.getQueryText());
+        if (cpoQPnorth.jComQueryObject != null) {
+            cpoQPnorth.jComQueryObject.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    if (cpoQPnorth.jComQueryObject.getSelectedItem() != null) {
+                        cpoQTM.attributeCpoClassNode = (CpoClassNode)cpoQPnorth.jComQueryObject.getSelectedItem();
+                    }
+                }
+            });
+            cpoQPnorth.jComQueryObject.setSelectedItem(cpoQTM.attributeCpoClassNode);
+        }
     }
 
     private void checkSQL() {
         if (cpoQPnorth.jTextASQL.getText().length() < 1)
             return;
 
-        int tokenCount = QueryParser.countBindMarkers(cpoQPnorth.jTextASQL.getText());
+				int tokenCount = QueryParser.countBindMarkers(cpoQPnorth.jTextASQL.getText());
 
         int attRowCount = cpoQTM.getNonRemovedRows();
 //    OUT.debug ("tokens: "+tokenCount+" and rows: "+attRowCount);
@@ -182,18 +237,16 @@ public class CpoQueryPanel extends JPanel {
                 cpoQTM.removeNewRow();
             }
         }
+        String oldSql = queryNode.getQueryText().getSQL();
         String newSql = cpoQPnorth.jTextASQL.getText();
-        /***
-         * Removed for now...causing problems
-        if (newSql.trim().endsWith(";")) {
-            // if the sql ends with a semicolon, strip it
-            newSql = newSql.substring(0, newSql.lastIndexOf(";"));
-            cpoQPnorth.jTextASQL.setText(newSql);
-        }
-        ***/
-        queryNode.setSQL(newSql);
+        
+        queryNode.getQueryText().setSQL(newSql);
 
         CpoUtil.updateStatus("SQL Length: " + newSql.length());
+        
+        // if the sql changed, mark the node dirty
+        if (!newSql.equals(oldSql))
+            queryNode.setDirty(true);
     }
 
   private final static String sqlTooBigMsg =
