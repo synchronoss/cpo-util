@@ -362,18 +362,18 @@ public class CpoQueryPanel extends JPanel {
         try {
             List<String> colList = parser.parse(query);
 
-            // at this point, the colList will only have columns that correspond to a ?
-            if (OUT.isDebugEnabled()) {
-                int count = 1;
-                for (String col : colList) {
-                  OUT.debug("Column[" + count + "] = " + col);
-                  count++;
-                }
-            }
-
             // if colList is null or empty, we're done
             if (colList == null || colList.isEmpty())
                 return;
+
+            // at this point, the colList will only have columns that correspond to a ?
+            if (OUT.isDebugEnabled()) {
+              int count = 1;
+              for (String col : colList) {
+                OUT.debug("Column[" + count + "] = " + col);
+                count++;
+              }
+            }
 
             // hash the attributes so we can do easier lookups
             HashMap<String, CpoAttributeMapNode> hash = new HashMap<String, CpoAttributeMapNode>();
