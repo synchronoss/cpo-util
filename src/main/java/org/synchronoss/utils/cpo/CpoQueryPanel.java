@@ -354,6 +354,10 @@ public class CpoQueryPanel extends JPanel {
         try {
             List<String> colList = parser.parse(query);
 
+            // if colList is null or empty, we're done
+            if (colList == null || colList.isEmpty())
+              return;
+
             // at this point, the colList will only have columns that correspond to a ?
             if (OUT.isDebugEnabled()) {
                 int count = 1;
@@ -362,10 +366,6 @@ public class CpoQueryPanel extends JPanel {
                   count++;
                 }
             }
-
-            // if colList is null or empty, we're done
-            if (colList == null || colList.isEmpty())
-                return;
 
             // hash the attributes so we can do easier lookups
             HashMap<String, CpoAttributeMapNode> hash = new HashMap<String, CpoAttributeMapNode>();

@@ -42,7 +42,7 @@ public class CpoQueryPanelNorth extends JPanel  {
   JTextArea jTextASQL = new JTextArea();
   private CpoQueryNode cpoQueryNode;
   private JLabel jLabQueryText = new JLabel();
-  private JTextField jTextQuerySeach = new JTextField();
+  private JTextField jTextQuerySearch = new JTextField();
   JComboBox jComQueryText = new JComboBox();
   JComboBox jComQueryObject;
   private JLabel jLabListQ = new JLabel();
@@ -81,7 +81,7 @@ public class CpoQueryPanelNorth extends JPanel  {
       this.jComQueryText.addItem(qt);
     }
     
-    this.jTextQuerySeach.addKeyListener(new KeyListener() {
+    this.jTextQuerySearch.addKeyListener(new KeyListener() {
       public void keyTyped(KeyEvent ke) {
       }
       public void keyPressed(KeyEvent ke) {
@@ -90,7 +90,7 @@ public class CpoQueryPanelNorth extends JPanel  {
         try {
           jComQueryText.removeAllItems();
           List<CpoQueryTextNode> qts = cpoQueryNode.getProxy().getQueryTextMatches(
-              (CpoServerNode)cpoQueryNode.getParent().getParent().getParent().getParent(), jTextQuerySeach.getText());
+              (CpoServerNode)cpoQueryNode.getParent().getParent().getParent().getParent(), jTextQuerySearch.getText());
           
           for (CpoQueryTextNode qt : qts) {
             jComQueryText.addItem(qt);
@@ -101,7 +101,7 @@ public class CpoQueryPanelNorth extends JPanel  {
         try {
           SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-              jTextQuerySeach.requestFocus();
+              jTextQuerySearch.requestFocus();
             }
           });
         } catch (Exception e) {
@@ -121,8 +121,8 @@ public class CpoQueryPanelNorth extends JPanel  {
 //    jTextASQL.setText(cpoQueryNode.getSQL());
     jTextASQL.setLineWrap(true);
     jLabQueryText.setText("Query Text:");
-    jTextQuerySeach.setMinimumSize(new Dimension(200, 22));
-    jTextQuerySeach.setPreferredSize(new Dimension(200, 22));
+    jTextQuerySearch.setMinimumSize(new Dimension(200, 22));
+    jTextQuerySearch.setPreferredSize(new Dimension(200, 22));
     jLabListQ.setText("LIST Query Class:");
     this.add(jLabSeq, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
     this.add(jTextSeq, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
@@ -137,7 +137,7 @@ public class CpoQueryPanelNorth extends JPanel  {
     jScrollSQL.getViewport().setPreferredSize(new Dimension(200,100));
     this.add(jScrollSQL, new GridBagConstraints(1, 5, 2, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 230, 45));
     this.add(jLabQueryText, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
-    this.add(jTextQuerySeach, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+    this.add(jTextQuerySearch, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
     this.add(jComQueryText, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 /*    if (jComQueryObject != null) {
       this.add(jLabListQ, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
