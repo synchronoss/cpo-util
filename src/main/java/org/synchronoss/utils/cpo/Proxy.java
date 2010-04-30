@@ -1475,7 +1475,7 @@ public class Proxy implements Observer {
     for (CpoAttributeMapNode atMapNode : alAttMap) {
       String attName = atMapNode.getAttribute();
       Class<?> attClass = getSqlTypeClass(atMapNode.getColumnType());
-      String attClassName = getRealClassName(attClass);
+      String attClassName = attClass.getName();
 
       // if the attribute uses a transform, figure out what class it really is
       if (atMapNode.getTransformClass() != null) {
@@ -1484,8 +1484,8 @@ public class Proxy implements Observer {
           Class<?> transformClass = CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass(atMapNode.getTransformClass());
           for (Method method : transformClass.getMethods()) {
             if (method.getName().equals("transformIn")) {
-              Class<?> returnType = method.getReturnType();
-              attClassName = getRealClassName(returnType);
+              attClass = method.getReturnType();
+              attClassName = getRealClassName(attClass);
             }
           }
         } catch (Exception e) {
@@ -1555,6 +1555,9 @@ public class Proxy implements Observer {
       if (attClass.isPrimitive()) {
         // primitive type, use ==
         buf.append("    if (" + attName + " != that." + attName + ")\n");
+      } else if (attClass.isArray()) {
+        // array type, use Array.equals()
+        buf.append("    if (!java.util.Arrays.equals(" + attName + ", that." + attName + "))\n");
       } else {
         // object, use .equals
         buf.append("    if (" + attName + " != null ? !" + attName + ".equals(that." + attName + ") : that." + attName + " != null)\n");
@@ -1574,6 +1577,9 @@ public class Proxy implements Observer {
       if (attClass.isPrimitive()) {
         // primitive type, need some magic
         buf.append("    result = 31 * result + (String.valueOf(" + attName + ").hashCode());\n");
+      } else if (attClass.isArray()) {
+        // array type, use Array.hashCode()
+        buf.append("    result = 31 * result + (" + attName + "!= null ? java.util.Arrays.hashCode(" + attName + ") : 0);\n");
       } else {
         buf.append("    result = 31 * result + (" + attName + " != null ? " + attName + ".hashCode() : 0);\n");
       }
