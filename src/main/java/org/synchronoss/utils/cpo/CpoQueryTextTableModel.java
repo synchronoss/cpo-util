@@ -41,6 +41,7 @@ public class CpoQueryTextTableModel extends AbstractTableModel  {
       CpoUtil.showException(pe);
     }
   }
+
   public int getRowCount() {
     if (this.cpoQueryTextFiltered != null)
       return this.cpoQueryTextFiltered.size();
@@ -72,28 +73,29 @@ public class CpoQueryTextTableModel extends AbstractTableModel  {
     if (cpoQueryTextFiltered != null) {
       workingQueryList = cpoQueryTextFiltered;
     }
-    if (columnIndex == 0)
+    if (columnIndex == 0) {
       return (workingQueryList.get(rowIndex)).getDesc();
-    else if (columnIndex == 1)
+    } else if (columnIndex == 1) {
       return (workingQueryList.get(rowIndex)).getSQL();
-    else if (columnIndex == 2)
-      return new Integer((workingQueryList.get(rowIndex)).getUsageCount());
-    else if (columnIndex == 3)
+    } else if (columnIndex == 2) {
+      return (workingQueryList.get(rowIndex)).getUsageCount();
+    } else if (columnIndex == 3) {
       return (workingQueryList.get(rowIndex)).getUserName();
-    else if (columnIndex == 4)
+    } else if (columnIndex == 4) {
       return (workingQueryList.get(rowIndex)).getCreateDate();      
-    else if (columnIndex == 5) {
+    } else if (columnIndex == 5) {
       if ((workingQueryList.get(rowIndex)).isNew()) return "New";
       else if ((workingQueryList.get(rowIndex)).isRemove()) return "Removed";
       else if ((workingQueryList.get(rowIndex)).isDirty()) return "Changed";
       else return "";
+    } else {
+      return null;
     }
-    else return null;
   }
 
   @Override
   public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-//    this.fireTableDataChanged();
+    //this.fireTableDataChanged();
   }
 
   public void removeRows(int[] rowIndex) {
@@ -125,22 +127,17 @@ public class CpoQueryTextTableModel extends AbstractTableModel  {
   }
 
   public void addNewRow(String description) {
-    String textId;
-    try {
-      textId = serverNode.getProxy().getNewGuid();
-    } catch (Exception pe) {
-      CpoUtil.showException(pe);
-      return;
+    CpoQueryTextNode cQTnode = serverNode.getProxy().addQueryText(description);
+    if (cQTnode != null) {
+      this.filter();
     }
-    CpoQueryTextNode cQTnode = new CpoQueryTextNode(textId, "", description, serverNode.getProxy().getCpoQueryTextLabelNode(serverNode));
-    cpoQueryText.add(cQTnode);
-    cQTnode.setNew(true);
-    this.filter();
   }
+
   public void addFilter(String filter) {
     this.filter = filter;
     this.filter();
   }
+
   private void filter() {
     if (this.filter == null) {
       this.removeFilter();
@@ -155,10 +152,12 @@ public class CpoQueryTextTableModel extends AbstractTableModel  {
     }
     this.fireTableDataChanged();
   }
+
   public void removeFilter() {
     this.cpoQueryTextFiltered = null;
     this.fireTableDataChanged();
   }
+
   public CpoQueryTextNode getQueryNodeAt(int row) {
     if (cpoQueryTextFiltered != null)
       return cpoQueryTextFiltered.get(row);

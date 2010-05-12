@@ -361,7 +361,36 @@ public class Proxy implements Observer {
     }
     return null;
   }
-  
+
+  public CpoQueryTextNode addQueryText(String desc) {
+    
+    if (desc == null || desc.equals(""))
+      return null;
+
+    String textId;
+    try {
+      textId = getNewGuid();
+    } catch (Exception pe) {
+      CpoUtil.showException(pe);
+      return null;
+    }
+    CpoQueryTextNode cQTnode = new CpoQueryTextNode(textId, "", desc, getCpoQueryTextLabelNode(getServerNode()));
+    cQTnode.setNew(true);
+
+    // add to cache
+    try {
+      // if cache is empty, try to load it
+      if (queryTextCache.isEmpty()) {
+        getQueryText(getServerNode());
+      }
+      queryTextCache.add(cQTnode);
+    } catch (Exception ex) {
+      // ignore
+    }
+
+    return cQTnode;
+  }
+
   public List<CpoQueryTextNode> getQueryText(CpoServerNode cpoServer) throws Exception {
     if (this.queryTextCache.size() != 0)
       return this.queryTextCache;
