@@ -35,10 +35,11 @@ public class CpoSaveNodesTableModel extends AbstractTableModel  {
     this.serverNode = serverNode;
     this.changedObjects = serverNode.getProxy().getAllChangedObjects();
   }
+  
   public CpoServerNode getServerNode() {
     return serverNode;
   }
-  
+
   public int getRowCount() {
     return this.changedObjects.size();
   }
@@ -64,7 +65,7 @@ public class CpoSaveNodesTableModel extends AbstractTableModel  {
 
   public Object getValueAt(int rowIndex, int columnIndex) {
     if (columnIndex == 0)
-      return dontSave.contains(changedObjects.get(rowIndex)) ? new Boolean(false) : new Boolean(true);
+      return !dontSave.contains(changedObjects.get(rowIndex));
     else if (columnIndex == 1) {
       String className = changedObjects.get(rowIndex).getClass().getName();
       return className.substring(className.lastIndexOf("."));
@@ -88,11 +89,10 @@ public class CpoSaveNodesTableModel extends AbstractTableModel  {
     if (columnIndex == 0) {
       if (aValue instanceof Boolean) {
         Boolean newVal = (Boolean)aValue;
-        if (newVal.booleanValue()) {
+        if (newVal) {
           if (dontSave.contains(changedObjects.get(rowIndex)))
             dontSave.remove(changedObjects.get(rowIndex));
-        }
-        else {
+        } else {
           if (!dontSave.contains(changedObjects.get(rowIndex)))
             dontSave.add(changedObjects.get(rowIndex));
         }
@@ -100,6 +100,7 @@ public class CpoSaveNodesTableModel extends AbstractTableModel  {
     }
     this.fireTableDataChanged();
   }
+
   public List<AbstractCpoNode> getSelectedNodes() {
     List<AbstractCpoNode> al = new ArrayList<AbstractCpoNode>();
     for (AbstractCpoNode node : changedObjects) {

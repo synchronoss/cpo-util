@@ -106,8 +106,9 @@ public class CpoQueryTextTableModel extends AbstractTableModel  {
     if (cpoQueryTextFiltered != null) {
       workingQueryList = cpoQueryTextFiltered;
     }
-    for (int i = 0 ; i < rowIndex.length ; i++) {
-      String textId = (workingQueryList.get(rowIndex[i])).getTextId();
+
+    for (int i : rowIndex) {
+      String textId = workingQueryList.get(i).getTextId();
       int usageCount;
       try {
         usageCount = serverNode.getProxy().getQueryTextUsageCount(textId);
@@ -120,8 +121,8 @@ public class CpoQueryTextTableModel extends AbstractTableModel  {
         this.filter();
       }
       else {
-        CpoUtil.showException(new Exception("You can not remove a node that has dependencies.\n"
-            +"This text id is used in "+usageCount+" cpo query(ies), please change them first!"));
+        CpoUtil.showErrorMessage("You can not remove a node that has dependencies.\n"
+            +"This text id is used in "+usageCount+" cpo query(ies), please change them first!");
       }
     }
   }

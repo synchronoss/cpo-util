@@ -75,6 +75,7 @@ public class ExportClassSwingWorker extends SwingWorker {
                 if (fw != null)
                     fw.close();
             } catch (IOException ex) {
+              // ignore
             }
             pf.stop();
         }

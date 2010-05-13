@@ -27,7 +27,7 @@ import java.util.*;
 
 public class SQLExporter  {
 
-  private Logger OUT = Logger.getLogger(getClass());
+  private static Logger OUT = Logger.getLogger(SQLExporter.class);
 
   private String tablePrefix = "";
   private final static String DELIMITER_SLASH = "\n/\n";

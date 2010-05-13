@@ -27,8 +27,10 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 public class CpoTesterResultsModel extends AbstractTableModel {
-    /** Version Id for this class. */
-    private static final long serialVersionUID=1L;
+
+  /** Version Id for this class. */
+  private static final long serialVersionUID=1L;
+  
   private Collection<?> results;
   private List<CpoAttributeMapNode> cpoAttMap; //CpoAttributeMapNode(s)
   private String[] columnNames;
@@ -38,12 +40,12 @@ public class CpoTesterResultsModel extends AbstractTableModel {
     this.results = results;
     this.cpoAttMap = cpoClassNode.getProxy().getAttributeMap(cpoClassNode);
   }
+  
   public int getRowCount() {
-//    OUT.debug ("Getting row size");
     return results.size();
   }
+
   public int getColumnCount() {
-//    OUT.debug ("Getting column count");
     if (cpoAttMap == null)
       return 0;
     
@@ -52,7 +54,6 @@ public class CpoTesterResultsModel extends AbstractTableModel {
 
   @Override
   public String getColumnName(int columnIndex) {
-//    OUT.debug ("Getting column name: "+columnIndex);
     if (this.columnNames != null) return this.columnNames[columnIndex];
     this.columnNames = new String[getColumnCount()];
     int columnCounter = 0;
@@ -65,18 +66,15 @@ public class CpoTesterResultsModel extends AbstractTableModel {
 
   @Override
   public Class<?> getColumnClass(int columnIndex) {
-    /***
+    /**
      * Using the return type causes major issues when the return type is a byte[] or a char[]
      * We can cheat a little and just say it's always going to be a string
-//    OUT.debug ("Getting return type for column: "+columnIndex);
     String columnName = getColumnName(columnIndex);
     String methodName = "get"+columnName.substring(0,1).toUpperCase()+columnName.substring(1);
-//    OUT.debug("getting return type for method: "+methodName);
     for (Object obj : results) {
       for (Method method : obj.getClass().getMethods()) {
         if (method.getName().equals(methodName) && method.getParameterTypes().length == 0) {
           try {
-//            OUT.debug(methods[i].getReturnType());
             return method.getReturnType();
           } catch (Exception e) {
             e.printStackTrace();
@@ -85,7 +83,7 @@ public class CpoTesterResultsModel extends AbstractTableModel {
       }
     }
     OUT.debug("Did not find column class you are looking for - returning String.class!");
-     ***/
+    **/
     return String.class;
   }
 
@@ -95,11 +93,9 @@ public class CpoTesterResultsModel extends AbstractTableModel {
   }
 
   public Object getValueAt(int rowIndex, int columnIndex) {
-//    OUT.debug ("Getting value at: "+rowIndex+","+columnIndex);
     int row = 0;
     String columnName = getColumnName(columnIndex);
     String methodName = "get"+columnName.substring(0,1).toUpperCase()+columnName.substring(1);
-//    OUT.debug("getting return type for method: "+methodName);
 
     Object rowObj = null;
     for (Object obj : results) {
@@ -108,7 +104,6 @@ public class CpoTesterResultsModel extends AbstractTableModel {
         for (Method method : rowObj.getClass().getMethods()) {
           if (method.getName().equals(methodName) && method.getParameterTypes().length == 0) {
             try {
-//              OUT.debug(methods[i].invoke(obj,null));
               Object returnObj = method.invoke(rowObj);
               return returnObj == null ? "" : returnObj.toString();
             } catch (Exception e) {
@@ -123,6 +118,7 @@ public class CpoTesterResultsModel extends AbstractTableModel {
     OUT.debug("Did not find column/row you are looking for - trying to return toString!");
     return rowObj == null ? "" : rowObj.toString();
   }
+
   @Override
   public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
   }

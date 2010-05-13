@@ -6,6 +6,7 @@
   <name>cpoUtil</name>
   <version>4.1-SNAPSHOT</version>
   <description>cpoUtil is the utility that configures the metadata for cpo</description>
+  <packaging>jar</packaging>
   <url>http://cpo.sourceforge.net/cpo-util-sourceforge/</url>
   <licenses>
     <license>
@@ -206,37 +207,17 @@
       <plugin>
         <groupId>org.dstovall</groupId>
         <artifactId>onejar-maven-plugin</artifactId>
-        <version>1.2.1</version>
+        <version>1.4.1</version>
         <executions>
           <execution>
             <configuration>
-              <!-- Optional -->
               <onejarVersion>0.96</onejarVersion>
+              <classifier>one-jar</classifier>
+              <attachToBuild>true</attachToBuild>
             </configuration>
             <goals>
               <goal>one-jar</goal>
             </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-artifacts</id>
-            <phase>package</phase>
-            <goals>
-              <goal>attach-artifact</goal>
-            </goals>
-            <configuration>
-              <artifacts>
-                <artifact>
-                  <file>${project.build.directory}/${project.build.finalName}.one-jar.jar</file>
-                  <type>one-jar.jar</type>
-                </artifact>
-              </artifacts>
-            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -256,6 +237,28 @@
             <goals>
               <goal>bundle</goal>
             </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.5</version>
+        <executions>
+          <execution>
+            <id>attach-artifacts</id>
+            <phase>package</phase>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+              <artifacts>
+                <artifact>
+                  <file>${project.build.directory}/${project.build.finalName}.dmg</file>
+                  <type>dmg</type>
+                </artifact>
+              </artifacts>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -329,7 +332,7 @@
     <dependency>
       <groupId>org.synchronoss</groupId>
       <artifactId>cpo</artifactId>
-      <version>4.0</version>
+      <version>4.0.1</version>
     </dependency>
   </dependencies>
   <reporting>
@@ -359,7 +362,6 @@
         <artifactId>maven-pmd-plugin</artifactId>
         <version>2.4</version>
         <configuration>
-          <linkXref>true</linkXref>
           <targetJdk>1.5</targetJdk>
         </configuration>
       </plugin>
@@ -373,12 +375,6 @@
         <artifactId>maven-surefire-report-plugin</artifactId>
         <version>2.4.3</version>
       </plugin>
-      <!--
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>changelog-maven-plugin</artifactId>
-      </plugin>
-      -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>taglist-maven-plugin</artifactId>
@@ -422,13 +418,6 @@
         <artifactId>cobertura-maven-plugin</artifactId>
         <version>2.2</version>
       </plugin>
-      <!--
-      <plugin>
-        <groupId>net.sf</groupId>
-        <artifactId>stat-scm</artifactId>
-        <version>1.0.0</version>
-      </plugin>
-      -->
     </plugins>
   </reporting>
 </project>

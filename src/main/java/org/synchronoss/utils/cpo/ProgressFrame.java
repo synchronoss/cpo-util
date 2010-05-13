@@ -41,11 +41,11 @@ public class ProgressFrame extends JFrame implements ActionListener, ProgressEve
     private int counterValue;
     private int maxValue;
 
-    private ProgressEvent max_event       = null ;
+    private ProgressEvent max_event = null;
 
-    int	local_counter = 0 ;
-    int wait_counter = 0 ;
-    boolean active = false ;
+    int	local_counter = 0;
+    int wait_counter = 0;
+    boolean active = false;
 
     /**
      * Default constructor.  Causes a progress frame with message = "Progress" and
@@ -93,23 +93,23 @@ public class ProgressFrame extends JFrame implements ActionListener, ProgressEve
      */
     public void progressMade(ProgressEvent pe) {
         if ( pe.isMaxEvent() ) {
-            max_event = pe ; // just hold this for now
-            wait_counter = max_event.getMax() / 10 ;
-            active = false ;
+            max_event = pe; // just hold this for now
+            wait_counter = max_event.getMax() / 10;
+            active = false;
         } else {
             if ( max_event != null ) {
                 // max has been delayed, see if we have enough now
-                local_counter += pe.getValue() ;
+                local_counter += pe.getValue();
                 if ( local_counter > wait_counter ) {
-                    setMaxValue(max_event.getMax()) ;
-                    max_event = null ;
-                    increment(wait_counter) ;
-                    active = true ;
+                    setMaxValue(max_event.getMax());
+                    max_event = null;
+                    increment(wait_counter);
+                    active = true;
                 }
             }
 
             if ( active ) {
-                increment(pe.getValue()) ;
+                increment(pe.getValue());
             }
         }
     }
@@ -131,7 +131,7 @@ public class ProgressFrame extends JFrame implements ActionListener, ProgressEve
         final ProgressFrame _this = this;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                //System.out.println("ProgressFrame disposing") ;
+                //System.out.println("ProgressFrame disposing");
                 _this.dispose();
             }
         });
@@ -143,8 +143,8 @@ public class ProgressFrame extends JFrame implements ActionListener, ProgressEve
      * any of the properties.
      */
     public void start() {
-        //System.out.println("progressbar starting: " + pbar) ;
-        final ProgressFrame _this = this ;
+        //System.out.println("progressbar starting: " + pbar);
+        final ProgressFrame _this = this;
 
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
@@ -161,8 +161,9 @@ public class ProgressFrame extends JFrame implements ActionListener, ProgressEve
                     _this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
                     _this.setVisible(true);
                 }
-            }) ;
+            });
         } catch ( Exception ex ) {
+          // ignore
         }
     }
 
@@ -176,7 +177,7 @@ public class ProgressFrame extends JFrame implements ActionListener, ProgressEve
         if (counterValue > maxValue)
             counterValue = maxValue;
 
-        //System.out.println("counterValue now " + counterValue + "; max " + maxValue) ;
+        //System.out.println("counterValue now " + counterValue + "; max " + maxValue);
 
         if (pbar.isIndeterminate())
             return;
@@ -185,7 +186,7 @@ public class ProgressFrame extends JFrame implements ActionListener, ProgressEve
             //SwingUtilities.invokeAndWait(new Runnable() {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    //System.out.println("update running") ;
+                    //System.out.println("update running");
                     pbar.setValue(counterValue);
                 }
             });
@@ -245,6 +246,6 @@ public class ProgressFrame extends JFrame implements ActionListener, ProgressEve
      * *
      */
     public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
-        //SwingUtilities.invokeLater(new Update()) ;
+        //SwingUtilities.invokeLater(new Update());
     }
 }

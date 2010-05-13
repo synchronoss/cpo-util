@@ -19,17 +19,13 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import javax.swing.JTextField;
-import java.awt.Dimension;
+import javax.swing.*;
+import java.awt.*;
 
 public class CpoWLPropertyPanel extends JPanel  {
-    /** Version Id for this class. */
-    private static final long serialVersionUID=1L;
+
+  /** Version Id for this class. */
+  private static final long serialVersionUID=1L;
 
   private GridBagLayout gridBagLayout1 = new GridBagLayout();
   private JLabel jLabWLURL = new JLabel();

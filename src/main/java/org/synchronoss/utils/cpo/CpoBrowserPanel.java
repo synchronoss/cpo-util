@@ -63,7 +63,7 @@ public class CpoBrowserPanel extends JPanel  {
 
     try {
       jbInit();
-    }catch(Exception e) {
+    } catch(Exception e) {
       CpoUtil.showException(e);
     }
 

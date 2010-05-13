@@ -55,7 +55,6 @@ public class ExportChangedSwingWorker extends SwingWorker {
         AbstractCpoNode first = nodeList.get(0);
         String dir = first.getProxy().getSqlDir();
 
-        File file = null;
         FileWriter fw = null;
         try {
             // First let's make sure that the sql dir exists
@@ -91,7 +90,7 @@ public class ExportChangedSwingWorker extends SwingWorker {
 
                   String fileName = node.getClassName() + ".sql";
 
-                  file = new File(dir, fileName);
+                  File file = new File(dir, fileName);
                   fw = new FileWriter(file);
                   fw.write(sql.toString());
                   fw.flush();
@@ -109,6 +108,7 @@ public class ExportChangedSwingWorker extends SwingWorker {
                 if (fw != null)
                     fw.close();
             } catch (IOException ex) {
+              // ignore
             }
             pf.stop();
         }

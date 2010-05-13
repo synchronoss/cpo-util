@@ -23,6 +23,7 @@ package org.synchronoss.utils.cpo;
 import org.synchronoss.cpo.jdbc.*;
 
 public class Statics  {
+  
   public static final String PROP_WLSURL="cpoutil.wls.url.";
   public static final String PROP_WLSUSER="cpoutil.wls.user.";
   public static final String PROP_WLSPASS="cpoutil.wls.pass.";
@@ -61,35 +62,8 @@ public class Statics  {
 
   public static final String CREATE_ALL_FILE_NAME = "CPO_CREATE_ALL.sql";
 
-//  private static Logger OUT = Logger.getLogger(Statics.class);
-//  private static HashMap jsqMap = null;
-
-  public static final String getJavaSqlType(int sqlTypeNum) {
+  public static String getJavaSqlType(int sqlTypeNum) {
 	  JavaSqlType<?> jdbcType = JavaSqlTypes.getJavaSqlType(sqlTypeNum);
 	  return jdbcType.getJavaSqlTypeName();
-  }
-  
-  /**
-   * @deprecated - this is just bad.  If you're using a StringBuffer in the first place,
-   * append the value instead of the marker.
-   */
-  @Deprecated
-  public static StringBuffer replaceMarker(StringBuffer source, String marker, String replace){
-      int attrOffset = 0;
-      int fromIndex = 0;
-      int mLength=marker.length();
-      replace = replace==null?"":replace;
-      int rLength=replace.length();
-      
-      //OUT.debug("starting string <"+source.toString()+">");
-      if(source!=null && source.length()>0) {
-          while((attrOffset=source.indexOf(marker, fromIndex))!=-1){
-                   source.replace(attrOffset,attrOffset+mLength, replace);
-                   fromIndex=attrOffset+rLength;
-          }
-      }
-      //OUT.debug("ending string <"+source.toString()+">");
-
-      return source;
   }
 }

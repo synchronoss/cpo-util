@@ -404,19 +404,19 @@ public class CpoUtil {
         String server, jdbcdriver, jdbcurl, jdbcparams;
         File sqlDir;
         if ((server = pane.getCpoUtilName()).equals("")) {
-          JOptionPane.showMessageDialog(frame, "You must specify a util name.", "Error", JOptionPane.ERROR_MESSAGE);
+          showErrorMessage("You must specify a util name.");
           continue;
         }
         if ((jdbcdriver = pane.getJdbcDriver()).equals("")) {
-          JOptionPane.showMessageDialog(frame, "You must specify a driver.", "Error", JOptionPane.ERROR_MESSAGE);
+          showErrorMessage("You must specify a driver.");
           continue;
         }
         if ((jdbcurl = pane.getJdbcUrl()).equals("")) {
-          JOptionPane.showMessageDialog(frame, "You must specify a url.", "Error", JOptionPane.ERROR_MESSAGE);
+          showErrorMessage("You must specify a url.");
           continue;
         }
         if ((sqlDir = pane.getSqlDir()) == null) {
-          JOptionPane.showMessageDialog(frame, "You must specify a sql dir.", "Error", JOptionPane.ERROR_MESSAGE);
+          showErrorMessage("You must specify a sql dir.");
           continue;
         }
         jdbcparams = pane.getJDBCParams();
@@ -443,6 +443,10 @@ public class CpoUtil {
 
   static void showMessage(String message) {
     JOptionPane.showMessageDialog(frame, message);
+  }
+
+  static void showErrorMessage(String message) {
+    JOptionPane.showMessageDialog(frame, message, "Error", JOptionPane.ERROR_MESSAGE);
   }
 
   static void showMultipleQueryTextWarning() {

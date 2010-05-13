@@ -19,10 +19,10 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
+import org.apache.log4j.Logger;
+
 import javax.swing.table.AbstractTableModel;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import org.apache.log4j.*;
+import java.util.*;
 
 public class CpoTesterParamModel extends AbstractTableModel {
   
@@ -71,10 +71,7 @@ public class CpoTesterParamModel extends AbstractTableModel {
 
   @Override
   public boolean isCellEditable(int rowIndex, int columnIndex) {
-    if (columnIndex == 4)
-      return true;
-    
-    return false;
+    return (columnIndex == 4);
   }
 
   public Object getValueAt(int rowIndex, int columnIndex) {
@@ -87,9 +84,9 @@ public class CpoTesterParamModel extends AbstractTableModel {
         CpoQueryParameterNode qpNode = enumQueryParams.nextElement();
         if (rowCount == rowIndex) {
           if (columnIndex == 0) {
-            return new Integer(node.getSeqNo());
+            return node.getSeqNo();
           } else if (columnIndex == 1) {
-            return new Integer(qpNode.getSeqNo());
+            return qpNode.getSeqNo();
           } else if (columnIndex == 2) {
             return qpNode.getCpoAttributeMapBean()!=null?qpNode.getCpoAttributeMapBean().getColumnName():null;
           } else if (columnIndex == 3) {
@@ -103,6 +100,7 @@ public class CpoTesterParamModel extends AbstractTableModel {
     }
     return null;
   }
+
   @Override
   public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
     if (columnIndex == 4) {

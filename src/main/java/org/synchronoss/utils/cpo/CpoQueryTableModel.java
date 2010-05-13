@@ -76,7 +76,7 @@ public class CpoQueryTableModel extends AbstractTableModel {
 
   public Object getValueAt(int rowIndex, int columnIndex) {
     if (columnIndex == 0)
-      return new Integer((cpoQPBs.get(rowIndex)).getSeqNo());
+      return (cpoQPBs.get(rowIndex)).getSeqNo();
     else if (columnIndex == 1)
       return (cpoQPBs.get(rowIndex)).getCpoAttributeMapBean();
     else if (columnIndex == 2)

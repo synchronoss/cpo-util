@@ -202,7 +202,7 @@ public class QueryParser {
 
   public static void main(String[] args) throws Exception {
     String query = "select * from IMPL_EMAIL_CONFIG where REGION = ? and UPPER(STATE) = ? and REASON_CODE = ? and IS_DELETED = '0'";
-//    String query = "insert into lnp_order_curr_disp(transaction_id, category, revision, state, timestamp,disp_transaction_id, trx_seq, user_id, tn, trans_comment) (select transaction_id, category, revision, state, timestamp,disp_transaction_id, trx_seq, user_id, tn, trans_comment from lnp_order_curr_disp_v where transaction_id = (select transaction_id from lnp_order_disp_head where disp_transaction_id = ?) and category = ? and (tn = ? or ? is null))";
+    //String query = "insert into lnp_order_curr_disp(transaction_id, category, revision, state, timestamp,disp_transaction_id, trx_seq, user_id, tn, trans_comment) (select transaction_id, category, revision, state, timestamp,disp_transaction_id, trx_seq, user_id, tn, trans_comment from lnp_order_curr_disp_v where transaction_id = (select transaction_id from lnp_order_disp_head where disp_transaction_id = ?) and category = ? and (tn = ? or ? is null))";
     QueryParser parser = new QueryParser();
     List<String> colList = parser.parse(query);
     int count = 1;

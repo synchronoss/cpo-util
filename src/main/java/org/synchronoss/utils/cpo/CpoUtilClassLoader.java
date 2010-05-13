@@ -20,12 +20,12 @@
  */
 package org.synchronoss.utils.cpo;
 
+import org.apache.log4j.Logger;
+
 import java.io.*;
 import java.util.*;
 import java.util.jar.*;
 import java.util.zip.ZipEntry;
-
-import org.apache.log4j.Logger;
 
 public class CpoUtilClassLoader extends ClassLoader {
 
@@ -53,8 +53,8 @@ public class CpoUtilClassLoader extends ClassLoader {
   @Override
   protected Class<?> findClass(String name) throws ClassNotFoundException {
     Class<?> c;
-      // Convert class name argument to filename
-      // Convert package names into subdirectories
+    // Convert class name argument to filename
+    // Convert package names into subdirectories
     try {
       byte data[] = loadClassData(name);
       c = defineClass (name, data, 0, data.length);
@@ -77,7 +77,7 @@ public class CpoUtilClassLoader extends ClassLoader {
           JarFile jf = new JarFile (file);            
           for (Enumeration<JarEntry> e = jf.entries(); e.hasMoreElements() ;) {
             ZipEntry entry = e.nextElement ();
-//            OUT.debug (entry.getName());
+            //OUT.debug (entry.getName());
             if (filename.equals (entry.getName ())) {
               InputStream is = jf.getInputStream (entry);
               int l = (int) entry.getSize ();

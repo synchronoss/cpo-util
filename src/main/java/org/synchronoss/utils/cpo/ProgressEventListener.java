@@ -21,5 +21,7 @@
 package org.synchronoss.utils.cpo;
 
 public interface ProgressEventListener {
-    public void progressMade(ProgressEvent pe) ;
-    }
+
+  public void progressMade(ProgressEvent pe);
+  
+}

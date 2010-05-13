@@ -24,16 +24,16 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class MainFrame extends JFrame {
-    /** Version Id for this class. */
-    private static final long serialVersionUID=1L;
+
+  /** Version Id for this class. */
+  private static final long serialVersionUID=1L;
+
   JLabel statusBar = new JLabel();
   private JMenuItem menuHelpAbout = new JMenuItem();
   private JMenu menuHelp = new JMenu();
   private JMenuItem menuFileBrowser = new JMenuItem();
   private JMenuItem menuFileClassPath = new JMenuItem();
   private JMenuItem menuFileExit = new JMenuItem();
-  //private JMenuItem menuFileNewJdbc = new JMenuItem();
-  //private JMenuItem menuFileNewWL = new JMenuItem();
   private JMenuItem menuFileEditCon = new JMenuItem();
   private JMenuItem menuFileUnloadLoader = new JMenuItem();
   private JMenu menuFile = new JMenu();
@@ -71,30 +71,6 @@ public class MainFrame extends JFrame {
           menuFileClassPath_ActionPerformed(ae);
         }
       });
-    /*
-    menuFileNewJdbc.setText("New JDBC Connection");
-    menuFileNewJdbc.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent ae) {
-          try {
-            fileNewJdbc_ActionPerformed(ae);
-          } catch (Exception e) {
-            CpoUtil.showException(e);
-          }
-        }
-      });
-      */
-      /*
-    menuFileNewWL.setText("New WebLogic Connection");
-    menuFileNewWL.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent ae) {
-          try {
-            fileNewWL_ActionPerformed(ae);
-          } catch (Exception e) {
-            CpoUtil.showException(e);
-          }
-        }
-      });
-       */
     menuFileEditCon.setText("Edit Connections");
     menuFileEditCon.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent ae) {
@@ -136,8 +112,6 @@ public class MainFrame extends JFrame {
     menuFile.add(menuFileBrowser);
     menuFile.add(menuFileClassPath);
     menuFile.add(menuFileEditCon);
-    //menuFile.add(menuFileNewJdbc);
-    //menuFile.add(menuFileNewWL);
     menuFile.add(menuFileUnloadLoader);
     menuFile.add(menuFileExit);
     menuBar.add(menuFile);
@@ -147,9 +121,11 @@ public class MainFrame extends JFrame {
     panelCenter.add(jTabbedPane, BorderLayout.CENTER);
     this.getContentPane().add(panelCenter, BorderLayout.CENTER);
   }
+
   void menuFileClassPath_ActionPerformed(ActionEvent e) {
     CpoUtil.setCustomClassPath("Set Your Custom Classpath, make sure to include the platform EJB!");
   }
+
   void menuFileBrowser_ActionPerformed(ActionEvent e) {
     try {
       CpoBrowserPanel browserPanel = new CpoBrowserPanel();
@@ -172,24 +148,27 @@ public class MainFrame extends JFrame {
   }
 
   void fileExit_ActionPerformed(ActionEvent e) {
-    //this.setVisible(false);
       if (CpoUtil.checkUnsavedData("You have unsaved data, are you sure you wish to exit??"))
         return;
-      System.exit( 0 );
+      System.exit(0);
   }
 
   void helpAbout_ActionPerformed(ActionEvent e) {
     JOptionPane.showMessageDialog(this, new MainFrame_AboutBoxPanel(), "About", JOptionPane.PLAIN_MESSAGE);
   }
+
   void fileNewJdbc_ActionPerformed(ActionEvent e) {
     CpoUtil.setNewJDBCConnection(null);
   }
+
   void fileNewWL_ActionPerformed(ActionEvent e) {
     CpoUtil.setNewWLConnection(null);
   }
+
   void fileEditCon_ActionPerformed(ActionEvent e) {
     CpoUtil.editConnection();
   }
+  
   void fileUnloadLoader_ActionPerformed(ActionEvent e) {
     CpoUtilClassLoader.unloadLoader();
     try {

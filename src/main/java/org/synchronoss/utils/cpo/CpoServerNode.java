@@ -85,17 +85,15 @@ public class CpoServerNode extends AbstractCpoNode {
           count++;
           return cpoQTLN;
         }
-        return classes.get(count++-1);
+        count++;
+        return classes.get(count-1);
       }
       public boolean hasMoreElements() {
-        if (classes.size()+1 == count)
-          return false;
-        
-        return true;
+        return (count < classes.size());
       }
     };
   }
-    
+
   @Override
   public String toString() {
     return this.prox.toString();

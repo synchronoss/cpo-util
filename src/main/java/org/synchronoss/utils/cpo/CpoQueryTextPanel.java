@@ -19,11 +19,10 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
-
-import javax.swing.*;
 
 public class CpoQueryTextPanel extends JPanel  {
     /** Version Id for this class. */
@@ -104,7 +103,9 @@ public class CpoQueryTextPanel extends JPanel  {
         }
       });
       menu.add(jMenuRemove);
-    } catch (Exception e) {}
+    } catch (Exception e) {
+      // ignore
+    }
     JMenuItem jMenuAddQT = new JMenuItem("Add New Query Text");
     jMenuAddQT.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent ae) {
@@ -140,11 +141,17 @@ public class CpoQueryTextPanel extends JPanel  {
     CpoQueryTextNode node = model.getQueryNodeAt(ts.getTrueRow(rowAtPoint));
     try {
       sb.append("<html>");
-      sb.append("<bold>"+node.getDesc()+"</bold><BR>");
+      sb.append("<bold>");
+      sb.append(node.getDesc());
+      sb.append("</bold><BR>");
       List<CpoQueryGroupNode> queryGroups = node.getProxy().getQueryGroups(node);
       for (CpoQueryGroupNode qGnode : queryGroups) {
         CpoClassNode classNode = node.getProxy().getClassNode(qGnode.getClassId());
-        sb.append("Class: "+classNode.getClassName()+" -- Query Group: "+qGnode.getGroupName()+"<BR>");
+        sb.append("Class: ");
+        sb.append(classNode.getClassName());
+        sb.append(" -- Query Group: ");
+        sb.append(qGnode.getGroupName());
+        sb.append("<BR>");
       }
       sb.append("</html>");
     } catch (Exception e) {

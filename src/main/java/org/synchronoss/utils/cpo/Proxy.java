@@ -214,10 +214,13 @@ public class Proxy implements Observer {
       pstmt.executeQuery();
       revsEnabled = true;
     } catch (Exception e) {
+      // ignore
     } finally {
       try {
         if (pstmt != null) pstmt.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+        // ignore
+      }
     }
   }
 
@@ -428,10 +431,14 @@ public class Proxy implements Observer {
     } finally {
       try {
         if (rs != null) rs.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+        // ignore
+      }
       try {
         if (pstmt != null) pstmt.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+        // ignore
+      }
     }
     queryTextCache = al;
     return al;
@@ -475,10 +482,14 @@ public class Proxy implements Observer {
     } finally {
       try {
         if (rs != null) rs.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+        // ignore
+      }
       try {
         if (pstmt != null) pstmt.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+        // ignore
+      }
     }
     this.queryGroupByTextCache.put(textNode,al);
     return al;
@@ -516,10 +527,14 @@ public class Proxy implements Observer {
     } finally {
       try {
         if (rs != null) rs.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+        // ignore
+      }
       try {
         if (pstmt != null) pstmt.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+        // ignore
+      }
     }
     this.queryGroupCache.put(parent,al);
     return al;
@@ -585,10 +600,14 @@ public class Proxy implements Observer {
     } finally {
       try {
         if (rs != null) rs.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+        // ignore
+      }
       try {
         if (pstmt != null) pstmt.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+        // ignore
+      }
     }
     this.queryCache.put(parent,al);
     return al;
@@ -632,10 +651,14 @@ public class Proxy implements Observer {
     } finally {
       try {
         if (rs != null) rs.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+        // ignore
+      }
       try {
         if (pstmt != null) pstmt.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+        // ignore
+      }
     }
     this.queryParamCache.put(qNode,al);
     return al;
@@ -719,10 +742,14 @@ public class Proxy implements Observer {
     } finally {
       try {
         if (rs != null) rs.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+        // ignore
+      }
       try {
         if (pstmt != null) pstmt.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+        // ignore
+      }
     }
     this.attMapCache.put(cpoAttLabNode,al);
     return al;
@@ -747,10 +774,14 @@ public class Proxy implements Observer {
     } finally {
       try {
         if (rs != null) rs.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+        // ignore
+      }
       try {
         if (pstmt != null) pstmt.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+        // ignore
+      }
     }
     return result;
   }
@@ -763,7 +794,9 @@ public class Proxy implements Observer {
     super.finalize();
     try {
       conn.close();
-    } catch (Exception e) {}
+    } catch (Exception e) {
+      // ignore
+    }
   }
 
   /**
@@ -791,8 +824,7 @@ public class Proxy implements Observer {
         parent.setChildDirty((AbstractCpoNode)obj);
         parent.setChildNew((AbstractCpoNode)obj);
         parent.setChildRemove((AbstractCpoNode)obj);
-        int index = 0;
-        index = parent.getIndex((TreeNode)obs);
+        int index = parent.getIndex((TreeNode)obs);
         OUT.debug ("Set parent flags - index is: "+index);
         if (index >= 0 && obs == obj) {
           OUT.debug ("Index: "+index+" size: "+((AbstractCpoNode)obs).getParent().getChildCount());
@@ -1336,12 +1368,15 @@ public class Proxy implements Observer {
       try {
         conn.rollback();
       } catch (Exception e) {
+        // ignore
       }
       throw se;
     } finally {
       try {
         pstmt.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+        // ignore
+      }
     }
   }
 
@@ -1485,10 +1520,14 @@ public class Proxy implements Observer {
     } finally {
       try {
         if (rs != null) rs.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+        // ignore
+      }
       try {
         if (pstmt != null) pstmt.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+        // ignore
+      }
     }
 
     return generateClass(className, attributes, attClasses);
@@ -1719,75 +1758,51 @@ public class Proxy implements Observer {
     } finally {
       try {
         if (rs != null) rs.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+        // ignore
+      }
       try {
         if (pstmt != null) pstmt.close();
-      } catch (Exception e) {}
+      } catch (Exception e) {
+        // ignore
+      }
     }    
   }
 
   public Collection<?> executeQueryGroup(Object obj, Object objReturnType, CpoQueryGroupNode cpoQGnode, boolean persist) throws Exception {
-//    try {
-      List<Object> result = new ArrayList<Object>();
-      if (cpoQGnode.getType().equals(Statics.CPO_TYPE_CREATE)) {
-        //insert
-        Method meth = cpoMan.getClass().getMethod("insertObject",new Class[]{String.class,Object.class});
-        meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
-        // retrieve from cpo, so we can verify insertion
-        meth = cpoMan.getClass().getMethod("retrieveObject",new Class[]{String.class,Object.class});
-        Object resultObj = meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
-        if (resultObj != null)
-          result.add(resultObj);
-      } else if (cpoQGnode.getType().equals(Statics.CPO_TYPE_DELETE)) {
-        Method meth = cpoMan.getClass().getMethod("deleteObject",new Class[]{String.class,Object.class});
-        meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
-        // retrieve from cpo, so we can verify deletion
-        meth = cpoMan.getClass().getMethod("retrieveObject",new Class[]{String.class,Object.class});
-        Object resultObj = meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
-        if (resultObj != null)
-          result.add(resultObj);
-      } else if (cpoQGnode.getType().equals(Statics.CPO_TYPE_LIST)) {
-        Collection<?> coll = null;
-        CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass("org.synchronoss.cpo.CpoWhere");
-        Method[] meth = cpoMan.getClass().getMethods();
-        for (int i = 0 ; i < meth.length ; i++) {
-          if (meth[i].getName().equals("retrieveObjects")) {
-            Class<?>[] paramClasses = meth[i].getParameterTypes();
-            if (paramClasses.length == 5) {
-              coll = (Collection<?>)meth[i].invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj,objReturnType,null,null});
-            }
-          }
-        }
-        if (coll == null)
-          return new ArrayList<Object>();
-        return coll;
-      } else if (cpoQGnode.getType().equals(Statics.CPO_TYPE_RETRIEVE)) {
-        Method meth = cpoMan.getClass().getMethod("retrieveObject",new Class[]{String.class,Object.class});
-        Object resultObj = meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
-        if (resultObj != null)
-          result.add(resultObj);
-      } else if (cpoQGnode.getType().equals(Statics.CPO_TYPE_UPDATE)) {
-        Method meth = cpoMan.getClass().getMethod("updateObject",new Class[]{String.class,Object.class});
-        meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
-        // retrieve from cpo, so we can verify update
-        meth = cpoMan.getClass().getMethod("retrieveObject",new Class[]{String.class,Object.class});
-        Object resultObj = meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
-        if (resultObj != null)
-          result.add(resultObj);
-      } else if (cpoQGnode.getType().equals(Statics.CPO_TYPE_EXIST) && persist) {
-        Method meth = cpoMan.getClass().getMethod("persistObject",new Class[]{String.class,Object.class});
-        meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
-        // retrieve from cpo, so we can verify update
-        meth = cpoMan.getClass().getMethod("retrieveObject",new Class[]{String.class,Object.class});
-        Object resultObj = meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
-        if (resultObj != null)
-          result.add(resultObj);
-      } else if (cpoQGnode.getType().equals(Statics.CPO_TYPE_EXIST)) {
-        Method meth = cpoMan.getClass().getMethod("existsObject",new Class[]{String.class,Object.class});
-        Object resultObj = meth.invoke(cpoMan,new Object[]{cpoQGnode.getGroupName(),obj});
-        if (resultObj != null)
-          result.add(resultObj);
-      }
+    List<Object> result = new ArrayList<Object>();
+    Object resultObj = null;
+    if (cpoQGnode.getType().equals(Statics.CPO_TYPE_CREATE)) {
+      //insert
+      resultObj = cpoMan.insertObject(cpoQGnode.getGroupName(), obj);
+    } else if (cpoQGnode.getType().equals(Statics.CPO_TYPE_DELETE)) {
+      cpoMan.deleteObject(cpoQGnode.getGroupName(), obj);
+      // retrieve from cpo, so we can verify deletion
+      resultObj = cpoMan.retrieveBean(cpoQGnode.getGroupName(), obj);
+    } else if (cpoQGnode.getType().equals(Statics.CPO_TYPE_LIST)) {
+      result = cpoMan.retrieveBeans(cpoQGnode.getGroupName(), obj, objReturnType);
+    } else if (cpoQGnode.getType().equals(Statics.CPO_TYPE_RETRIEVE)) {
+      resultObj = cpoMan.retrieveBean(cpoQGnode.getGroupName(), obj);
+    } else if (cpoQGnode.getType().equals(Statics.CPO_TYPE_UPDATE)) {
+      cpoMan.updateObject(cpoQGnode.getGroupName(), obj);
+      // retrieve from cpo, so we can verify update
+      resultObj = cpoMan.retrieveBean(cpoQGnode.getGroupName(), obj);
+    } else if (cpoQGnode.getType().equals(Statics.CPO_TYPE_EXIST) && persist) {
+      cpoMan.persistObject(cpoQGnode.getGroupName(), obj);
+      // retrieve from cpo, so we can verify update
+      resultObj = cpoMan.retrieveBean(cpoQGnode.getGroupName(), obj);
+    } else if (cpoQGnode.getType().equals(Statics.CPO_TYPE_EXIST)) {
+      resultObj = cpoMan.existsObject(cpoQGnode.getGroupName(), obj);
+    }
+
+    // always return a list, even if it's empty
+    if (result == null)
+      return new ArrayList<Object>();
+
+    // if there was a result object, add it to the list
+    if (resultObj != null)
+      result.add(resultObj);
+
     return result;
   }
   
@@ -1808,10 +1823,14 @@ public class Proxy implements Observer {
       } finally {
           try {
               if (rs != null) rs.close();
-          } catch (Exception e) {}
+          } catch (Exception e) {
+            // ignore
+          }
           try {
               if (pstmt != null) pstmt.close();
-          } catch (Exception e) {}
+          } catch (Exception e) {
+            // ignore
+          }
       }
       if (ignoredAttr.length()>0) {
           String message = " Did not add attributes "+ignoredAttr+"because they already exist.";

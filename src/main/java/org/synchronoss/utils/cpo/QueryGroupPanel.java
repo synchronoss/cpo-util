@@ -23,8 +23,10 @@ import javax.swing.*;
 import java.awt.*;
 
 public class QueryGroupPanel extends JPanel  {
-    /** Version Id for this class. */
-    private static final long serialVersionUID=1L;
+
+  /** Version Id for this class. */
+  private static final long serialVersionUID=1L;
+  
   private GridBagLayout gridBagLayout1 = new GridBagLayout();
   private JLabel jLabName = new JLabel();
   private JLabel jLabType = new JLabel();
@@ -56,9 +58,11 @@ public class QueryGroupPanel extends JPanel  {
     this.add(jTextName, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
     this.add(jComType, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
   }
+
   public String getGroupName() {
     return this.jTextName.getText();
   }
+
   public String getGroupType() {
     return (String)this.jComType.getSelectedItem();
   }

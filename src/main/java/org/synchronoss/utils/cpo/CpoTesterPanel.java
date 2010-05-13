@@ -123,11 +123,9 @@ public class CpoTesterPanel extends JPanel implements ClipboardOwner  {
     OUT.debug ("Class name tester will use: "+cpoClassName+" and "+cpoClassNameReturnType+" as the return type class");
     try  {
       Class<?> cpoClass = CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass(cpoClassName);
-//      Class cpoClass = Class.forName(cpoClassName);
       Object cpoObject = cpoClass.newInstance();
       Object cpoObjectReturnType = CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass(cpoClassNameReturnType).newInstance();
       Method[] methods = cpoClass.getMethods();
-//      Method[] methods = cpoClass.getDeclaredMethods();
       CpoTesterParamModel ctpm = (CpoTesterParamModel)cpoTPnorth.jTableParam.getModel();
       Enumeration<Object> enumParams = ctpm.parameter.keys();
       while (enumParams.hasMoreElements()) {
@@ -135,16 +133,16 @@ public class CpoTesterPanel extends JPanel implements ClipboardOwner  {
         String methodName = "set"+key.substring(0,1).toUpperCase()+key.substring(1);
         OUT.debug ("Method name looking for: "+methodName);
         boolean found = false;
-        for (int i = 0 ; i < methods.length ; i++) {
-          if (methods[i].getName().equals(methodName)) {
-            Class<?>[] paramTypes = methods[i].getParameterTypes();
-            if (paramTypes.length != 1)//throw new Exception("Param types count is not equal to 1");
+        for (Method method : methods) {
+          if (method.getName().equals(methodName)) {
+            Class<?>[] paramTypes = method.getParameterTypes();
+            if (paramTypes.length != 1)
               continue;
-            methods[i].invoke(cpoObject,new Object[]{getMethObjFrStr(paramTypes[0],(String)ctpm.parameter.get(key))});
+            method.invoke(cpoObject, getMethObjFrStr(paramTypes[0], (String)ctpm.parameter.get(key)));
             found = true;
           }
         }
-        if (!found) throw new Exception("Could not find method: "+methodName);
+        if (!found) throw new Exception("Could not find method: " + methodName);
       }
       Collection<?> result = cpoClassNode.getProxy().executeQueryGroup(cpoObject,cpoObjectReturnType,(CpoQueryGroupNode)cpoTPnorth.jComQueryGroup.getSelectedItem(),cpoTPnorth.jCheckPersist.isSelected());
       TableSorter ts = new TableSorter(new CpoTesterResultsModel(result,returnClassNode));
@@ -157,6 +155,11 @@ public class CpoTesterPanel extends JPanel implements ClipboardOwner  {
       CpoUtil.setCustomClassPath("Need path to: web-common, wls-startup and log4j!");
     }
     catch (Exception ex)  {
+      Throwable t = ex;
+      while (t != null) {
+        t.printStackTrace();
+        t = t.getCause();
+      }
       CpoUtil.showException(ex);
     }
   }
@@ -227,7 +230,7 @@ public class CpoTesterPanel extends JPanel implements ClipboardOwner  {
       e.printStackTrace();
       throw e;
     }
-    CpoUtil.showException(new Exception("Could not locate the type for param: "+param+" which is class: "+cls));
+    CpoUtil.showErrorMessage("Could not locate the type for param: "+param+" which is class: "+cls);
     return null;
   }
   private void keyTypedEvent(KeyEvent e) {

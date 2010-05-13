@@ -20,17 +20,18 @@
  */
 package org.synchronoss.utils.cpo;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.util.*;
 import java.util.List;
 
-import javax.swing.*;
-
 public class CpoUtilClassPathPanel extends JPanel  {
-    /** Version Id for this class. */
-    private static final long serialVersionUID=1L;
+
+  /** Version Id for this class. */
+  private static final long serialVersionUID=1L;
+  
   private GridBagLayout gridBagLayout1 = new GridBagLayout();
   private JLabel jLabClasspath = new JLabel();
   private JList jListClasspath = new JList();
@@ -71,6 +72,7 @@ public class CpoUtilClassPathPanel extends JPanel  {
     this.add(jButAddClassPath, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
     this.add(jButRemove, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
   }
+
   private void addFile() {
     JFileChooser jFile = new JFileChooser();
     jFile.setMultiSelectionEnabled(true);
@@ -80,10 +82,11 @@ public class CpoUtilClassPathPanel extends JPanel  {
     files.addAll(Arrays.asList(jFile.getSelectedFiles()));
     this.jListClasspath.setListData(new Vector<File>(files));
   }
+
   private void removeFile() {
     Object[] selectedFiles = this.jListClasspath.getSelectedValues();
-    for (int i = 0 ; i < selectedFiles.length ; i++) {
-      files.remove(selectedFiles[i]);
+    for (Object selectedFile : selectedFiles) {
+      files.remove(selectedFile);
     }
     this.jListClasspath.setListData(new Vector<File>(files));
   }

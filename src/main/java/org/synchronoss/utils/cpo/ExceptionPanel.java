@@ -19,19 +19,15 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import java.awt.Rectangle;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import javax.swing.JTextArea;
-import javax.swing.BorderFactory;
-import java.io.StringWriter;
-import java.io.PrintWriter;
+import javax.swing.*;
+import java.awt.*;
+import java.io.*;
 
 public class ExceptionPanel extends JPanel  {
-    /** Version Id for this class. */
-    private static final long serialVersionUID=1L;
+
+  /** Version Id for this class. */
+  private static final long serialVersionUID=1L;
+
   private JScrollPane jScrollExc = new JScrollPane();
   private JTextArea jTextExc = new JTextArea();
 
