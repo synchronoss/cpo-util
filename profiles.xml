@@ -7,7 +7,7 @@
         <activeByDefault>false</activeByDefault>
       </activation>
       <properties>
-        <cpoutil.bootstrapUrl>http://wiki.synchronoss.net/~components/sncrcpoutil/bootstrap.properties</cpoutil.bootstrapUrl>
+        <cpoutil.bootstrapUrl>http://wiki.synchronoss.net/~components/sncrcpo/bootstrap.properties</cpoutil.bootstrapUrl>
       </properties>
     </profile>
   </profiles>
