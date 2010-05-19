@@ -66,7 +66,7 @@
       <!-- must create a shell for your account at sourceforge by execing: ssh -t <username>,<project name>@shell.sf.net create-->
       <id>sf-cpo-site</id>
       <!--<url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/cpo-util-sourceforge</url>-->
-			<url>sftp://web.sourceforge.net/home/groups/c/cp/cpo/htdocs</url>
+			<url>sftp://web.sourceforge.net/home/groups/c/cp/cpo/htdocs/cpo-util-sourceforge</url>
     </site>
   </distributionManagement>
   <issueManagement>
