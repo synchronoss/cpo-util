@@ -22,7 +22,7 @@
   </licenses>
   <properties>
     <currentVersion>${project.version}</currentVersion>
-    <cpoutil.bootstrapUrl />
+    <cpoutil.bootstrapUrl/>
   </properties>
   <ciManagement>
     <system>teamcity</system>
@@ -53,17 +53,20 @@
     <repository>
       <id>sf-cpo-releases</id>
       <name>Sourceforge CPO Repository</name>
-      <url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/sf-cpo-releases</url>
+      <!--<url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/sf-cpo-releases</url>-->
+			<url>sftp://web.sourceforge.net/home/groups/c/cp/cpo/htdocs/sf-cpo-releases</url>
     </repository>
     <snapshotRepository>
       <id>sf-cpo-snapshots</id>
       <name>Sourceforge CPO Snapshot Repository</name>
-      <url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/sf-cpo-snapshots</url>
+      <!--<url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/sf-cpo-snapshots</url>-->
+			<url>sftp://web.sourceforge.net/home/groups/c/cp/cpo/htdocs/sf-cpo-snapshots</url>
     </snapshotRepository>
     <site>
       <!-- must create a shell for your account at sourceforge by execing: ssh -t <username>,<project name>@shell.sf.net create-->
       <id>sf-cpo-site</id>
-      <url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/cpo-util-sourceforge</url>
+      <!--<url>scp://shell.sourceforge.net/home/groups/c/cp/cpo/htdocs/cpo-util-sourceforge</url>-->
+			<url>sftp://web.sourceforge.net/home/groups/c/cp/cpo/htdocs</url>
     </site>
   </distributionManagement>
   <issueManagement>
@@ -127,11 +130,11 @@
       </resource>
     </resources>
     <extensions>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-webdav</artifactId>
-        <version>1.0-beta-2</version>
-      </extension>
+			<extension>
+				<groupId>net.sf.maven.plugins</groupId>
+				<artifactId>wagon-http-sourceforge</artifactId>
+				<version>0.4</version>
+			</extension>
     </extensions>
     <pluginManagement>
       <plugins>
