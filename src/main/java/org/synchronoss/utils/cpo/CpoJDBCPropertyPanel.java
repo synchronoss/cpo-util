@@ -23,7 +23,6 @@ package org.synchronoss.utils.cpo;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -136,6 +135,7 @@ public class CpoJDBCPropertyPanel extends JPanel  {
     JFileChooser chooser = new JFileChooser();
     chooser.setApproveButtonText("Select");
     chooser.setDialogTitle("Select configuration to load:");
+    /***
     chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
     chooser.setFileFilter(new FileFilter() {
       public String getDescription() {
@@ -145,6 +145,7 @@ public class CpoJDBCPropertyPanel extends JPanel  {
         return (f.getName().toLowerCase().endsWith(".properties"));
       }
     });
+    ***/
     int option = chooser.showOpenDialog(this);
     if (option == JFileChooser.APPROVE_OPTION) {
       File file = chooser.getSelectedFile();
