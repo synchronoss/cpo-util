@@ -297,7 +297,7 @@ public class CpoQueryPanel extends JPanel {
             }
         });
         menu.add(jMenuAddAttrs);
-        JMenuItem jMenuGuessAttributes = new JMenuItem("Guess Attributes (Experimental)");
+        JMenuItem jMenuGuessAttributes = new JMenuItem("Guess Attributes");
         jMenuGuessAttributes.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 guessAttributes();

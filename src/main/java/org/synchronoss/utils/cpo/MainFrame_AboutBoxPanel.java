@@ -21,7 +21,6 @@
 package org.synchronoss.utils.cpo;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 
 public class MainFrame_AboutBoxPanel extends JPanel {
@@ -29,13 +28,19 @@ public class MainFrame_AboutBoxPanel extends JPanel {
   /** Version Id for this class. */
   private static final long serialVersionUID=1L;
 
-  private Border border = BorderFactory.createEtchedBorder();
-  private GridBagLayout layoutMain = new GridBagLayout();
-  private JLabel labelCompany = new JLabel();
-  private JLabel labelCopyright = new JLabel();
-  private JLabel labelAuthor = new JLabel();
-  private JLabel labelTitle = new JLabel();
-  private JLabel labelVersion = new JLabel();
+  private JLabel titleLabel = new JLabel();
+  private JLabel titleValue = new JLabel();
+  private JLabel versionLabel = new JLabel();
+  private JLabel versionValue = new JLabel();
+  private JLabel authorLabel = new JLabel();
+  private JLabel authorValue = new JLabel();
+  private JLabel copyrightLabel = new JLabel();
+  private JLabel copyrightValue = new JLabel();
+  private JLabel companyLabel = new JLabel();
+  private JLabel companyValue = new JLabel();
+
+  private JLabel jvmLabel = new JLabel();
+  private JLabel jvmValue = new JLabel();
 
   public MainFrame_AboutBoxPanel() {
     try {
@@ -46,17 +51,42 @@ public class MainFrame_AboutBoxPanel extends JPanel {
   }
 
   private void jbInit() throws Exception {
-    this.setLayout(layoutMain);
-    this.setBorder(border);
-    labelTitle.setText("Title: " + CpoUtil.props.getProperty("cpoutil.title"));
-    labelVersion.setText("Version: " + CpoUtil.props.getProperty("cpoutil.version"));
-    labelAuthor.setText("Author: " + CpoUtil.props.getProperty("cpoutil.author"));
-    labelCopyright.setText("Copyright: " + CpoUtil.props.getProperty("cpoutil.copyright"));
-    labelCompany.setText("Company: " + CpoUtil.props.getProperty("cpoutil.company"));
-    this.add(labelTitle, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 15, 0, 15), 0, 0));
-    this.add(labelVersion, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 15, 0, 15), 0, 0));
-    this.add(labelAuthor, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 15, 0, 15), 0, 0));
-    this.add(labelCopyright, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 15, 0, 15), 0, 0));
-    this.add(labelCompany, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 15, 5, 15), 0, 0));
+    this.setLayout(new GridBagLayout());
+
+    titleLabel.setText("Title:");
+    this.add(titleLabel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
+
+    titleValue.setText(CpoUtil.props.getProperty("cpoutil.title"));
+    this.add(titleValue, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
+
+    versionLabel.setText("Version:");
+    this.add(versionLabel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
+
+    versionValue.setText(CpoUtil.props.getProperty("cpoutil.version"));
+    this.add(versionValue, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
+
+    authorLabel.setText("Author:");
+    this.add(authorLabel, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
+
+    authorValue.setText(CpoUtil.props.getProperty("cpoutil.author"));
+    this.add(authorValue, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
+
+    copyrightLabel.setText("Copyright:");
+    this.add(copyrightLabel, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
+
+    copyrightValue.setText(CpoUtil.props.getProperty("cpoutil.copyright"));
+    this.add(copyrightValue, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
+
+    companyLabel.setText("Company:");
+    this.add(companyLabel, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
+
+    companyValue.setText(CpoUtil.props.getProperty("cpoutil.company"));
+    this.add(companyValue, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
+
+    jvmLabel.setText("Java Version:");
+    this.add(jvmLabel, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
+
+    jvmValue.setText(System.getProperty("java.version"));
+    this.add(jvmValue, new GridBagConstraints(1, 5, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
   }
 }
