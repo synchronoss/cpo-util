@@ -1530,7 +1530,7 @@ public class Proxy implements Observer {
       }
     }
 
-    return generateClass(className, attributes, attClasses);
+    return generateClass(className, attributes, attClasses, null);
   }
 
   public String makeClassOuttaNode(CpoClassNode node) throws Exception {
@@ -1564,10 +1564,10 @@ public class Proxy implements Observer {
       attClasses.put(attName, attClass);
     }
 
-    return generateClass(className, attributes, attClasses);
+    return generateClass(className, attributes, attClasses, getQueryGroupLabelNode(node).children());
   }
 
-  private String generateClass(String className, Map<String, String> attributes, Map<String, Class> attClasses) {
+  private String generateClass(String className, Map<String, String> attributes, Map<String, Class> attClasses, Enumeration<CpoQueryGroupNode> queryGroupEnum) {
     StringBuilder buf = new StringBuilder();
 
     // generate class header
@@ -1580,6 +1580,26 @@ public class Proxy implements Observer {
 
     // generate class declaration
     buf.append("public class " + className + " implements java.io.Serializable {\n");
+    buf.append("\n");
+
+    // generate statics for query groups
+    buf.append("  /* Query group statics */\n");
+    if (queryGroupEnum != null) {
+      while (queryGroupEnum.hasMoreElements()) {
+        CpoQueryGroupNode cqgn = queryGroupEnum.nextElement();
+        String qgName = cqgn.getGroupName();
+        if (qgName == null)
+          qgName = "NULL";
+
+        String staticName = "QG_" + cqgn.getType() + "_" + qgName.toUpperCase();
+
+        if (cqgn.getGroupName() == null) {
+          buf.append("  public final static String " + staticName + " = null;\n");
+        } else {
+          buf.append("  public final static String " + staticName + " = \"" + qgName + "\";\n");
+        }
+      }
+    }
     buf.append("\n");
 
     // generate property declarations
