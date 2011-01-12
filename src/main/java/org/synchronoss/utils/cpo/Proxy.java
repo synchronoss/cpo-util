@@ -1501,32 +1501,34 @@ public class Proxy implements Observer {
     TreeMap<String, String> attributes = new TreeMap<String, String>();
     TreeMap<String, Class> attClasses = new TreeMap<String, Class>();
 
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
-    try {
-      pstmt = conn.prepareStatement(sql);
-      rs = pstmt.executeQuery();
-      ResultSetMetaData rsmd = rs.getMetaData();
-      int columns = rsmd.getColumnCount();
-      for (int i = 1 ; i <= columns ; i++) {
-        String attName = makeAttFromColName(rsmd.getColumnName(i));
-        OUT.debug("Column Type = "+rsmd.getColumnType(i));
-        Class<?> attClass = getSqlTypeClass(rsmd.getColumnType(i));
-        String attClassName = getRealClassName(attClass);
+    if (sql != null && sql.length() > 0) {
+      PreparedStatement pstmt = null;
+      ResultSet rs = null;
+      try {
+        pstmt = conn.prepareStatement(sql);
+        rs = pstmt.executeQuery();
+        ResultSetMetaData rsmd = rs.getMetaData();
+        int columns = rsmd.getColumnCount();
+        for (int i = 1 ; i <= columns ; i++) {
+          String attName = makeAttFromColName(rsmd.getColumnName(i));
+          OUT.debug("Column Type = "+rsmd.getColumnType(i));
+          Class<?> attClass = getSqlTypeClass(rsmd.getColumnType(i));
+          String attClassName = getRealClassName(attClass);
 
-        attributes.put(attName, attClassName);
-        attClasses.put(attName, attClass);
-      }
-    } finally {
-      try {
-        if (rs != null) rs.close();
-      } catch (Exception e) {
-        // ignore
-      }
-      try {
-        if (pstmt != null) pstmt.close();
-      } catch (Exception e) {
-        // ignore
+          attributes.put(attName, attClassName);
+          attClasses.put(attName, attClass);
+        }
+      } finally {
+        try {
+          if (rs != null) rs.close();
+        } catch (Exception e) {
+          // ignore
+        }
+        try {
+          if (pstmt != null) pstmt.close();
+        } catch (Exception e) {
+          // ignore
+        }
       }
     }
 
@@ -1761,32 +1763,35 @@ public class Proxy implements Observer {
         attMapParent = (CpoAttributeLabelNode)child;
     }
     if (attMapParent == null) throw new Exception ("Can't find the Attribute Label for this node: "+ccn);
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
-    try {
+
+    if (sql != null && sql.length() > 0) {
+      PreparedStatement pstmt = null;
+      ResultSet rs = null;
+      try {
         pstmt = conn.prepareStatement(sql);
-      rs = pstmt.executeQuery();
-      ResultSetMetaData rsmd = rs.getMetaData();
-      int columns = rsmd.getColumnCount();
-      for (int i = 1 ; i <= columns ; i++) {
-        CpoAttributeMapNode camn = new CpoAttributeMapNode(attMapParent,this.getNewGuid(),
-            ccn.getClassId(),rsmd.getColumnName(i),this.makeAttFromColName(rsmd.getColumnName(i)),
-            Statics.getJavaSqlType(rsmd.getColumnType(i)),null, null,null, "IN");
-        this.getAttributeMap(ccn).add(camn);
-        camn.setNew(true);
+        rs = pstmt.executeQuery();
+        ResultSetMetaData rsmd = rs.getMetaData();
+        int columns = rsmd.getColumnCount();
+        for (int i = 1 ; i <= columns ; i++) {
+          CpoAttributeMapNode camn = new CpoAttributeMapNode(attMapParent,this.getNewGuid(),
+              ccn.getClassId(),rsmd.getColumnName(i),this.makeAttFromColName(rsmd.getColumnName(i)),
+              Statics.getJavaSqlType(rsmd.getColumnType(i)),null, null,null, "IN");
+          this.getAttributeMap(ccn).add(camn);
+          camn.setNew(true);
+        }
+      } finally {
+        try {
+          if (rs != null) rs.close();
+        } catch (Exception e) {
+          // ignore
+        }
+        try {
+          if (pstmt != null) pstmt.close();
+        } catch (Exception e) {
+          // ignore
+        }
       }
-    } finally {
-      try {
-        if (rs != null) rs.close();
-      } catch (Exception e) {
-        // ignore
-      }
-      try {
-        if (pstmt != null) pstmt.close();
-      } catch (Exception e) {
-        // ignore
-      }
-    }    
+    }
   }
 
   public Collection<?> executeQueryGroup(Object obj, Object objReturnType, CpoQueryGroupNode cpoQGnode, boolean persist) throws Exception {
