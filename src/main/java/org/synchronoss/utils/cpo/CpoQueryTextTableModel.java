@@ -117,7 +117,7 @@ public class CpoQueryTextTableModel extends AbstractTableModel  {
         return;
       }
       if (usageCount == 0) {
-        (workingQueryList.get(rowIndex[i])).setRemove(true);
+        (workingQueryList.get(i)).setRemove(true);
         this.filter();
       }
       else {
