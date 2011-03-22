@@ -85,11 +85,13 @@ public class CpoServerNode extends AbstractCpoNode {
           count++;
           return cpoQTLN;
         }
+        AbstractCpoNode child = classes.get(count - 1);
         count++;
-        return classes.get(count-1);
+        return child;
       }
       public boolean hasMoreElements() {
-        return (count < classes.size());
+        // classes + the query text node
+        return (count < (classes.size() + 1));
       }
     };
   }
