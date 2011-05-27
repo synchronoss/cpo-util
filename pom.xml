@@ -30,6 +30,70 @@
   </ciManagement>
   <profiles>
     <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+        <property>
+          <name>!cpo.excludeDefaultProfile</name>
+        </property>
+      </activation>
+      <properties>
+        <cpo.assembly.id>dist</cpo.assembly.id>
+        <cpo.onejar.filename>${project.build.finalName}.one-jar.jar</cpo.onejar.filename>
+        <cpo.osx.filename>${project.build.finalName}.dmg</cpo.osx.filename>
+        <cpo.osx.bundleName>CpoUtil-${project.version}</cpo.osx.bundleName>
+      </properties>
+    </profile>
+    <profile>
+      <id>sncr</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <properties>
+        <cpoutil.bootstrapUrl>http://wiki.synchronoss.net/~components/sncrcpo/bootstrap.properties</cpoutil.bootstrapUrl>
+        <cpo.classifier>sncr</cpo.classifier>
+        <cpo.assembly.id>dist-${cpo.classifier}</cpo.assembly.id>
+        <cpo.onejar.filename>${project.build.finalName}-${cpo.classifier}.one-jar.jar</cpo.onejar.filename>
+        <cpo.osx.filename>${project.build.finalName}-${cpo.classifier}.dmg</cpo.osx.filename>
+        <cpo.osx.bundleName>CpoUtil-${project.version}-${cpo.classifier}</cpo.osx.bundleName>
+      </properties>
+    </profile>
+    <profile>
+      <id>mac</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <!-- the dmg only gets generated if you build on a mac, and hte build-helper plugin fails if the file doesn't exist -->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <version>1.5</version>
+            <executions>
+              <execution>
+                <id>attach-artifacts</id>
+                <phase>install</phase>
+                <goals>
+                  <goal>attach-artifact</goal>
+                </goals>
+                <configuration>
+                  <artifacts>
+                    <artifact>
+                      <file>${project.build.directory}/${cpo.osx.filename}</file>
+                      <type>dmg</type>
+                    </artifact>
+                  </artifacts>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>DEPLOY</id>
       <build>
         <plugins>
@@ -128,6 +192,13 @@
         <directory>src/main/resources</directory>
         <filtering>true</filtering>
       </resource>
+      <resource>
+        <directory>src/assemble</directory>
+        <includes>
+          <include>**/*.xml</include>
+        </includes>
+        <filtering>true</filtering>
+      </resource>
     </resources>
     <extensions>
       <extension>
@@ -205,17 +276,20 @@
               <addClasspath>true</addClasspath>
             </manifest>
           </archive>
+          <!-- breaks one-jar plugin -->
+          <!--<classifier>${cpo.classifier}</classifier>-->
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.dstovall</groupId>
         <artifactId>onejar-maven-plugin</artifactId>
-        <version>1.4.1</version>
+        <version>1.4.4</version>
         <executions>
           <execution>
+            <phase>package</phase>
             <configuration>
-              <onejarVersion>0.96</onejarVersion>
-              <classifier>one-jar</classifier>
+              <onejarVersion>0.97</onejarVersion>
+              <filename>${cpo.onejar.filename}</filename>
               <attachToBuild>true</attachToBuild>
             </configuration>
             <goals>
@@ -227,12 +301,14 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>osxappbundle-maven-plugin</artifactId>
-        <version>1.0-alpha-1</version>
+        <version>1.0-alpha-2</version>
         <configuration>
           <mainClass>org.synchronoss.utils.cpo.CpoUtil</mainClass>
           <iconFile>${basedir}/src/main/resources/sync-logo-sm.icns</iconFile>
           <javaApplicationStub>${basedir}/src/assemble/JavaApplicationStub</javaApplicationStub>
-          <bundleName>CpoUtil-${pom.version}</bundleName>
+          <bundleName>${cpo.osx.bundleName}</bundleName>
+          <diskImageFile>${project.build.directory}/${cpo.osx.filename}</diskImageFile>
+          <internetEnable>true</internetEnable>
         </configuration>
         <executions>
           <execution>
@@ -272,7 +348,7 @@
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
-      <version>1.2.13</version>
+      <version>1.2.16</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
