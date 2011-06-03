@@ -132,8 +132,8 @@ public class MainFrame extends JFrame {
   void menuFileBrowser_ActionPerformed(ActionEvent e) {
     try {
       final CpoBrowserPanel browserPanel = new CpoBrowserPanel();
-      this.jTabbedPane.addTab(browserPanel.getServer(),null,browserPanel,browserPanel.getDatabaseName()+" Revisions enabled: "+browserPanel.getProxy().revsEnabled);
-      this.statusBar.setText("Connected to: "+browserPanel.getServer()+" using "+browserPanel.getProxy().getConnectionClassName());
+      this.jTabbedPane.addTab(browserPanel.getServer(), null, browserPanel, browserPanel.getDatabaseName());
+      this.statusBar.setText("Connected to: " + browserPanel.getServer() + " using " + browserPanel.getProxy().getConnectionClassName());
       this.jTabbedPane.setSelectedComponent(browserPanel);
 
       JButton tabCloseButton = new JButton(closeIcon);

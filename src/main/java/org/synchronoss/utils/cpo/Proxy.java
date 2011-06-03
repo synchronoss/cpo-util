@@ -34,7 +34,6 @@ import java.sql.*;
 import java.util.*;
 
 public class Proxy implements Observer {
-  boolean revsEnabled = false;
   private Context ctx;
   private Properties defProps;
   private String server;
@@ -68,7 +67,6 @@ public class Proxy implements Observer {
     this.server = server;
     this.cpoTree = cpoTree;
     getConnection();
-    checkForRevsEnabled();
     loadProtectedClasses();
   }
   
@@ -203,27 +201,6 @@ public class Proxy implements Observer {
       OUT.debug("About to return initial context");
   }
 
-  private void checkForRevsEnabled() {
-    StringBuilder sql = new StringBuilder("select distinct userid from ");
-    sql.append(tablePrefix);
-    sql.append("cpo_class_rev");
-    
-    PreparedStatement pstmt = null;
-    try {
-      pstmt = conn.prepareStatement(sql.toString());
-      pstmt.executeQuery();
-      revsEnabled = true;
-    } catch (Exception e) {
-      // ignore
-    } finally {
-      try {
-        if (pstmt != null) pstmt.close();
-      } catch (Exception e) {
-        // ignore
-      }
-    }
-  }
-
   private void loadProtectedClasses() {
     String url = connProps.getProperty("cpoutil.protectedClasses." + server);
     if (OUT.isDebugEnabled()) OUT.debug("Connection Protected Classes Url: " + url);
@@ -317,23 +294,15 @@ public class Proxy implements Observer {
     ResultSet rs = null;
     try {
       StringBuilder sql = new StringBuilder();
-      if (revsEnabled) {
-        sql.append("select class_id, name, userid, createdate from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_class order by upper(name)");
-      } else {
-        sql.append("select class_id, name from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_class order by upper(name)");
-      }
+      sql.append("select class_id, name, userid, createdate from ");
+      sql.append(tablePrefix);
+      sql.append("cpo_class order by upper(name)");
       pstmt = conn.prepareStatement(sql.toString());
       rs = pstmt.executeQuery();
       while (rs.next()) {
         CpoClassNode cpoClassNode = new CpoClassNode(rs.getString("name"),rs.getString("class_id"),parent);
-        if (revsEnabled) {
-          cpoClassNode.setUserName(rs.getString("userid"));
-          cpoClassNode.setCreateDate(rs.getTimestamp("createdate"));
-        }
+        cpoClassNode.setUserName(rs.getString("userid"));
+        cpoClassNode.setCreateDate(rs.getTimestamp("createdate"));
         cpoClassNode.setProtected(this.isClassProtected(cpoClassNode.getClassName()));
         al.add(cpoClassNode);
         classCacheById.put(cpoClassNode.getClassId(),cpoClassNode);
@@ -403,29 +372,18 @@ public class Proxy implements Observer {
     ResultSet rs = null;
     try {
       StringBuilder sql = new StringBuilder();
-      if (revsEnabled) {
-        sql.append("select text.text_id, text.sql_text, text.description, (select count(*) from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_query where text_id = text.text_id) as usagecount, text.userid, text.createdate from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_query_text text order by text.description");
-      } else {
-        sql.append("select text.text_id, text.sql_text, text.description, count(query.text_id) as usagecount from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_query_text text, ");
-        sql.append(tablePrefix);
-        sql.append("cpo_query query WHERE text.text_id = query.text_id GROUP BY text.text_id, text.sql_text, text.description order by text.description");
-      }
+      sql.append("select text.text_id, text.sql_text, text.description, (select count(*) from ");
+      sql.append(tablePrefix);
+      sql.append("cpo_query where text_id = text.text_id) as usagecount, text.userid, text.createdate from ");
+      sql.append(tablePrefix);
+      sql.append("cpo_query_text text order by text.description");
       pstmt = conn.prepareStatement(sql.toString());
       rs = pstmt.executeQuery();
       while (rs.next()) {
-        CpoQueryTextNode cpoQTNode = new CpoQueryTextNode(rs.getString("text_id"),
-            rs.getString("sql_text"),rs.getString("description"),parent);
+        CpoQueryTextNode cpoQTNode = new CpoQueryTextNode(rs.getString("text_id"), rs.getString("sql_text"),rs.getString("description"),parent);
         cpoQTNode.setUsageCount(rs.getInt("usagecount"));
-        if (revsEnabled) {
-          cpoQTNode.setUserName(rs.getString("userid"));
-          cpoQTNode.setCreateDate(rs.getTimestamp("createdate"));
-        }
+        cpoQTNode.setUserName(rs.getString("userid"));
+        cpoQTNode.setCreateDate(rs.getTimestamp("createdate"));
         al.add(cpoQTNode);
       }
     } finally {
@@ -453,30 +411,19 @@ public class Proxy implements Observer {
     ResultSet rs = null;
     try {
     	StringBuilder sql = new StringBuilder();
-      if (revsEnabled) {
-        sql.append("select group_id, class_id, group_type, name, userid, createdate from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_query_group where group_id in ");
-        sql.append("(select group_id from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_query where text_id = ?) order by name, group_type, group_id");
-      } else {
-        sql.append("select group_id, class_id, group_type, name from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_query_group where group_id in ");
-        sql.append("(select group_id from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_query where text_id = ?) order by name, group_type, group_id");
-      }
+      sql.append("select group_id, class_id, group_type, name, userid, createdate from ");
+      sql.append(tablePrefix);
+      sql.append("cpo_query_group where group_id in ");
+      sql.append("(select group_id from ");
+      sql.append(tablePrefix);
+      sql.append("cpo_query where text_id = ?) order by name, group_type, group_id");
       pstmt = conn.prepareStatement(sql.toString());
       pstmt.setString(1,textNode.getTextId());
       rs = pstmt.executeQuery();
       while (rs.next()) {
         CpoQueryGroupNode cpoQueryGroupNode = new CpoQueryGroupNode(rs.getString("name"),rs.getString("class_id"), rs.getString("group_id"), rs.getString("group_type"),null);
-        if (revsEnabled) {
-          cpoQueryGroupNode.setUserName(rs.getString("userid"));
-          cpoQueryGroupNode.setCreateDate(rs.getTimestamp("createdate"));
-        }
+        cpoQueryGroupNode.setUserName(rs.getString("userid"));
+        cpoQueryGroupNode.setCreateDate(rs.getTimestamp("createdate"));
         al.add(cpoQueryGroupNode);
       }
     } finally {
@@ -504,24 +451,16 @@ public class Proxy implements Observer {
     ResultSet rs = null;
     try {
     	StringBuilder sql = new StringBuilder();
-      if (revsEnabled) {
-    	  sql.append("select group_id, class_id, group_type, name, userid, createdate from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_query_group where class_id = ? order by name, group_type, group_id");
-      } else {
-    	  sql.append("select group_id, class_id, group_type, name from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_query_group where class_id = ? order by name, group_type, group_id");
-      }
+      sql.append("select group_id, class_id, group_type, name, userid, createdate from ");
+      sql.append(tablePrefix);
+      sql.append("cpo_query_group where class_id = ? order by name, group_type, group_id");
       pstmt = conn.prepareStatement(sql.toString());
       pstmt.setString(1,((CpoClassNode)parent.getParent()).getClassId());
       rs = pstmt.executeQuery();
       while (rs.next()) {
         CpoQueryGroupNode cpoQueryGroupNode = new CpoQueryGroupNode(rs.getString("name"),rs.getString("class_id"), rs.getString("group_id"), rs.getString("group_type"),parent);
-        if (revsEnabled) {
-          cpoQueryGroupNode.setUserName(rs.getString("userid"));
-          cpoQueryGroupNode.setCreateDate(rs.getTimestamp("createdate"));
-        }
+        cpoQueryGroupNode.setUserName(rs.getString("userid"));
+        cpoQueryGroupNode.setCreateDate(rs.getTimestamp("createdate"));
         al.add(cpoQueryGroupNode);
       }
     } finally {
@@ -573,28 +512,17 @@ public class Proxy implements Observer {
     ResultSet rs = null;
     try {
     	StringBuilder sql = new StringBuilder();
-      if (revsEnabled) {
-        sql.append("select q.query_id, q.group_id, q.text_id, q.seq_no, q.userid, q.createdate from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_query q where q.group_id = ? order by q.seq_no");
-      } else {
-        sql.append("select q.query_id, q.group_id, q.text_id, q.seq_no from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_query q where q.group_id = ? order by q.seq_no");
-      }
+      sql.append("select q.query_id, q.group_id, q.text_id, q.seq_no, q.userid, q.createdate from ");
+      sql.append(tablePrefix);
+      sql.append("cpo_query q where q.group_id = ? order by q.seq_no");
       pstmt = conn.prepareStatement(sql.toString());
       pstmt.setString(1,parent.getGroupId());
       rs = pstmt.executeQuery();
       while (rs.next()) {
-        CpoQueryTextNode cQTnode = this.getQueryText(
-            (CpoServerNode)parent.getParent().getParent().getParent(),rs.getString("text_id"));
-        CpoQueryNode cpoQueryNode = new CpoQueryNode(rs.getString("query_id"),
-            rs.getString("group_id"), rs.getInt("seq_no"),
-            cQTnode,parent);
-        if (revsEnabled) {
-          cpoQueryNode.setUserName(rs.getString("userid"));
-          cpoQueryNode.setCreateDate(rs.getTimestamp("createdate"));
-        }
+        CpoQueryTextNode cQTnode = this.getQueryText((CpoServerNode)parent.getParent().getParent().getParent(),rs.getString("text_id"));
+        CpoQueryNode cpoQueryNode = new CpoQueryNode(rs.getString("query_id"), rs.getString("group_id"), rs.getInt("seq_no"), cQTnode,parent);
+        cpoQueryNode.setUserName(rs.getString("userid"));
+        cpoQueryNode.setCreateDate(rs.getTimestamp("createdate"));
         al.add(cpoQueryNode);
       }
     } finally {
@@ -625,15 +553,9 @@ public class Proxy implements Observer {
     ResultSet rs = null;
     try {
     	StringBuilder sql = new StringBuilder();
-      if (revsEnabled) {
-        sql.append("select qp.attribute_id, qp.query_id, qp.seq_no, qp.param_type, qp.userid, qp.createdate from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_query_parameter qp where query_id = ? order by qp.seq_no");
-      } else {
-        sql.append("select qp.attribute_id, qp.query_id, qp.seq_no, qp.param_type from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_query_parameter qp where query_id = ? order by qp.seq_no");
-      }
+      sql.append("select qp.attribute_id, qp.query_id, qp.seq_no, qp.param_type, qp.userid, qp.createdate from ");
+      sql.append(tablePrefix);
+      sql.append("cpo_query_parameter qp where query_id = ? order by qp.seq_no");
       pstmt = conn.prepareStatement(sql.toString());
       pstmt.setString(1,qNode.getQueryId());
       rs = pstmt.executeQuery();
@@ -642,10 +564,8 @@ public class Proxy implements Observer {
             getAttributeMap((CpoServerNode)qNode.getParent().getParent().getParent().getParent(),rs.getString("attribute_id")),
             rs.getString("param_type"));
         
-        if (revsEnabled) {
-          cpoQPB.setUserName(rs.getString("userid"));
-          cpoQPB.setCreateDate(rs.getTimestamp("createdate"));
-        }
+        cpoQPB.setUserName(rs.getString("userid"));
+        cpoQPB.setCreateDate(rs.getTimestamp("createdate"));
         al.add(cpoQPB);
       }
     } finally {
@@ -714,17 +634,10 @@ public class Proxy implements Observer {
     ResultSet rs = null;
     try {
     	StringBuilder sql = new StringBuilder();
-      if (revsEnabled) {
-        sql.append("select am.attribute_id, am.class_id, am.column_name, am.attribute, am.column_type, ");
-        sql.append("am.transform_class, am.db_table, am.db_column, am.userid, am.createdate from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_attribute_map am where am.class_id = ? order by am.attribute");
-      } else {
-        sql.append("select am.attribute_id, am.class_id, am.column_name, am.attribute, am.column_type, ");
-        sql.append("am.transform_class, am.db_table, am.db_column from ");
-        sql.append(tablePrefix);
-        sql.append("cpo_attribute_map am where am.class_id = ? order by am.attribute");
-      }
+      sql.append("select am.attribute_id, am.class_id, am.column_name, am.attribute, am.column_type, ");
+      sql.append("am.transform_class, am.db_table, am.db_column, am.userid, am.createdate from ");
+      sql.append(tablePrefix);
+      sql.append("cpo_attribute_map am where am.class_id = ? order by am.attribute");
       pstmt = conn.prepareStatement(sql.toString());
       pstmt.setString(1,((CpoClassNode)cpoAttLabNode.getParent()).getClassId());
       rs = pstmt.executeQuery();
@@ -733,10 +646,8 @@ public class Proxy implements Observer {
             rs.getString("class_id"), rs.getString("column_name"), 
             rs.getString("attribute"), rs.getString("column_type"), rs.getString("transform_class"),
             rs.getString("db_table"), rs.getString("db_column"),"IN");
-        if (revsEnabled) {
-          cpoAB.setUserName(rs.getString("userid"));
-          cpoAB.setCreateDate(rs.getTimestamp("createdate"));
-        }
+        cpoAB.setUserName(rs.getString("userid"));
+        cpoAB.setCreateDate(rs.getTimestamp("createdate"));
         al.add(cpoAB);
       }
     } finally {
@@ -895,27 +806,22 @@ public class Proxy implements Observer {
       List<AbstractCpoNode> toBeCleaned = new ArrayList<AbstractCpoNode>();
       for (AbstractCpoNode node : nodes) {
         if (node instanceof CpoClassNode) {
-          CpoClassNode ccn = (CpoClassNode)node;
+          CpoClassNode ccn = (CpoClassNode) node;
           if (ccn.isNew()) {
-        	  StringBuilder sql = new StringBuilder();
-            if (revsEnabled) {
-              sql.append("insert into ");
-              sql.append(tablePrefix);
-              sql.append("cpo_class (class_id, name, userid) ");
-              sql.append("values (?,?,'");
-              sql.append(CpoUtil.username);
-              sql.append("')");
-            } else {
-              sql.append("insert into ");
-              sql.append(tablePrefix);
-              sql.append("cpo_class (class_id, name) values (?,?)");
-            }
+            StringBuilder sql = new StringBuilder();
+            sql.append("insert into ");
+            sql.append(tablePrefix);
+            sql.append("cpo_class (class_id, name, userid) ");
+            sql.append("values (?,?,'");
+            sql.append(CpoUtil.username);
+            sql.append("')");
+
             pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1,ccn.getClassId());
-            pstmt.setString(2,ccn.getClassName());
+            pstmt.setString(1, ccn.getClassId());
+            pstmt.setString(2, ccn.getClassName());
             pstmt.executeUpdate();
           } else if (ccn.isRemove()) {
-        	  StringBuilder sqlDelQueryParam=new StringBuilder("delete from ");
+            StringBuilder sqlDelQueryParam = new StringBuilder("delete from ");
             sqlDelQueryParam.append(tablePrefix);
             sqlDelQueryParam.append("cpo_query_parameter where query_id in ");
             sqlDelQueryParam.append("(select query_id from ");
@@ -924,72 +830,68 @@ public class Proxy implements Observer {
             sqlDelQueryParam.append("(select group_id from ");
             sqlDelQueryParam.append(tablePrefix);
             sqlDelQueryParam.append("cpo_query_group where class_id = ?))");
-            
-        	  StringBuilder sqlDelAttMap=new StringBuilder("delete from ");
-        	  sqlDelAttMap.append(tablePrefix);
-        	  sqlDelAttMap.append("cpo_attribute_map where class_id = ?");
-            
-        	  StringBuilder sqlDelQuery=new StringBuilder("delete from ");
-        	  sqlDelQuery.append(tablePrefix);
-        	  sqlDelQuery.append("cpo_query where group_id in ");
+
+            StringBuilder sqlDelAttMap = new StringBuilder("delete from ");
+            sqlDelAttMap.append(tablePrefix);
+            sqlDelAttMap.append("cpo_attribute_map where class_id = ?");
+
+            StringBuilder sqlDelQuery = new StringBuilder("delete from ");
+            sqlDelQuery.append(tablePrefix);
+            sqlDelQuery.append("cpo_query where group_id in ");
             sqlDelQuery.append("(select group_id from ");
             sqlDelQuery.append(tablePrefix);
             sqlDelQuery.append("cpo_query_group where class_id = ?)");
 
-        	  StringBuilder sqlDelQueryGroup=new StringBuilder("delete from ");
+            StringBuilder sqlDelQueryGroup = new StringBuilder("delete from ");
             sqlDelQueryGroup.append(tablePrefix);
             sqlDelQueryGroup.append("cpo_query_group where class_id = ?");
 
-        	  StringBuilder sqlDelClass=new StringBuilder("delete from ");
+            StringBuilder sqlDelClass = new StringBuilder("delete from ");
             sqlDelClass.append(tablePrefix);
             sqlDelClass.append("cpo_class where class_id = ?");
-		
+
             pstmt = conn.prepareStatement(sqlDelQueryParam.toString());
-            pstmt.setString(1,ccn.getClassId());
+            pstmt.setString(1, ccn.getClassId());
             pstmt.execute();
             pstmt.close();
-            
+
             pstmt = conn.prepareStatement(sqlDelAttMap.toString());
-            pstmt.setString(1,ccn.getClassId());
+            pstmt.setString(1, ccn.getClassId());
             pstmt.execute();
             pstmt.close();
-            
+
             pstmt = conn.prepareStatement(sqlDelQuery.toString());
-            pstmt.setString(1,ccn.getClassId());
+            pstmt.setString(1, ccn.getClassId());
             pstmt.execute();
             pstmt.close();
-            
+
             pstmt = conn.prepareStatement(sqlDelQueryGroup.toString());
-            pstmt.setString(1,ccn.getClassId());
+            pstmt.setString(1, ccn.getClassId());
             pstmt.execute();
             pstmt.close();
-            
+
             pstmt = conn.prepareStatement(sqlDelClass.toString());
-            pstmt.setString(1,ccn.getClassId());
+            pstmt.setString(1, ccn.getClassId());
             pstmt.execute();
           } else if (ccn.isDirty()) {
-        	  StringBuilder sql = new StringBuilder();
-            if (revsEnabled) {
-              sql.append("update ");
-              sql.append(tablePrefix);
-              sql.append("cpo_class set name = ?, userid = '");
-              sql.append(CpoUtil.username);
-              sql.append("' where class_id = ?");
-            } else {
-              sql.append("update ");
-              sql.append(tablePrefix);
-              sql.append("cpo_class set name = ? where class_id = ?");
-            }
+            StringBuilder sql = new StringBuilder();
+            sql.append("update ");
+            sql.append(tablePrefix);
+            sql.append("cpo_class set name = ?, userid = '");
+            sql.append(CpoUtil.username);
+            sql.append("' where class_id = ?");
             pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1,ccn.getClassName());
-            pstmt.setString(2,ccn.getClassId());
+            pstmt.setString(1, ccn.getClassName());
+            pstmt.setString(2, ccn.getClassId());
             pstmt.executeUpdate();
           }
-        } else
+        } else {
           continue;
+        }
         toBeCleaned.add(node);
-        if (pstmt != null)
+        if (pstmt != null) {
           pstmt.close();
+        }
       }
 
       /**
@@ -997,100 +899,84 @@ public class Proxy implements Observer {
        */
       for (AbstractCpoNode node : nodes) {
         if (node instanceof CpoAttributeMapNode) {
-          CpoAttributeMapNode camn = (CpoAttributeMapNode)node;
+          CpoAttributeMapNode camn = (CpoAttributeMapNode) node;
           if (camn.isNew()) {
-        	  StringBuilder sql = new StringBuilder();
-            if (revsEnabled) {
-              sql.append("insert into ");
-              sql.append(tablePrefix);
-              sql.append("cpo_attribute_map (attribute_id, class_id, ");
-              sql.append("column_name, attribute, column_type, db_table, db_column, userid, transform_class) ");
-              sql.append("values (?,?,?,?,?,?,?,'");
-              sql.append(CpoUtil.username);
-              sql.append("',?)");
-            } else {
-              sql.append("insert into ");
-              sql.append(tablePrefix);
-              sql.append("cpo_attribute_map (attribute_id, class_id, ");
-              sql.append("column_name, attribute, column_type, db_table, db_column,transform_class) ");
-              sql.append("values (?,?,?,?,?,?,?,?)");
-            }
+            StringBuilder sql = new StringBuilder();
+            sql.append("insert into ");
+            sql.append(tablePrefix);
+            sql.append("cpo_attribute_map (attribute_id, class_id, ");
+            sql.append("column_name, attribute, column_type, db_table, db_column, userid, transform_class) ");
+            sql.append("values (?,?,?,?,?,?,?,'");
+            sql.append(CpoUtil.username);
+            sql.append("',?)");
+
             pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1,camn.getAttributeId());
-            pstmt.setString(2,camn.getClassId());
-            pstmt.setString(3,camn.getColumnName());
-            pstmt.setString(4,camn.getAttribute());
-            pstmt.setString(5,camn.getColumnType());
-            pstmt.setString(6,camn.getDbTable());
-            pstmt.setString(7,camn.getDbColumn());
-            pstmt.setString(8,camn.getTransformClass());
+            pstmt.setString(1, camn.getAttributeId());
+            pstmt.setString(2, camn.getClassId());
+            pstmt.setString(3, camn.getColumnName());
+            pstmt.setString(4, camn.getAttribute());
+            pstmt.setString(5, camn.getColumnType());
+            pstmt.setString(6, camn.getDbTable());
+            pstmt.setString(7, camn.getDbColumn());
+            pstmt.setString(8, camn.getTransformClass());
             pstmt.executeUpdate();
           } else if (camn.isRemove()) {
             StringBuilder sql = new StringBuilder("delete from ");
             sql.append(tablePrefix);
             sql.append("cpo_attribute_map where attribute_id = ?");
             pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1,camn.getAttributeId());
+            pstmt.setString(1, camn.getAttributeId());
             pstmt.execute();
           } else if (camn.isDirty()) {
             //  update everything except class_id - might want to change this later...
             StringBuilder sql = new StringBuilder();
-            if (revsEnabled) {
-              sql.append("update ");
-              sql.append(tablePrefix);
-              sql.append("cpo_attribute_map set ");
-              sql.append("column_name = ?, attribute = ?, column_type = ?, db_table = ?, ");
-              sql.append("db_column = ?, userid = '");
-              sql.append(CpoUtil.username);
-              sql.append("', transform_class=? where attribute_id = ?");
-            } else {
-              sql.append("update ");
-              sql.append(tablePrefix);
-              sql.append("cpo_attribute_map set ");
-              sql.append("column_name = ?, attribute = ?, column_type = ?, db_table = ?, ");
-              sql.append("db_column = ?, transform_class=? where attribute_id = ?");
-            }
+            sql.append("update ");
+            sql.append(tablePrefix);
+            sql.append("cpo_attribute_map set ");
+            sql.append("column_name = ?, attribute = ?, column_type = ?, db_table = ?, ");
+            sql.append("db_column = ?, userid = '");
+            sql.append(CpoUtil.username);
+            sql.append("', transform_class=? where attribute_id = ?");
+
             pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1,camn.getColumnName());
-            pstmt.setString(2,camn.getAttribute());
-            pstmt.setString(3,camn.getColumnType());
-            pstmt.setString(4,camn.getDbTable());
-            pstmt.setString(5,camn.getDbColumn());
-            pstmt.setString(6,camn.getTransformClass());
-            pstmt.setString(7,camn.getAttributeId());
+            pstmt.setString(1, camn.getColumnName());
+            pstmt.setString(2, camn.getAttribute());
+            pstmt.setString(3, camn.getColumnType());
+            pstmt.setString(4, camn.getDbTable());
+            pstmt.setString(5, camn.getDbColumn());
+            pstmt.setString(6, camn.getTransformClass());
+            pstmt.setString(7, camn.getAttributeId());
             pstmt.executeUpdate();
           }
-        } else
+        } else {
           continue;
+        }
         toBeCleaned.add(node);
-        if (pstmt != null)
+        if (pstmt != null) {
           pstmt.close();
+        }
       }
+
       /**
        * do query groups
        */
       for (AbstractCpoNode node : nodes) {
         if (node instanceof CpoQueryGroupNode) {
-          CpoQueryGroupNode cqgn = (CpoQueryGroupNode)node;
+          CpoQueryGroupNode cqgn = (CpoQueryGroupNode) node;
           if (cqgn.isNew()) {
-        	  StringBuilder sql = new StringBuilder();
-            if (revsEnabled) {
-              sql.append("insert into ");
-              sql.append(tablePrefix);
-              sql.append("cpo_query_group (group_id, class_id, group_type, ");
-              sql.append("name,userid) values (?,?,?,?,'");
-              sql.append(CpoUtil.username);
-              sql.append("')");
-            } else {
-              sql.append("insert into ");
-              sql.append(tablePrefix);
-              sql.append("cpo_query_group (group_id, class_id, group_type,name) values (?,?,?,?)");
-            }
+            StringBuilder sql = new StringBuilder();
+            sql.append("insert into ");
+            sql.append(tablePrefix);
+            sql.append("cpo_query_group (group_id, class_id, group_type, ");
+            sql.append("name,userid) values (?,?,?,?,'");
+            sql.append(CpoUtil.username);
+            sql.append("')");
+
             pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1,cqgn.getGroupId());
-            pstmt.setString(2,cqgn.getClassId());
-            pstmt.setString(3,cqgn.getType());
-            pstmt.setString(4,cqgn.getGroupName());
+            pstmt.setString(1, cqgn.getGroupId());
+            pstmt.setString(2, cqgn.getClassId());
+            pstmt.setString(3, cqgn.getType());
+            pstmt.setString(4, cqgn.getGroupName());
             pstmt.executeUpdate();
           } else if (cqgn.isRemove()) {
             StringBuilder sqlDelQueryParam = new StringBuilder("delete from ");
@@ -1099,259 +985,233 @@ public class Proxy implements Observer {
             sqlDelQueryParam.append("(select query_id from ");
             sqlDelQueryParam.append(tablePrefix);
             sqlDelQueryParam.append("cpo_query where group_id = ?)");
-                        
+
             StringBuilder sqlDelQuery = new StringBuilder("delete from ");
             sqlDelQuery.append(tablePrefix);
             sqlDelQuery.append("cpo_query where group_id = ?");
-                        
+
             StringBuilder sqlDelQueryGroup = new StringBuilder("delete from ");
             sqlDelQueryGroup.append(tablePrefix);
             sqlDelQueryGroup.append("cpo_query_group where group_id = ?");
-                        
+
             pstmt = conn.prepareStatement(sqlDelQueryParam.toString());
-            pstmt.setString(1,cqgn.getGroupId());
+            pstmt.setString(1, cqgn.getGroupId());
             pstmt.execute();
             pstmt.close();
-            
+
             pstmt = conn.prepareStatement(sqlDelQuery.toString());
-            pstmt.setString(1,cqgn.getGroupId());
+            pstmt.setString(1, cqgn.getGroupId());
             pstmt.execute();
             pstmt.close();
-            
+
             pstmt = conn.prepareStatement(sqlDelQueryGroup.toString());
-            pstmt.setString(1,cqgn.getGroupId());
+            pstmt.setString(1, cqgn.getGroupId());
             pstmt.execute();
           } else if (cqgn.isDirty()) {
             StringBuilder sql = new StringBuilder();
-            if (revsEnabled) {
-              sql.append("update ");
-              sql.append(tablePrefix);
-              sql.append("cpo_query_group set group_type = ?, name = ?, userid = '");
-              sql.append(CpoUtil.username);
-              sql.append("' where group_id = ?");
-            } else {
-              sql.append("update ");
-              sql.append(tablePrefix);
-              sql.append("cpo_query_group set group_type = ?, name = ? where group_id = ?");
-            }
+            sql.append("update ");
+            sql.append(tablePrefix);
+            sql.append("cpo_query_group set group_type = ?, name = ?, userid = '");
+            sql.append(CpoUtil.username);
+            sql.append("' where group_id = ?");
+
             pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1,cqgn.getType());
-            pstmt.setString(2,cqgn.getGroupName());
-            pstmt.setString(3,cqgn.getGroupId());
+            pstmt.setString(1, cqgn.getType());
+            pstmt.setString(2, cqgn.getGroupName());
+            pstmt.setString(3, cqgn.getGroupId());
             pstmt.executeUpdate();
           }
-        }
-        else
+        } else {
           continue;
+        }
         toBeCleaned.add(node);
-        if (pstmt != null)
+        if (pstmt != null) {
           pstmt.close();
+        }
       }
+
       /**
        * do query text
        */
       for (AbstractCpoNode node : nodes) {
         if (node instanceof CpoQueryTextNode) {
-          CpoQueryTextNode cQTnode = (CpoQueryTextNode)node;
+          CpoQueryTextNode cQTnode = (CpoQueryTextNode) node;
           // strip sql of CRs
           String sqlText = cQTnode.getSQL();
-          if (sqlText == null) sqlText = "";
-          else sqlText = sqlText.trim();      
+          if (sqlText == null)
+            sqlText = "";
+          else
+            sqlText = sqlText.trim();
           try {
             RE reStripBlankLines = new RE("\\r\\n\\s*\\r\\n");
-            sqlText = reStripBlankLines.substituteAll(sqlText,"\r\n");
+            sqlText = reStripBlankLines.substituteAll(sqlText, "\r\n");
             RE reStripBlankLines2 = new RE("\\n\\s*\\n");
-            sqlText = reStripBlankLines2.substituteAll(sqlText,"\n");
+            sqlText = reStripBlankLines2.substituteAll(sqlText, "\n");
           } catch (REException ree) {
             CpoUtil.showException(ree);
           }
           if (cQTnode.isNew()) {
-        	  StringBuilder insertTextId=new StringBuilder();
-            if (revsEnabled) {
-              insertTextId.append("insert into ");
-              insertTextId.append(tablePrefix);
-              insertTextId.append("cpo_query_text (text_id, sql_text, description,userid) ");
-              insertTextId.append("values (?,?,?,'");
-              insertTextId.append(CpoUtil.username);
-              insertTextId.append("')");
-            } else {
-              insertTextId.append("insert into ");
-              insertTextId.append(tablePrefix);
-              insertTextId.append("cpo_query_text (text_id, sql_text, description) values (?,?,?)");
-            }
+            StringBuilder insertTextId = new StringBuilder();
+            insertTextId.append("insert into ");
+            insertTextId.append(tablePrefix);
+            insertTextId.append("cpo_query_text (text_id, sql_text, description,userid) ");
+            insertTextId.append("values (?,?,?,'");
+            insertTextId.append(CpoUtil.username);
+            insertTextId.append("')");
+
             pstmt = conn.prepareStatement(insertTextId.toString());
-            pstmt.setString(1,cQTnode.getTextId());
-            pstmt.setString(2,sqlText);
-            pstmt.setString(3,cQTnode.getDesc());
+            pstmt.setString(1, cQTnode.getTextId());
+            pstmt.setString(2, sqlText);
+            pstmt.setString(3, cQTnode.getDesc());
             pstmt.executeUpdate();
           } else if (cQTnode.isRemove()) {
-            StringBuilder removeTextId=new StringBuilder("delete from ");
+            StringBuilder removeTextId = new StringBuilder("delete from ");
             removeTextId.append(tablePrefix);
             removeTextId.append("cpo_query_text where text_id = ?");
+
             pstmt = conn.prepareStatement(removeTextId.toString());
-            pstmt.setString(1,cQTnode.getTextId());
+            pstmt.setString(1, cQTnode.getTextId());
             pstmt.execute();
           } else if (cQTnode.isDirty()) {
-        	  StringBuilder updateTextId=new StringBuilder();
-            if (revsEnabled) {
-              updateTextId.append("update ");
-              updateTextId.append(tablePrefix);
-              updateTextId.append("cpo_query_text set sql_text = ?, description = ?, userid = '");
-              updateTextId.append(CpoUtil.username);
-              updateTextId.append("' where text_id = ?");
-            } else {
-              updateTextId.append("update ");
-              updateTextId.append(tablePrefix);
-              updateTextId.append("cpo_query_text set sql_text = ?, description = ? where text_id = ?");
-            }
+            StringBuilder updateTextId = new StringBuilder();
+            updateTextId.append("update ");
+            updateTextId.append(tablePrefix);
+            updateTextId.append("cpo_query_text set sql_text = ?, description = ?, userid = '");
+            updateTextId.append(CpoUtil.username);
+            updateTextId.append("' where text_id = ?");
+
             pstmt = conn.prepareStatement(updateTextId.toString());
-            pstmt.setString(1,sqlText);
-            pstmt.setString(2,cQTnode.getDesc());
-            pstmt.setString(3,cQTnode.getTextId());
+            pstmt.setString(1, sqlText);
+            pstmt.setString(2, cQTnode.getDesc());
+            pstmt.setString(3, cQTnode.getTextId());
             pstmt.executeUpdate();
           }
-        }
-        else
+        } else {
           continue;
+        }
         toBeCleaned.add(node);
-        if (pstmt != null)
+        if (pstmt != null) {
           pstmt.close();
+        }
       }
+
       /**
        * do query node
        */
       for (AbstractCpoNode node : nodes) {
         if (node instanceof CpoQueryNode) {
-          CpoQueryNode cqn = (CpoQueryNode)node;
+          CpoQueryNode cqn = (CpoQueryNode) node;
           if (cqn.isNew()) {
-        	  StringBuilder sql = new StringBuilder();
-            if (revsEnabled) {
-              sql.append("insert into ");
-              sql.append(tablePrefix);
-              sql.append("cpo_query (query_id, group_id, text_id, seq_no, userid) ");
-              sql.append("values (?,?,?,?,'");
-              sql.append(CpoUtil.username);
-              sql.append("')");
-            } else {
-              sql.append("insert into ");
-              sql.append(tablePrefix);
-              sql.append("cpo_query (query_id, group_id, text_id, seq_no) ");
-              sql.append("values (?,?,?,?)");
-            }
+            StringBuilder sql = new StringBuilder();
+            sql.append("insert into ");
+            sql.append(tablePrefix);
+            sql.append("cpo_query (query_id, group_id, text_id, seq_no, userid) ");
+            sql.append("values (?,?,?,?,'");
+            sql.append(CpoUtil.username);
+            sql.append("')");
+
             pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1,cqn.getQueryId());
-            pstmt.setString(2,cqn.getGroupId());
-            pstmt.setString(3,cqn.getTextId());
-            pstmt.setInt(4,cqn.getSeqNo());
+            pstmt.setString(1, cqn.getQueryId());
+            pstmt.setString(2, cqn.getGroupId());
+            pstmt.setString(3, cqn.getTextId());
+            pstmt.setInt(4, cqn.getSeqNo());
             pstmt.executeUpdate();
           } else if (cqn.isRemove()) {
-            StringBuilder sqlDelQueryParam=new StringBuilder("delete from ");
+            StringBuilder sqlDelQueryParam = new StringBuilder("delete from ");
             sqlDelQueryParam.append(tablePrefix);
             sqlDelQueryParam.append("cpo_query_parameter where query_id = ?");
-                    	  
-            StringBuilder sqlDelQuery=new StringBuilder("delete from ");
+
+            StringBuilder sqlDelQuery = new StringBuilder("delete from ");
             sqlDelQuery.append(tablePrefix);
             sqlDelQuery.append("cpo_query where query_id = ?");
-                
+
             pstmt = conn.prepareStatement(sqlDelQueryParam.toString());
-            pstmt.setString(1,cqn.getQueryId());
+            pstmt.setString(1, cqn.getQueryId());
             pstmt.execute();
             pstmt.close();
-                        
+
             pstmt = conn.prepareStatement(sqlDelQuery.toString());
-            pstmt.setString(1,cqn.getQueryId());
+            pstmt.setString(1, cqn.getQueryId());
             pstmt.execute();
           } else if (cqn.isDirty()) {
             // not updating group_id ... could change later
-        	  StringBuilder sql = new StringBuilder();
-            if (revsEnabled) {
-              sql.append("update ");
-              sql.append(tablePrefix);
-              sql.append("cpo_query set text_id = ?, seq_no = ?, userid = '");
-              sql.append(CpoUtil.username);
-              sql.append("' where query_id = ?");
-            } else {
-              sql.append("update ");
-              sql.append(tablePrefix);
-              sql.append("cpo_query set text_id = ?, seq_no = ? where query_id = ?");
-        		}
+            StringBuilder sql = new StringBuilder();
+            sql.append("update ");
+            sql.append(tablePrefix);
+            sql.append("cpo_query set text_id = ?, seq_no = ?, userid = '");
+            sql.append(CpoUtil.username);
+            sql.append("' where query_id = ?");
+
             pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1,cqn.getTextId());
-            pstmt.setInt(2,cqn.getSeqNo());
-            pstmt.setString(3,cqn.getQueryId());
+            pstmt.setString(1, cqn.getTextId());
+            pstmt.setInt(2, cqn.getSeqNo());
+            pstmt.setString(3, cqn.getQueryId());
             pstmt.executeUpdate();
           }
-        }
-        else
+        } else {
           continue;
+        }
         toBeCleaned.add(node);
-        if (pstmt != null)
+        if (pstmt != null) {
           pstmt.close();
+        }
       }
+
       /**
        * do query parameters
        */
       for (AbstractCpoNode node : nodes) {
         if (node instanceof CpoQueryParameterNode) {
-          CpoQueryParameterNode cqpn = (CpoQueryParameterNode)node;
+          CpoQueryParameterNode cqpn = (CpoQueryParameterNode) node;
           if (cqpn.isNew()) {
-        	  StringBuilder sql = new StringBuilder();
-            if (revsEnabled) {
-              sql.append("insert into ");
-              sql.append(tablePrefix);
-              sql.append("cpo_query_parameter (attribute_id, query_id, seq_no, userid, param_type) ");
-              sql.append("values (?,?,?,'");
-              sql.append(CpoUtil.username);
-              sql.append("',?)");
-            } else {
-              sql.append("insert into ");
-              sql.append(tablePrefix);
-              sql.append("cpo_query_parameter (attribute_id, query_id, seq_no, param_type) ");
-              sql.append("values (?,?,?,?)");
-            }
+            StringBuilder sql = new StringBuilder();
+            sql.append("insert into ");
+            sql.append(tablePrefix);
+            sql.append("cpo_query_parameter (attribute_id, query_id, seq_no, userid, param_type) ");
+            sql.append("values (?,?,?,'");
+            sql.append(CpoUtil.username);
+            sql.append("',?)");
+
             pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1,cqpn.getAttributeId());
-            pstmt.setString(2,cqpn.getQueryId());
-            pstmt.setInt(3,cqpn.getSeqNo());
-            pstmt.setString(4,cqpn.getType());
+            pstmt.setString(1, cqpn.getAttributeId());
+            pstmt.setString(2, cqpn.getQueryId());
+            pstmt.setInt(3, cqpn.getSeqNo());
+            pstmt.setString(4, cqpn.getType());
 //            OUT.debug("Inserting query attribute parameter: "+cqpn.getSeqNo()+" for query node: "+cqpn.getQueryId()+" and attribute map node: "+cqpn.getAttributeId());
             pstmt.executeUpdate();
 //            OUT.debug("Inserted query attribute parameter: "+cqpn.getSeqNo()+" for query node: "+cqpn.getQueryId()+" and attribute map node: "+cqpn.getAttributeId()+" "+result);
           } else if (cqpn.isRemove()) {
-              StringBuilder sql = new StringBuilder("delete from ");
-              sql.append(tablePrefix);
-              sql.append("cpo_query_parameter where query_id = ? and seq_no = ?");
-              pstmt = conn.prepareStatement(sql.toString());
-              pstmt.setString(1,cqpn.getQueryId());
-              pstmt.setInt(2,cqpn.getSeqNo());
-              pstmt.execute();
-          } else if (cqpn.isDirty()) {
-        	  StringBuilder sql = new StringBuilder();
-            if (revsEnabled) {
-              sql.append("update ");
-              sql.append(tablePrefix);
-              sql.append("cpo_query_parameter set attribute_id = ?, param_type = ?, userid = '");
-              sql.append(CpoUtil.username);
-              sql.append("' where query_id = ? and seq_no = ? ");
-            } else {
-              sql.append("update ");
-              sql.append(tablePrefix);
-              sql.append("cpo_query_parameter set attribute_id = ?, param_type = ? where query_id = ? and seq_no = ? ");
-            }
+            StringBuilder sql = new StringBuilder("delete from ");
+            sql.append(tablePrefix);
+            sql.append("cpo_query_parameter where query_id = ? and seq_no = ?");
+
             pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1,cqpn.getAttributeId());
-            pstmt.setString(2,cqpn.getType());
-            pstmt.setString(3,cqpn.getQueryId());
-            pstmt.setInt(4,cqpn.getSeqNo());
+            pstmt.setString(1, cqpn.getQueryId());
+            pstmt.setInt(2, cqpn.getSeqNo());
+            pstmt.execute();
+          } else if (cqpn.isDirty()) {
+            StringBuilder sql = new StringBuilder();
+            sql.append("update ");
+            sql.append(tablePrefix);
+            sql.append("cpo_query_parameter set attribute_id = ?, param_type = ?, userid = '");
+            sql.append(CpoUtil.username);
+            sql.append("' where query_id = ? and seq_no = ? ");
+
+            pstmt = conn.prepareStatement(sql.toString());
+            pstmt.setString(1, cqpn.getAttributeId());
+            pstmt.setString(2, cqpn.getType());
+            pstmt.setString(3, cqpn.getQueryId());
+            pstmt.setInt(4, cqpn.getSeqNo());
             pstmt.executeUpdate();
             //OUT.debug("updated parameter query_id="+cqpn.getQueryId()+" seq="+cqpn.getSeqNo()+ " group_type="+cqpn.getType());
           }
-        }
-        else
+        } else {
           continue;
+        }
         toBeCleaned.add(node);
-        if (pstmt != null)
+        if (pstmt != null) {
           pstmt.close();
+        }
       }
       conn.commit();
       // commit completed ok - clean up objects
