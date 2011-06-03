@@ -19,6 +19,7 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
+
 import gnu.regexp.*;
 import org.apache.log4j.Logger;
 
@@ -62,9 +63,9 @@ public class SQLExporter  {
 
   public SQLClassExport exportSQL(TreeNode parent, boolean skipDeletes) {
     HashSet<String> createdQueryTexts = new HashSet<String>();
-    StringBuffer sqlDeleteClassBuffer = new StringBuffer();
-    StringBuffer sqlInsertBuffer = new StringBuffer();
-    StringBuffer sqlInsertQueryText = new StringBuffer();
+    StringBuilder sqlDeleteClassBuffer = new StringBuilder();
+    StringBuilder sqlInsertBuffer = new StringBuilder();
+    StringBuilder sqlInsertQueryText = new StringBuilder();
 
     /**
      * export Class rows
@@ -74,7 +75,6 @@ public class SQLExporter  {
       /**
        * remove cpo_class rows first
        */
-//      String tempTableName = "sncr_temp_cpo";
       if (!skipDeletes) {
         sqlDeleteClassBuffer.append("delete from ");
         sqlDeleteClassBuffer.append(tablePrefix);
@@ -106,11 +106,13 @@ public class SQLExporter  {
        */
       sqlInsertBuffer.append("insert into ");
       sqlInsertBuffer.append(tablePrefix);
-      sqlInsertBuffer.append("cpo_class (class_id, name) values ('");
+      sqlInsertBuffer.append("cpo_class (class_id, name, userid) values ('");
       sqlInsertBuffer.append(classNode.getClassId());
       sqlInsertBuffer.append("','");
       sqlInsertBuffer.append(classNode.getClassName());
-      sqlInsertBuffer.append("')");
+      sqlInsertBuffer.append("',");
+      sqlInsertBuffer.append(classNode.getUserName() == null ? null : "'" + classNode.getUserName() + "'");
+      sqlInsertBuffer.append(")");
       sqlInsertBuffer.append(sqlDelimiter);
       Enumeration<AbstractCpoNode> enumLabels = classNode.children();
 
@@ -135,7 +137,7 @@ public class SQLExporter  {
             sqlInsertBuffer.append("insert into ");
             sqlInsertBuffer.append(tablePrefix);
             sqlInsertBuffer.append("cpo_attribute_map (attribute_id, class_id, column_name, attribute, ");
-            sqlInsertBuffer.append("column_type, db_column, db_table,transform_class) values ('");
+            sqlInsertBuffer.append("column_type, db_column, db_table,transform_class, userid) values ('");
             sqlInsertBuffer.append(attMapNode.getAttributeId());
             sqlInsertBuffer.append("','");
             sqlInsertBuffer.append(attMapNode.getClassId());
@@ -143,16 +145,16 @@ public class SQLExporter  {
             sqlInsertBuffer.append(attMapNode.getColumnName());
             sqlInsertBuffer.append("','");
             sqlInsertBuffer.append(attMapNode.getAttribute());
-            sqlInsertBuffer.append("',");
-            sqlInsertBuffer.append("'");
+            sqlInsertBuffer.append("','");
             sqlInsertBuffer.append(attMapNode.getColumnType());
-            sqlInsertBuffer.append("'");
-            sqlInsertBuffer.append(",");
+            sqlInsertBuffer.append("',");
             sqlInsertBuffer.append(attMapNode.getDbColumn() == null ? null : "'" + attMapNode.getDbColumn() + "'");
             sqlInsertBuffer.append(",");
             sqlInsertBuffer.append(attMapNode.getDbTable() == null ? null : "'" + attMapNode.getDbTable() + "'");
             sqlInsertBuffer.append(",");
             sqlInsertBuffer.append(attMapNode.getTransformClass() == null ? null : "'" + attMapNode.getTransformClass() + "'");
+            sqlInsertBuffer.append(",");
+            sqlInsertBuffer.append(attMapNode.getUserName() == null ? null : "'" + attMapNode.getUserName() + "'");
             sqlInsertBuffer.append(")");
             sqlInsertBuffer.append(sqlDelimiter);
           }
@@ -184,7 +186,7 @@ public class SQLExporter  {
              */
             sqlInsertBuffer.append("insert into ");
             sqlInsertBuffer.append(tablePrefix);
-            sqlInsertBuffer.append("cpo_query_group (group_id, class_id, group_type, name) values ('");
+            sqlInsertBuffer.append("cpo_query_group (group_id, class_id, group_type, name, userid) values ('");
             sqlInsertBuffer.append(queryGroupNode.getGroupId());
             sqlInsertBuffer.append("','");
             sqlInsertBuffer.append(queryGroupNode.getClassId());
@@ -192,6 +194,8 @@ public class SQLExporter  {
             sqlInsertBuffer.append(queryGroupNode.getType());
             sqlInsertBuffer.append("',");
             sqlInsertBuffer.append(queryGroupNode.getGroupName() == null ? null : "'" + queryGroupNode.getGroupName() + "'");
+            sqlInsertBuffer.append(",");
+            sqlInsertBuffer.append(queryGroupNode.getUserName() == null ? null : "'" + queryGroupNode.getUserName() + "'");
             sqlInsertBuffer.append(")");
             sqlInsertBuffer.append(sqlDelimiter);
               
@@ -209,7 +213,7 @@ public class SQLExporter  {
                */
               sqlInsertBuffer.append("insert into ");
               sqlInsertBuffer.append(tablePrefix);
-              sqlInsertBuffer.append("cpo_query (query_id, group_id, text_id, seq_no) values ('");
+              sqlInsertBuffer.append("cpo_query (query_id, group_id, text_id, seq_no, userid) values ('");
               sqlInsertBuffer.append(queryNode.getQueryId());
               sqlInsertBuffer.append("','");
               sqlInsertBuffer.append(queryNode.getGroupId());
@@ -217,7 +221,9 @@ public class SQLExporter  {
               sqlInsertBuffer.append(queryNode.getTextId());
               sqlInsertBuffer.append("','");
               sqlInsertBuffer.append(queryNode.getSeqNo());
-              sqlInsertBuffer.append("')");
+              sqlInsertBuffer.append("',");
+              sqlInsertBuffer.append(queryNode.getUserName() == null ? null : "'" + queryNode.getUserName() + "'");
+              sqlInsertBuffer.append(")");
               sqlInsertBuffer.append(sqlDelimiter);
 
               CpoQueryTextNode queryTextNode = queryNode.getQueryText();
@@ -254,31 +260,20 @@ public class SQLExporter  {
                 CpoUtil.showException(ree);
                 return null;
               }
+
               if (!createdQueryTexts.contains(queryTextNode.getTextId())) {
                 sqlInsertQueryText.append("insert into ");
                 sqlInsertQueryText.append(tablePrefix);
-                sqlInsertQueryText.append("cpo_query_text (text_id, sql_text, description) values ('");
+                sqlInsertQueryText.append("cpo_query_text (text_id, sql_text, description, userid) values ('");
                 sqlInsertQueryText.append(queryTextNode.getTextId());
                 sqlInsertQueryText.append("','");
                 sqlInsertQueryText.append(queryTextSql);
                 sqlInsertQueryText.append("',");
                 sqlInsertQueryText.append(queryTextDesc == null ? null : "'" + queryTextDesc + "'");
+                sqlInsertQueryText.append(",");
+                sqlInsertQueryText.append(queryTextNode.getUserName() == null ? null : "'" + queryTextNode.getUserName() + "'");
                 sqlInsertQueryText.append(")");
                 sqlInsertQueryText.append(sqlDelimiter);
-
-                /**
-                 * This seems completely useless, commenting it out for now
-                sqlInsertQueryText.append("update ");
-                sqlInsertQueryText.append(tablePrefix);
-                sqlInsertQueryText.append("cpo_query_text set sql_text = '");
-                sqlInsertQueryText.append(queryTextSql);
-                sqlInsertQueryText.append("', description = ");
-                sqlInsertQueryText.append(queryTextDesc == null ? null : "'" + queryTextDesc + "'");
-                sqlInsertQueryText.append(" where text_id = '");
-                sqlInsertQueryText.append(queryTextNode.getTextId());
-                sqlInsertQueryText.append("'");
-                sqlInsertQueryText.append(sqlDelimiter);
-                **/
 
                 createdQueryTexts.add(queryTextNode.getTextId());
               }
@@ -291,7 +286,7 @@ public class SQLExporter  {
                  */
                 sqlInsertBuffer.append("insert into ");
                 sqlInsertBuffer.append(tablePrefix);
-                sqlInsertBuffer.append("cpo_query_parameter (attribute_id, query_id, seq_no,param_type) values ('");
+                sqlInsertBuffer.append("cpo_query_parameter (attribute_id, query_id, seq_no, param_type, userid) values ('");
                 sqlInsertBuffer.append(queryParamNode.getAttributeId());
                 sqlInsertBuffer.append("','");
                 sqlInsertBuffer.append(queryParamNode.getQueryId());
@@ -299,7 +294,9 @@ public class SQLExporter  {
                 sqlInsertBuffer.append(queryParamNode.getSeqNo());
                 sqlInsertBuffer.append("','");
                 sqlInsertBuffer.append(queryParamNode.getType());
-                sqlInsertBuffer.append("')");
+                sqlInsertBuffer.append("',");
+                sqlInsertBuffer.append(queryParamNode.getUserName() == null ? null : "'" + queryParamNode.getUserName() + "'");
+                sqlInsertBuffer.append(")");
                 sqlInsertBuffer.append(sqlDelimiter);
               }
             }
@@ -346,7 +343,7 @@ public class SQLExporter  {
    * Generates a delete all string
    */
   public String exportDeleteAll() {
-    StringBuffer sqlDeleteAll = new StringBuffer();
+    StringBuilder sqlDeleteAll = new StringBuilder();
     sqlDeleteAll.append("delete from ");
     sqlDeleteAll.append(tablePrefix);
     sqlDeleteAll.append("cpo_query_parameter");
@@ -383,7 +380,7 @@ public class SQLExporter  {
    * Generates a create all with deletes string
    */
   public String exportCreateAll(CpoServerNode menuNode, ProgressEventListener pel) {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
 
     // create the delete all statements
     String delSql = exportDeleteAll();

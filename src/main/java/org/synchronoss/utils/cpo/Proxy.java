@@ -967,8 +967,7 @@ public class Proxy implements Observer {
             StringBuilder sql = new StringBuilder();
             sql.append("insert into ");
             sql.append(tablePrefix);
-            sql.append("cpo_query_group (group_id, class_id, group_type, ");
-            sql.append("name,userid) values (?,?,?,?,'");
+            sql.append("cpo_query_group (group_id, class_id, group_type, name, userid) values (?,?,?,?,'");
             sql.append(CpoUtil.username);
             sql.append("')");
 
@@ -1054,7 +1053,7 @@ public class Proxy implements Observer {
             StringBuilder insertTextId = new StringBuilder();
             insertTextId.append("insert into ");
             insertTextId.append(tablePrefix);
-            insertTextId.append("cpo_query_text (text_id, sql_text, description,userid) ");
+            insertTextId.append("cpo_query_text (text_id, sql_text, description, userid) ");
             insertTextId.append("values (?,?,?,'");
             insertTextId.append(CpoUtil.username);
             insertTextId.append("')");
