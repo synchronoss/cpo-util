@@ -42,6 +42,9 @@ public class MainFrame extends JFrame {
   private BorderLayout layoutMain = new BorderLayout();
   JTabbedPane jTabbedPane = new JTabbedPane();
   private BorderLayout layoutPanel = new BorderLayout();
+  private int tabCounter = 0;
+
+  private static ImageIcon closeIcon = new ImageIcon(CpoBrowserTree.class.getResource("/close.png"));
 
   public MainFrame() {
     try {
@@ -128,10 +131,45 @@ public class MainFrame extends JFrame {
 
   void menuFileBrowser_ActionPerformed(ActionEvent e) {
     try {
-      CpoBrowserPanel browserPanel = new CpoBrowserPanel();
+      final CpoBrowserPanel browserPanel = new CpoBrowserPanel();
       this.jTabbedPane.addTab(browserPanel.getServer(),null,browserPanel,browserPanel.getDatabaseName()+" Revisions enabled: "+browserPanel.getProxy().revsEnabled);
       this.statusBar.setText("Connected to: "+browserPanel.getServer()+" using "+browserPanel.getProxy().getConnectionClassName());
       this.jTabbedPane.setSelectedComponent(browserPanel);
+
+      JButton tabCloseButton = new JButton(closeIcon);
+      tabCloseButton.setContentAreaFilled(false);
+      tabCloseButton.setBorderPainted(false);
+      tabCloseButton.setActionCommand("" + tabCounter++);
+      tabCloseButton.setMaximumSize(new Dimension(16, 16));
+      tabCloseButton.setMinimumSize(new Dimension(16, 16));
+      tabCloseButton.setPreferredSize(new Dimension(16, 16));
+
+      ActionListener al = new ActionListener() {
+        public void actionPerformed(ActionEvent ae) {
+          JButton btn = (JButton) ae.getSource();
+          String s1 = btn.getActionCommand();
+          for (int i = 0; i < jTabbedPane.getTabCount(); i++) {
+            JPanel pnl = (JPanel) jTabbedPane.getTabComponentAt(i);
+            btn = (JButton) pnl.getComponent(1);
+            String s2 = btn.getActionCommand();
+            if (s1.equals(s2)) {
+              if (!CpoUtil.checkUnsavedData("You have unsaved data, are you sure you wish to exit??", i)) {
+                jTabbedPane.removeTabAt(i);
+              }
+              break;
+            }
+          }
+        }
+      };
+      tabCloseButton.addActionListener(al);
+
+      JPanel pnl = new JPanel(new GridBagLayout());
+      pnl.setOpaque(false);
+      pnl.add(new JLabel(browserPanel.getServer()), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+      pnl.add(tabCloseButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHEAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+      jTabbedPane.setTabComponentAt(jTabbedPane.getTabCount() - 1, pnl);
+      jTabbedPane.setSelectedIndex(jTabbedPane.getTabCount() - 1);
+
     } catch(SqlDirRequiredException ex) {
       // the server selected doesn't have a sql dir selected, force the user to pick one
       JOptionPane.showMessageDialog(this, ex.getMessage(), "Warning", JOptionPane.WARNING_MESSAGE);
