@@ -1444,6 +1444,14 @@ public class Proxy implements Observer {
     buf.append("\n");
 
     // generate statics for query groups
+    buf.append("  /* Attribute name statics */\n");
+    for (String attName : attributes.keySet()) {
+      String staticName = "ATTR_" + attName.toUpperCase();
+      buf.append("  public final static String " + staticName + " = \"" + attName + "\";\n");
+    }
+    buf.append("\n");
+
+    // generate statics for query groups
     buf.append("  /* Query group statics */\n");
     if (queryGroupEnum != null) {
       while (queryGroupEnum.hasMoreElements()) {
