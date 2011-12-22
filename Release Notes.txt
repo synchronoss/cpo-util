@@ -1,3 +1,15 @@
+CpoUtil v4.1 Release Notes
+--------------------------
+-Upgraded to Cpo 4.0.11
+-Upgraded to use Java 6 (required)
+-Upgraded to oracle 11g JDBC driver
+-Added ability to close cpo browser tabs (x on tab)
+-Generated java classes will now contain statics for attributes like they do for query group names
+-Removed all revEnabled code (it was actually never used, so just cleaning it up)
+-Exporter now provides userId in all generated queries all the time, this allows the user to display correctly in the "last updated by" columns
+
+
+
 CpoUtil v4.0 Release Notes
 --------------------------
 -Guess Attributes is no longer experimental.  It's been in use long enough and works well enough now.
