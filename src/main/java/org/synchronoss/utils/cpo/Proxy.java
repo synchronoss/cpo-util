@@ -1412,7 +1412,7 @@ public class Proxy implements Observer {
           // need to use the CpoUtilClassLoader...and it needs to have the jar loaded for that class
           Class<?> transformClass = CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass(atMapNode.getTransformClass());
           for (Method method : transformClass.getMethods()) {
-            if (method.getName().equals("transformIn")) {
+            if (method.getName().equals("transformIn") && !method.isSynthetic() && !method.isBridge()) {
               attClass = method.getReturnType();
               attClassName = getRealClassName(attClass);
             }
@@ -1511,13 +1511,13 @@ public class Proxy implements Observer {
       Class attClass = attClasses.get(attName);
       if (attClass.isPrimitive()) {
         // primitive type, use ==
-        buf.append("    if (" + attName + " != that." + attName + ")\n");
+        buf.append("    if (" + generateGetterName(attName) + " != that." + generateGetterName(attName) + ")\n");
       } else if (attClass.isArray()) {
         // array type, use Array.equals()
-        buf.append("    if (!java.util.Arrays.equals(" + attName + ", that." + attName + "))\n");
+        buf.append("    if (!java.util.Arrays.equals(" + generateGetterName(attName) + ", that." + generateGetterName(attName) + "))\n");
       } else {
         // object, use .equals
-        buf.append("    if (" + attName + " != null ? !" + attName + ".equals(that." + attName + ") : that." + attName + " != null)\n");
+        buf.append("    if (" + generateGetterName(attName) + " != null ? !" + generateGetterName(attName) + ".equals(that." + generateGetterName(attName) + ") : that." + generateGetterName(attName) + " != null)\n");
       }
       buf.append("      return false;\n");
     }
@@ -1533,12 +1533,12 @@ public class Proxy implements Observer {
       Class attClass = attClasses.get(attName);
       if (attClass.isPrimitive()) {
         // primitive type, need some magic
-        buf.append("    result = 31 * result + (String.valueOf(" + attName + ").hashCode());\n");
+        buf.append("    result = 31 * result + (String.valueOf(" + generateGetterName(attName) + ").hashCode());\n");
       } else if (attClass.isArray()) {
         // array type, use Array.hashCode()
-        buf.append("    result = 31 * result + (" + attName + "!= null ? java.util.Arrays.hashCode(" + attName + ") : 0);\n");
+        buf.append("    result = 31 * result + (" + generateGetterName(attName) + "!= null ? java.util.Arrays.hashCode(" + generateGetterName(attName) + ") : 0);\n");
       } else {
-        buf.append("    result = 31 * result + (" + attName + " != null ? " + attName + ".hashCode() : 0);\n");
+        buf.append("    result = 31 * result + (" + generateGetterName(attName) + " != null ? " + generateGetterName(attName) + ".hashCode() : 0);\n");
       }
     }
     buf.append("    return result;\n");
@@ -1548,7 +1548,7 @@ public class Proxy implements Observer {
     buf.append("  public String toString() {\n");
     buf.append("    StringBuilder str = new StringBuilder();\n");
     for (String attName : attributes.keySet()) {
-      buf.append("    str.append(\"" + attName + " = \" + " + attName + " + \"\\n\");\n");
+      buf.append("    str.append(\"" + attName + " = \" + " + generateGetterName(attName) + " + \"\\n\");\n");
     }
     buf.append("    return str.toString();\n");
     buf.append("  }\n");
@@ -1558,15 +1558,17 @@ public class Proxy implements Observer {
 
     return buf.toString();
   }
+  
+  private String generateGetterName(String attName) {
+    if (attName.length() > 1) {
+      return ("get" + attName.substring(0, 1).toUpperCase() + attName.substring(1) + "()");
+    }
+    return ("get" + attName.toUpperCase() + "()");
+  }
 
   private String generateClassGetter(String attClassName, String attName) {
     StringBuilder buf = new StringBuilder();
-    if (attName.length() > 1) {
-      buf.append("  public " + attClassName + " get" + attName.substring(0, 1).toUpperCase() + attName.substring(1) + "() {\n");
-    } else {
-      buf.append("  public " + attClassName + " get" + attName.toUpperCase() + "() {\n");
-    }
-
+    buf.append("  public " + attClassName + " " + generateGetterName(attName) + " {\n");
     buf.append("    return this." + attName + ";\n");
     buf.append("  }\n");
 
