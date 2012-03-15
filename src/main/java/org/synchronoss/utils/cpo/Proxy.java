@@ -1534,6 +1534,7 @@ public class Proxy implements Observer {
     // generate hashCode()
     buf.append("  public int hashCode() {\n");
     buf.append("    int result = 0;\n");
+    buf.append("    result = 31 * result + getClass().getName().hashCode();\n");
     for (String attName : attributes.keySet()) {
       // need to look at the classes here
       Class attClass = attClasses.get(attName);
