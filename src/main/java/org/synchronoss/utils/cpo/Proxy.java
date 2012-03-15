@@ -696,18 +696,24 @@ public class Proxy implements Observer {
     }
     return result;
   }
+  
+  public void close() {
+    try {
+      conn.close();
+    } catch (Exception e) {
+      // ignore
+    }
+    conn = null;
+    cpoMan = null;
+  }
 
   /**
    * lets try to close this oracle connection b4 we take a hike
    */
   @Override
   protected void finalize() throws Throwable {
+    close();
     super.finalize();
-    try {
-      conn.close();
-    } catch (Exception e) {
-      // ignore
-    }
   }
 
   /**

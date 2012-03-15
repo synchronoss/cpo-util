@@ -154,6 +154,7 @@ public class MainFrame extends JFrame {
             String s2 = btn.getActionCommand();
             if (s1.equals(s2)) {
               if (!CpoUtil.checkUnsavedData("You have unsaved data, are you sure you wish to exit??", i)) {
+                browserPanel.getProxy().close();
                 jTabbedPane.removeTabAt(i);
               }
               break;
