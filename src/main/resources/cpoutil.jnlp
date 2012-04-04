@@ -20,6 +20,6 @@
   <jar href="libs/log4j.jar"/>
   <jar href="libs/cpo.jar"/>
 </resources>
-<application-desc main-class="org.synchronoss.utils.cpo.CpoUtil"/>
+<application-desc main-class="org.synchronoss.cpo.util.CpoUtil"/>
 </jnlp>
 
