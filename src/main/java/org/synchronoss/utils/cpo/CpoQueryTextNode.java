@@ -19,29 +19,34 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import javax.swing.JPanel;
-import java.util.Enumeration;
-import javax.swing.tree.TreeNode;
 
-public class CpoQueryTextNode extends AbstractCpoNode  {
-  String textId, sql, desc;
-  int usageCount;
-  
-  public CpoQueryTextNode(String textId, String sql, String desc, AbstractCpoNode parent) {
+import org.synchronoss.cpo.meta.domain.CpoQueryText;
+
+import javax.swing.*;
+import javax.swing.tree.TreeNode;
+import java.util.*;
+
+public class CpoQueryTextNode extends AbstractCpoNode {
+
+  CpoQueryText queryText;
+
+  public CpoQueryTextNode(CpoQueryText queryText, AbstractCpoNode parent) {
+    this.queryText = queryText;
     this.parent = parent;
-    this.textId = textId;
-    this.sql = sql;
-    this.desc = desc;
-    this.addObserver(parent.getProxy());
-//    this.addObserver(parent);
+    if (parent != null) {
+      this.addObserver(parent.getProxy());
+    }
   }
+
   @Override
   public void refreshChildren() {
   }
+
   @Override
   public JPanel getPanelForSelected() {
     return null;
   }
+
   public TreeNode getChildAt(int childIndex) {
     return null;
   }
@@ -66,53 +71,95 @@ public class CpoQueryTextNode extends AbstractCpoNode  {
   public Enumeration<AbstractCpoNode> children() {
     return null;
   }
+
+  public CpoQueryText getCpoQueryText() {
+    return queryText;
+  }
+
   public String getDesc() {
-    return this.desc;
+    return queryText.getDescription();
   }
+
   public String getTextId() {
-    return this.textId;
+    return queryText.getTextId();
   }
+
+  public int getUsageCount() {
+    return queryText.getRefCount();
+  }
+
   public String getSQL() {
-    return this.sql;
+    return queryText.getSqlText();
   }
+
+  @Override
+  public String getUserName() {
+    return queryText.getUserid();
+  }
+
+  @Override
+  public Calendar getCreateDate() {
+    return queryText.getCreatedate();
+  }
+
   public void setSQL(String sql) {
-    if (this.sql != null && this.sql.equals(sql)) return;
-    this.sql = sql;
+
+    if (sql == null) {
+      sql = "";
+    } else {
+      sql = sql.trim();
+    }
+
+    // strip sql of CRs
+    sql = sql.replaceAll("\\r\\n\\s*\\r\\n", "\r\n");
+    sql = sql.replaceAll("\\n\\s*\\n", "\n");
+
+    if (queryText.getSqlText() != null && queryText.getSqlText().equals(sql))
+      return;
+
+    queryText.setSqlText(sql);
     this.setDirty(true);
   }
+
   public void setDesc(String desc) {
-    if (this.desc != null && this.desc.equals(desc)) return;
-    this.desc = desc;
+    if (queryText.getDescription() != null && queryText.getDescription().equals(desc))
+      return;
+
+    queryText.setDescription(desc);
     this.setDirty(true);
   }
+
+  public void setUsageCount(int usageCount) {
+    queryText.setRefCount(usageCount);
+  }
+
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof CpoQueryTextNode)) {return false;}
-    //PJD for HSQLDB 
-    if (((CpoQueryTextNode)obj).getTextId() == null) {
+    if (!(obj instanceof CpoQueryTextNode)) {
       return false;
     }
-    if (((CpoQueryTextNode)obj).getTextId().equals(this.getTextId()))
+    //PJD for HSQLDB 
+    if (((CpoQueryTextNode) obj).getTextId() == null) {
+      return false;
+    }
+    if (((CpoQueryTextNode) obj).getTextId().equals(this.getTextId()))
       return true;
-    
+
     return false;
   }
+
   @Override
   public int hashCode() {
     //PJD for HSQLDB 
-    if (this.getTextId() == null) {
+    if (queryText.getTextId() == null) {
       return -1;
     }
-    return this.getTextId().hashCode();
+    return queryText.getTextId().hashCode();
   }
+
   @Override
   public String toString() {
-    return this.hashCode()+" -- "+this.getDesc();
-  }
-  public void setUsageCount(int usageCount) {
-    this.usageCount = usageCount;
-  }
-  public int getUsageCount() {
-    return this.usageCount;
+    //return this.hashCode() + " -- " + this.getDesc();
+    return queryText.toString();
   }
 }

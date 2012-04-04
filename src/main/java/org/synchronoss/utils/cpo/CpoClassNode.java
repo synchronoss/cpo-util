@@ -20,50 +20,69 @@
  */
 package org.synchronoss.utils.cpo;
 
-import javax.swing.tree.TreeNode;
-import javax.swing.JPanel;
-import java.util.Enumeration;
+import org.synchronoss.cpo.meta.domain.CpoClass;
 
-public class CpoClassNode extends AbstractCpoNode {
-  
-  private String name,class_id;
+import javax.swing.*;
+import javax.swing.tree.TreeNode;
+import java.util.*;
+
+public class CpoClassNode extends AbstractCpoNode implements Comparable<CpoClassNode> {
+
+  private CpoClass cpoClass;
   private CpoQueryGroupLabelNode queryGroupLabel;
   private CpoAttributeLabelNode attributeLabel;
-  
-  public CpoClassNode(String name, String class_id, AbstractCpoNode parent) {
-    this.name = name;
-    this.class_id = class_id;
+
+  public CpoClassNode(CpoClass cpoClass, AbstractCpoNode parent) {
+    this.cpoClass = cpoClass;
     this.parent = parent;
-    if (parent != null)
+    if (parent != null) {
       this.addObserver(parent.getProxy());
-//    this.addObserver(parent);
+    }
+  }
+
+  @Override
+  public CpoServerNode getParent() {
+    return (CpoServerNode)this.parent;
   }
 
   @Override
   public JPanel getPanelForSelected() {
     return new CpoTesterPanel(this);
   }
-    
+
+  @Override
   public TreeNode getChildAt(int childIndex) {
-    if (childIndex == 0) return this.queryGroupLabel;
-    else if (childIndex == 1) return this.attributeLabel;
-    else return null;
+    if (childIndex == 0) {
+      return this.queryGroupLabel;
+    } else if (childIndex == 1) {
+      return this.attributeLabel;
+    } else {
+      return null;
+    }
   }
 
+  @Override
   public int getChildCount() {
     return 2;
   }
 
+  @Override
   public int getIndex(TreeNode node) {
-    if (node == this.queryGroupLabel) return 0;
-    else if (node == this.attributeLabel) return 1;
-    else return -1;
+    if (node == this.queryGroupLabel) {
+      return 0;
+    } else if (node == this.attributeLabel) {
+      return 1;
+    } else {
+      return -1;
+    }
   }
 
+  @Override
   public boolean getAllowsChildren() {
     return true;
   }
 
+  @Override
   public boolean isLeaf() {
     return false;
   }
@@ -72,15 +91,17 @@ public class CpoClassNode extends AbstractCpoNode {
   public Enumeration<AbstractCpoNode> children() {
     if (queryGroupLabel == null || attributeLabel == null)
       refreshChildren();
-    
+
     return new Enumeration<AbstractCpoNode>() {
       int count = 0;
+
       public AbstractCpoNode nextElement() {
         if (count++ == 0) {
           return queryGroupLabel;
         }
         return attributeLabel;
       }
+
       public boolean hasMoreElements() {
         return (count <= 1);
       }
@@ -92,33 +113,46 @@ public class CpoClassNode extends AbstractCpoNode {
     return this.getDisplayClassName();
   }
 
-  public String getClassId() {
-    return this.class_id;
+  public CpoClass getCpoClass() {
+    return cpoClass;
   }
 
-  public String getClassName() {
-    return this.name;
+  @Override
+  public String getUserName() {
+    return cpoClass.getUserid();
+  }
+
+  @Override
+  public Calendar getCreateDate() {
+    return cpoClass.getCreatedate();
   }
 
   public String getDisplayClassName() {
-    if (!this.getProxy().getClassNameToggle() && getClassName().lastIndexOf(".") != -1 && getClassName().length() > getClassName().lastIndexOf(".") + 1) {
-      return getClassName().substring(getClassName().lastIndexOf(".") + 1);
+    String className = cpoClass.getName();
+    if (!this.getProxy().getClassNameToggle() && className.lastIndexOf(".") != -1 && className.length() > className.lastIndexOf(".") + 1) {
+      return className.substring(className.lastIndexOf(".") + 1);
     }
-    return getClassName();
+    return className;
   }
-  
+
   @Override
   public void refreshChildren() {
     if (this.queryGroupLabel == null || this.attributeLabel == null) {
-//      OUT.debug("CpoClassNode refreshing data");
       this.queryGroupLabel = new CpoQueryGroupLabelNode(this);
       this.attributeLabel = new CpoAttributeLabelNode(this);
     }
   }
+
   public void setClassName(String className) {
-    if ((className == null && this.name == null) || (this.name != null && this.name.equals(className)))
+    if ((className == null && cpoClass.getName() == null) || (cpoClass.getName() != null && cpoClass.getName().equals(className))) {
       return;
-    this.name = className;
+    }
+    cpoClass.setName(className);
     this.setDirty(true);
+  }
+
+  @Override
+  public int compareTo(CpoClassNode ccn) {
+    return getDisplayClassName().compareTo(ccn.getDisplayClassName());
   }
 }

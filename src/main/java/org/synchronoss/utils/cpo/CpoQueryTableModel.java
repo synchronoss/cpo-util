@@ -19,36 +19,38 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
+
 import org.apache.log4j.Logger;
+import org.synchronoss.cpo.meta.domain.*;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class CpoQueryTableModel extends AbstractTableModel {
-    /** Version Id for this class. */
-    private static final long serialVersionUID=1L;
+
+  /** Version Id for this class. */
+  private static final long serialVersionUID = 1L;
   private CpoQueryNode cpoQueryNode;
-  private List<CpoQueryParameterNode> cpoQPBs; //CpoQueryParameterNode(s)
-  private String[] columnNames = {"Seq Num","Attribute","Column Name","Column Type","In/Out/Both","DB Table", "DB Column","Get Transform Class","User","Date","Changed?"};
-  private Object[] columnClasses = {String.class, CpoAttributeMapNode.class, String.class, String.class, JComboBox.class, String.class, String.class, String.class, String.class, Date.class, String.class};
+  private List<CpoQueryParameterNode> cpoQPBs;
+  private String[] columnNames = {"Seq Num", "Attribute", "Column Name", "Column Type", "In/Out/Both", "DB Table", "DB Column", "Get Transform Class", "User", "Date", "Changed?"};
+  private Object[] columnClasses = {String.class, CpoAttributeMapNode.class, String.class, String.class, JComboBox.class, String.class, String.class, String.class, String.class, String.class, String.class};
   CpoClassNode attributeCpoClassNode;
   private Logger OUT = Logger.getLogger(this.getClass());
-  
+
   public CpoQueryTableModel(CpoQueryNode cpoQueryNode) throws Exception {
     this.cpoQueryNode = cpoQueryNode;
     this.cpoQPBs = this.cpoQueryNode.getProxy().getQueryParameters(cpoQueryNode);
     if (this.cpoQPBs.size() > 0)
-//      this.attributeCpoClassNode = (CpoClassNode)((CpoQueryParameterNode)this.cpoQPBs.get(0)).getParent().getParent().getParent().getParent();
       this.attributeCpoClassNode = (CpoClassNode)(this.cpoQPBs.get(0)).getCpoAttributeMapBean().getParent().getParent();
     else
       this.attributeCpoClassNode = (CpoClassNode)cpoQueryNode.getParent().getParent().getParent();
-    
+
     for (CpoQueryParameterNode qpbs : cpoQPBs) {
       OUT.debug("qpbs: " + qpbs);
     }
-    OUT.debug("ClassNode: "+attributeCpoClassNode);
-//    OUT.debug ("Size of QPBs for queryNode: "+cpoQueryNode+" is "+cpoQPBs.size());
+    OUT.debug("ClassNode: " + attributeCpoClassNode);
   }
 
   public int getRowCount() {
@@ -75,39 +77,52 @@ public class CpoQueryTableModel extends AbstractTableModel {
   }
 
   public Object getValueAt(int rowIndex, int columnIndex) {
-    if (columnIndex == 0)
-      return (cpoQPBs.get(rowIndex)).getSeqNo();
-    else if (columnIndex == 1)
-      return (cpoQPBs.get(rowIndex)).getCpoAttributeMapBean();
-    else if (columnIndex == 2)
-      return (cpoQPBs.get(rowIndex)).getCpoAttributeMapBean()!=null
-          ?(cpoQPBs.get(rowIndex)).getCpoAttributeMapBean().getColumnName():null;
-    else if (columnIndex == 3)
-      return (cpoQPBs.get(rowIndex)).getCpoAttributeMapBean()!=null
-          ?(cpoQPBs.get(rowIndex)).getCpoAttributeMapBean().getColumnType():null;
-    else if (columnIndex == 4)
-      return (cpoQPBs.get(rowIndex)).getType();
-    else if (columnIndex == 5)
-      return (cpoQPBs.get(rowIndex)).getCpoAttributeMapBean()!=null
-          ?(cpoQPBs.get(rowIndex)).getCpoAttributeMapBean().getDbTable():null;
-    else if (columnIndex == 6)
-      return (cpoQPBs.get(rowIndex)).getCpoAttributeMapBean()!=null
-          ?(cpoQPBs.get(rowIndex)).getCpoAttributeMapBean().getDbColumn():null;
-    else if (columnIndex == 7)
-      return (cpoQPBs.get(rowIndex)).getCpoAttributeMapBean()!=null
-          ?(cpoQPBs.get(rowIndex)).getCpoAttributeMapBean().getTransformClass():null;
-    else if (columnIndex == 8)
-      return (cpoQPBs.get(rowIndex)).getCpoAttributeMapBean()!=null
-          ?(cpoQPBs.get(rowIndex)).getCpoAttributeMapBean().getUserName():null;
-    else if (columnIndex == 9)
-      return (cpoQPBs.get(rowIndex)).getCpoAttributeMapBean()!=null
-          ?(cpoQPBs.get(rowIndex)).getCpoAttributeMapBean().getCreateDate():null;
-    else if (columnIndex == 10)
-      if ((cpoQPBs.get(rowIndex)).isNew()) return "New";
-      else if ((cpoQPBs.get(rowIndex)).isRemove()) return "Removed";
-      else if (cpoQPBs.get(rowIndex).isDirty()) return "Changed";
-      else return "";
-    else return null;
+    CpoQueryParameterNode cqpn = cpoQPBs.get(rowIndex);
+    CpoQueryParameter queryParameter = cqpn.getCpoQueryParameter();
+
+    CpoAttributeMapNode camn = cqpn.getCpoAttributeMapBean();
+    CpoAttribute att = null;
+    if (camn != null) {
+      att = camn.getCpoAttribute();
+    }
+
+    if (columnIndex == 0) {
+      return queryParameter.getSeqNo();
+    } else if (columnIndex == 1) {
+      return cqpn.getCpoAttributeMapBean();
+    } else if (columnIndex == 2) {
+      return att != null ? att.getColumnName() : null;
+    } else if (columnIndex == 3) {
+      return att != null ? att.getColumnType() : null;
+    } else if (columnIndex == 4) {
+      return queryParameter.getParamType();
+    } else if (columnIndex == 5) {
+      return att != null ? att.getDbTable() : null;
+    } else if (columnIndex == 6) {
+      return att != null ? att.getDbColumn() : null;
+    } else if (columnIndex == 7) {
+      return att != null ? att.getTransformClass() : null;
+    } else if (columnIndex == 8) {
+      return att != null ? att.getUserid() : null;
+    } else if (columnIndex == 9) {
+      String createDate = "";
+      if (att != null && att.getCreatedate() != null) {
+        SimpleDateFormat df = new SimpleDateFormat();
+        createDate = df.format(att.getCreatedate().getTime());
+      }
+      return createDate;
+    } else if (columnIndex == 10) {
+      if (cqpn.isNew())
+        return "New";
+      else if (cqpn.isRemove())
+        return "Removed";
+      else if (cqpn.isDirty())
+        return "Changed";
+      else
+        return "";
+    } else {
+      return null;
+    }
   }
 
   @Override
@@ -120,15 +135,14 @@ public class CpoQueryTableModel extends AbstractTableModel {
     }
     this.fireTableDataChanged();
   }
+
   public void removeNewRow() {
     int originalLength = this.getNonRemovedRows();
     ListIterator<CpoQueryParameterNode> iter = this.cpoQPBs.listIterator(this.cpoQPBs.size());
     while (iter.hasPrevious()) {
       CpoQueryParameterNode cqpn = iter.previous();
       if (cqpn.isNew()) {
-//        this.cpoQPBs.remove(cqpn);
         cqpn.setRemove(true);
-//        cpoQueryNode.getProxy().removeObjectFromAllCache(cqpn);
         this.fireTableDataChanged();
         break;
       }
@@ -142,10 +156,12 @@ public class CpoQueryTableModel extends AbstractTableModel {
       }
     }
   }
+
   public void removeRow(int rowIndex) {
     (this.cpoQPBs.get(rowIndex)).setRemove(true);
     this.fireTableDataChanged();
   }
+
   public void addNewRow() {
     int originalLength = this.getNonRemovedRows();
     for (CpoQueryParameterNode cqpn : cpoQPBs) {
@@ -157,11 +173,19 @@ public class CpoQueryTableModel extends AbstractTableModel {
     }
     if (this.getNonRemovedRows() == originalLength) {
       try {
-        CpoQueryParameterNode cqpn = new CpoQueryParameterNode(cpoQueryNode,
-            this.cpoQPBs.size()+1,
-//            (CpoAttributeMapNode)cpoQueryNode.getProxy().getAttributeMap((CpoClassNode)cpoQueryNode.getParent().getParent().getParent()).get(0));
-            cpoQueryNode.getProxy().getAttributeMap(this.attributeCpoClassNode).get(0),
-            "IN");
+        CpoAttributeMapNode camn = cpoQueryNode.getProxy().getAttributeMap(this.attributeCpoClassNode).get(0);
+        CpoAttribute attribute = camn.getCpoAttribute();
+
+        CpoQueryParameter parameter = new CpoQueryParameter();
+        parameter.setAttributeId(attribute.getAttributeId());
+        parameter.setQueryId(cpoQueryNode.getCpoQuery().getQueryId());
+        parameter.setSeqNo(cpoQPBs.size() + 1);
+        parameter.setParamType("IN");
+        parameter.setUserid(CpoUtil.username);
+        parameter.setCreatedate(Calendar.getInstance());
+
+
+        CpoQueryParameterNode cqpn = new CpoQueryParameterNode(parameter, camn, cpoQueryNode);
         cqpn.setNew(true);
         this.addRow(cqpn);
       } catch (Exception pe) {
@@ -169,10 +193,12 @@ public class CpoQueryTableModel extends AbstractTableModel {
       }
     }
   }
+
   public void addRow(CpoQueryParameterNode cpoQPN) {
     this.cpoQPBs.add(cpoQPN);
     this.fireTableDataChanged();
   }
+
   public int getNonRemovedRows() {
     int count=0;
     for (CpoQueryParameterNode cqpn : cpoQPBs) {

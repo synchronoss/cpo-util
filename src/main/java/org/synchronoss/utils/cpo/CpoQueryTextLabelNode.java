@@ -19,16 +19,23 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import javax.swing.JPanel;
-import java.util.Enumeration;
-import javax.swing.tree.TreeNode;
 
-public class CpoQueryTextLabelNode extends AbstractCpoNode  {
-  
+import javax.swing.*;
+import javax.swing.tree.TreeNode;
+import java.util.*;
+
+public class CpoQueryTextLabelNode extends AbstractCpoNode {
+
   public CpoQueryTextLabelNode(CpoServerNode serverNode) {
     this.parent = serverNode;
-//    this.addObserver(parent);
-    this.addObserver(parent.getProxy());
+    if (parent != null) {
+      this.addObserver(parent.getProxy());
+    }
+  }
+
+  @Override
+  public CpoServerNode getParent() {
+    return (CpoServerNode)this.parent;
   }
 
   @Override
@@ -64,8 +71,19 @@ public class CpoQueryTextLabelNode extends AbstractCpoNode  {
   public Enumeration<AbstractCpoNode> children() {
     return null;
   }
+
   @Override
   public String toString() {
     return "Query Text";
+  }
+
+  @Override
+  public String getUserName() {
+    return "";
+  }
+
+  @Override
+  public Calendar getCreateDate() {
+    return Calendar.getInstance();
   }
 }

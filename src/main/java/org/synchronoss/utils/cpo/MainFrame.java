@@ -133,7 +133,7 @@ public class MainFrame extends JFrame {
     try {
       final CpoBrowserPanel browserPanel = new CpoBrowserPanel();
       this.jTabbedPane.addTab(browserPanel.getServer(), null, browserPanel, browserPanel.getDatabaseName());
-      this.statusBar.setText("Connected to: " + browserPanel.getServer() + " using " + browserPanel.getProxy().getConnectionClassName());
+      this.statusBar.setText("Connected to: " + browserPanel.getServer());
       this.jTabbedPane.setSelectedComponent(browserPanel);
 
       JButton tabCloseButton = new JButton(closeIcon);
@@ -187,13 +187,11 @@ public class MainFrame extends JFrame {
   }
 
   void fileExit_ActionPerformed(ActionEvent e) {
-      if (CpoUtil.checkUnsavedData("You have unsaved data, are you sure you wish to exit??"))
-        return;
-      System.exit(0);
+    CpoUtil.exit();
   }
 
   void helpAbout_ActionPerformed(ActionEvent e) {
-    JOptionPane.showMessageDialog(this, new MainFrame_AboutBoxPanel(), "About", JOptionPane.PLAIN_MESSAGE);
+    JOptionPane.showMessageDialog(this, new AboutBoxPanel(), "About", JOptionPane.PLAIN_MESSAGE);
   }
 
   void fileNewJdbc_ActionPerformed(ActionEvent e) {

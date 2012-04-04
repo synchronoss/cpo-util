@@ -136,7 +136,7 @@ public class CpoBrowserPanel extends JPanel  {
   }
 
   String getServer() {
-    return this.prox.toString();
+    return this.prox.getServer();
   }
 
   String getDatabaseName() {

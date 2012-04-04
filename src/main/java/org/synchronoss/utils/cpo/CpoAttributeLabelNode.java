@@ -22,9 +22,7 @@ package org.synchronoss.utils.cpo;
 
 import javax.swing.tree.TreeNode;
 import javax.swing.JPanel;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class CpoAttributeLabelNode extends AbstractCpoNode  {
   
@@ -32,9 +30,15 @@ public class CpoAttributeLabelNode extends AbstractCpoNode  {
   
   public CpoAttributeLabelNode(CpoClassNode parent) {
     this.parent = parent;
-    this.addObserver(parent.getProxy());
-//    this.addObserver(parent);
-    this.setProtected(parent.isProtected());
+    if (parent != null) {
+      this.addObserver(parent.getProxy());
+      this.setProtected(parent.isProtected());
+    }
+  }
+
+  @Override
+  public CpoClassNode getParent() {
+    return (CpoClassNode)this.parent;
   }
 
   @Override
@@ -95,5 +99,15 @@ public class CpoAttributeLabelNode extends AbstractCpoNode  {
   @Override
   public String toString() {
     return "Attribute Map";
+  }
+
+  @Override
+  public String getUserName() {
+    return "";
+  }
+
+  @Override
+  public Calendar getCreateDate() {
+    return Calendar.getInstance();
   }
 }

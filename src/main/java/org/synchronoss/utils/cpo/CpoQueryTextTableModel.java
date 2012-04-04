@@ -20,15 +20,19 @@
  */
 package org.synchronoss.utils.cpo;
 
+import org.synchronoss.cpo.meta.domain.CpoQueryText;
+
 import javax.swing.table.AbstractTableModel;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class CpoQueryTextTableModel extends AbstractTableModel  {
-    /** Version Id for this class. */
-    private static final long serialVersionUID=1L;
+
+  /** Version Id for this class. */
+  private static final long serialVersionUID=1L;
   private CpoServerNode serverNode;
   private String[] columnNames = {"Description","SQL","UsageCount","User","Date","Modified?"};
-  private Object[] columnClasses = {String.class, String.class, Integer.class, String.class, Date.class, String.class};
+  private Object[] columnClasses = {String.class, String.class, Integer.class, String.class, String.class, String.class};
   private List<CpoQueryTextNode> cpoQueryText;
   private List<CpoQueryTextNode> cpoQueryTextFiltered;
   private String filter;
@@ -73,21 +77,35 @@ public class CpoQueryTextTableModel extends AbstractTableModel  {
     if (cpoQueryTextFiltered != null) {
       workingQueryList = cpoQueryTextFiltered;
     }
+
+    CpoQueryTextNode cqtn = workingQueryList.get(rowIndex);
+    CpoQueryText queryText = cqtn.getCpoQueryText();
+
     if (columnIndex == 0) {
-      return (workingQueryList.get(rowIndex)).getDesc();
+      return queryText.getDescription();
     } else if (columnIndex == 1) {
-      return (workingQueryList.get(rowIndex)).getSQL();
+      return queryText.getSqlText();
     } else if (columnIndex == 2) {
-      return (workingQueryList.get(rowIndex)).getUsageCount();
+      return queryText.getRefCount();
     } else if (columnIndex == 3) {
-      return (workingQueryList.get(rowIndex)).getUserName();
+      return queryText.getUserid();
     } else if (columnIndex == 4) {
-      return (workingQueryList.get(rowIndex)).getCreateDate();      
+      String createDate = "";
+      if (queryText.getCreatedate() != null) {
+        SimpleDateFormat df = new SimpleDateFormat();
+        createDate = df.format(queryText.getCreatedate().getTime());
+      }
+      return createDate;
     } else if (columnIndex == 5) {
-      if ((workingQueryList.get(rowIndex)).isNew()) return "New";
-      else if ((workingQueryList.get(rowIndex)).isRemove()) return "Removed";
-      else if ((workingQueryList.get(rowIndex)).isDirty()) return "Changed";
-      else return "";
+      if (cqtn.isNew()) {
+        return "New";
+      } else if (cqtn.isRemove()) {
+        return "Removed";
+      } else if (cqtn.isDirty()) {
+        return "Changed";
+      } else {
+        return "";
+      }
     } else {
       return null;
     }
@@ -107,24 +125,22 @@ public class CpoQueryTextTableModel extends AbstractTableModel  {
       workingQueryList = cpoQueryTextFiltered;
     }
 
+    List<CpoQueryTextNode> nodesToRemove = new ArrayList<CpoQueryTextNode>();
     for (int i : rowIndex) {
-      String textId = workingQueryList.get(i).getTextId();
-      int usageCount;
-      try {
-        usageCount = serverNode.getProxy().getQueryTextUsageCount(textId);
-      } catch (Exception pe) {
-        CpoUtil.showException(pe);
-        return;
-      }
+      CpoQueryTextNode cqtn = workingQueryList.get(i);
+      CpoQueryText text = cqtn.getCpoQueryText();
+      int usageCount = text.getRefCount();
       if (usageCount == 0) {
-        (workingQueryList.get(i)).setRemove(true);
-        this.filter();
-      }
-      else {
-        CpoUtil.showErrorMessage("You can not remove a node that has dependencies.\n"
-            +"This text id is used in "+usageCount+" cpo query(ies), please change them first!");
+        nodesToRemove.add(cqtn);
+      } else {
+        CpoUtil.showErrorMessage("You can not remove a node that has dependencies.\n" + "This text id is used in " + usageCount + " cpo query(ies), please change them first!");
       }
     }
+
+    for (CpoQueryTextNode node : nodesToRemove) {
+      node.setRemove(true);
+    }
+    this.filter();
   }
 
   public void addNewRow(String description) {
@@ -146,10 +162,11 @@ public class CpoQueryTextTableModel extends AbstractTableModel  {
     }
     cpoQueryTextFiltered = new ArrayList<CpoQueryTextNode>();
     for (CpoQueryTextNode node : cpoQueryText) {
-      if (node.getDesc() != null && node.getDesc().toLowerCase().indexOf(this.filter.toLowerCase()) != -1)
+      if (node.getDesc() != null && node.getDesc().toLowerCase().contains(this.filter.toLowerCase())) {
         cpoQueryTextFiltered.add(node);
-      else if (node.getSQL() != null && node.getSQL().toLowerCase().indexOf(this.filter.toLowerCase()) != -1)
+      } else if (node.getSQL() != null && node.getSQL().toLowerCase().contains(this.filter.toLowerCase())) {
         cpoQueryTextFiltered.add(node);
+      }
     }
     this.fireTableDataChanged();
   }

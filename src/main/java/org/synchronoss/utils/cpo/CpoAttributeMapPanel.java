@@ -30,14 +30,17 @@ public class CpoAttributeMapPanel extends JPanel  {
 
   /** Version Id for this class. */
   private static final long serialVersionUID=1L;
-  private BorderLayout borderLayout1 = new BorderLayout();
+  private JPanel buttonPanel = new JPanel();
+  private JButton addButton = new JButton();
+  private JButton addFromSqlButton = new JButton();
+  private JButton removeButton = new JButton();
+
   private CpoAttributeLabelNode cpoAttLabNode;
   private JTable jTableAttMap;
   private JScrollPane jScrollTable = new JScrollPane();
   private CpoAttMapTableModel model;
   TableSorter ts;
   private JPopupMenu menu = new JPopupMenu();
-  private int menuRow;
   private Logger OUT = Logger.getLogger(this.getClass());
   
   public CpoAttributeMapPanel(CpoAttributeLabelNode cpoAttLabelNode) {
@@ -50,6 +53,37 @@ public class CpoAttributeMapPanel extends JPanel  {
   }
 
   private void jbInit() throws Exception {
+    this.setLayout(new BorderLayout());
+
+    buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    addButton.setText("New");
+    addButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent actionEvent) {
+        addNewAttribute();
+      }
+    });
+    buttonPanel.add(addButton);
+
+    addFromSqlButton.setText("New From SQL");
+    addFromSqlButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent actionEvent) {
+        addAttrToClassFromSQL();
+      }
+    });
+    buttonPanel.add(addFromSqlButton);
+
+    removeButton.setText("Remove");
+    removeButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent actionEvent) {
+        removeAttribute();
+      }
+    });
+    buttonPanel.add(removeButton);
+
+    this.add(buttonPanel, BorderLayout.NORTH);
     model = new CpoAttMapTableModel(cpoAttLabNode);
     ts = new TableSorter(model);
     jTableAttMap = new JTable(ts);
@@ -58,28 +92,29 @@ public class CpoAttributeMapPanel extends JPanel  {
       @Override
       public void mouseReleased(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
+          ListSelectionModel selectionModel = jTableAttMap.getSelectionModel();
+          int row = jTableAttMap.rowAtPoint(e.getPoint());
+          selectionModel.addSelectionInterval(row, row);
           showMenu(e.getPoint());
         }
       }
     });
     jTableAttMap.setDefaultEditor(String.class,new CpoAttMapTableEditor(cpoAttLabNode.getProxy().getCpoSqlTypes()));
     jScrollTable.getViewport().add(jTableAttMap);
-    this.setLayout(borderLayout1);
     this.add(jScrollTable,BorderLayout.CENTER);
   }
+
   public void showMenu(Point point) {
-    menuRow = jTableAttMap.rowAtPoint(point);
-//    OUT.debug ("Row selected: "+menuRow);
     buildMenu();
     menu.show(jTableAttMap, (int)point.getX(), (int)point.getY());
   }
+
   public void buildMenu() {
     menu.removeAll();
-    menu.setLabel(jTableAttMap.getValueAt(menuRow,0).toString());
     JMenuItem jMenuRemove = new JMenuItem("Remove");
     jMenuRemove.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent ae) {
-        model.removeRow(ts.getTrueRow(menuRow));
+        removeAttribute();
       }
     });
     menu.add(jMenuRemove);
@@ -98,6 +133,7 @@ public class CpoAttributeMapPanel extends JPanel  {
     });
     menu.add(jMenuAddAttrWithSql);   
   }
+
   public void addNewAttribute() {
     CpoNewAttributePanel cnap = new CpoNewAttributePanel(cpoAttLabNode.getProxy().getCpoSqlTypes());
     int result = JOptionPane.showConfirmDialog(this,cnap,"Add New Attribute",JOptionPane.OK_CANCEL_OPTION);
@@ -108,10 +144,10 @@ public class CpoAttributeMapPanel extends JPanel  {
   }
 
   private void addAttrToClassFromSQL() {
-    CpoClassNode ccn = (CpoClassNode)cpoAttLabNode.getParent();
+    CpoClassNode ccn = cpoAttLabNode.getParent();
     CpoNewClassPanel cncp = new CpoNewClassPanel();
-    if (ccn.getClassName() != null)
-      cncp.jTextClassName.setText(ccn.getClassName());
+    if (ccn.getCpoClass().getName() != null)
+      cncp.jTextClassName.setText(ccn.getCpoClass().getName());
     OUT.debug(cncp.jTextClassName.getText());
     int result = JOptionPane.showConfirmDialog(this, cncp, "Add New Attributes based on SQL", JOptionPane.OK_CANCEL_OPTION);
     if (result == 0) {
@@ -130,6 +166,15 @@ public class CpoAttributeMapPanel extends JPanel  {
        * user wishes to cancel creation
        */
       CpoUtil.updateStatus("Aborted Attribute Creation");
+    }
+  }
+
+  private void removeAttribute() {
+    int[] selectedRows = jTableAttMap.getSelectedRows();
+    if (selectedRows.length < 1) {
+      CpoUtil.showErrorMessage("Please select an attribute to remove.");
+    } else {
+      model.removeRows(ts.getTrueRows(selectedRows));
     }
   }
 }

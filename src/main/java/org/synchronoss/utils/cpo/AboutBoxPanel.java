@@ -23,8 +23,8 @@ package org.synchronoss.utils.cpo;
 import javax.swing.*;
 import java.awt.*;
 
-public class MainFrame_AboutBoxPanel extends JPanel {
-  
+public class AboutBoxPanel extends JPanel {
+
   /** Version Id for this class. */
   private static final long serialVersionUID=1L;
 
@@ -42,7 +42,7 @@ public class MainFrame_AboutBoxPanel extends JPanel {
   private JLabel jvmLabel = new JLabel();
   private JLabel jvmValue = new JLabel();
 
-  public MainFrame_AboutBoxPanel() {
+  public AboutBoxPanel() {
     try {
       jbInit();
     } catch(Exception e) {

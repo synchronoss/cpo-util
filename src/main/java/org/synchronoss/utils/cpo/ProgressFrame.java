@@ -20,6 +20,8 @@
  */
 package org.synchronoss.utils.cpo;
 
+import org.synchronoss.cpo.meta.event.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -32,220 +34,215 @@ import java.awt.event.ActionListener;
  */
 public class ProgressFrame extends JFrame implements ActionListener, ProgressEventListener {
 
-    private javax.swing.JLabel label;
-    private javax.swing.JProgressBar pbar;
+  private javax.swing.JLabel label;
+  private javax.swing.JProgressBar pbar;
 
-    /**
-     * Holds value of property counterValue.
-     */
-    private int counterValue;
-    private int maxValue;
+  /**
+   * Holds value of property counterValue.
+   */
+  private int counterValue;
+  private int maxValue;
 
-    private ProgressEvent max_event = null;
+  private ProgressEvent max_event = null;
 
-    int	local_counter = 0;
-    int wait_counter = 0;
-    boolean active = false;
+  int local_counter = 0;
+  int wait_counter = 0;
+  boolean active = false;
 
-    /**
-     * Default constructor.  Causes a progress frame with message = "Progress" and
-     * an estimated execution time of 20 seconds.
-     */
-    public ProgressFrame() {
-        this("Progress", 20);
+  /**
+   * Default constructor.  Causes a progress frame with message = "Progress" and
+   * an estimated execution time of 20 seconds.
+   */
+  public ProgressFrame() {
+    this("Progress", 20);
+  }
+
+  /**
+   * Creates new form ProgressFrame
+   *
+   * @param message The text message to appear above the progress bar.
+   * @param max The number of "increments" that the background
+   * process will take.  If this value is -1 then an indeterminate
+   * progress box will be shown.
+   */
+  public ProgressFrame(String message, int max) {
+
+    counterValue = 0;
+    if (max == -1) {
+      maxValue = 10;
+    } else {
+      maxValue = max;
     }
 
-    /**
-     * Creates new form ProgressFrame
-     *
-     * @param message The text message to appear above the progress bar.
-     * @param max The number of "increments" that the background
-     * process will take.  If this value is -1 then an indeterminate
-     * progress box will be shown.
-     */
-    public ProgressFrame(String message, int max) {
+    initComponents();
 
-        counterValue = 0;
-        if (max == -1)
-            maxValue = 10;
-        else
-            maxValue = max;
+    setTitle("Working");
+    label.setText(message);
 
-        initComponents();
+    pbar.setValue(counterValue);
 
-        setTitle("Working");
-        label.setText(message);
-
-        pbar.setValue(counterValue);
-
-        if (max == -1)
-            pbar.setIndeterminate(true);
-
-        pack();
+    if (max == -1) {
+      pbar.setIndeterminate(true);
     }
 
-    public ProgressFrame(String message) {
-        this(message, -1);
-    }
+    pack();
+  }
 
-    /**
-     * The ProgressEventListener method.
-     */
-    public void progressMade(ProgressEvent pe) {
-        if ( pe.isMaxEvent() ) {
-            max_event = pe; // just hold this for now
-            wait_counter = max_event.getMax() / 10;
-            active = false;
-        } else {
-            if ( max_event != null ) {
-                // max has been delayed, see if we have enough now
-                local_counter += pe.getValue();
-                if ( local_counter > wait_counter ) {
-                    setMaxValue(max_event.getMax());
-                    max_event = null;
-                    increment(wait_counter);
-                    active = true;
-                }
-            }
+  public ProgressFrame(String message) {
+    this(message, -1);
+  }
 
-            if ( active ) {
-                increment(pe.getValue());
-            }
+  /**
+   * The ProgressEventListener method.
+   */
+  public void progressMade(ProgressEvent pe) {
+    if (pe.isMaxEvent()) {
+      max_event = pe; // just hold this for now
+      wait_counter = max_event.getMax() / 10;
+      active = false;
+    } else {
+      if (max_event != null) {
+        // max has been delayed, see if we have enough now
+        local_counter += pe.getValue();
+        if (local_counter > wait_counter) {
+          setMaxValue(max_event.getMax());
+          max_event = null;
+          increment(wait_counter);
+          active = true;
         }
+      }
+
+      if (active) {
+        increment(pe.getValue());
+      }
     }
+  }
 
-    public void setMaxValue(int newMax) {
-        maxValue = newMax;
+  public void setMaxValue(int newMax) {
+    maxValue = newMax;
 
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                pbar.setIndeterminate(false);
-                pbar.setMaximum(maxValue);
-            }
-        });
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        pbar.setIndeterminate(false);
+        pbar.setMaximum(maxValue);
+      }
+    });
 
-        setCounterValue(0);
-    }
+    setCounterValue(0);
+  }
 
-    public void stop() {
-        final ProgressFrame _this = this;
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                //System.out.println("ProgressFrame disposing");
-                _this.dispose();
-            }
-        });
-    }
+  public void stop() {
+    final ProgressFrame _this = this;
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        _this.dispose();
+      }
+    });
+  }
 
-    /**
-     * Start the timer, which will begin to update the progress
-     * bar.  Once the timer is started it would be unwise to alter
-     * any of the properties.
-     */
-    public void start() {
-        //System.out.println("progressbar starting: " + pbar);
-        final ProgressFrame _this = this;
+  /**
+   * Start the timer, which will begin to update the progress
+   * bar.  Once the timer is started it would be unwise to alter
+   * any of the properties.
+   */
+  public void start() {
+    final ProgressFrame _this = this;
 
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-                    Dimension frameSize = _this.getSize();
-                    if (frameSize.height > screenSize.height) {
-                        frameSize.height = screenSize.height;
-                    }
-                    if (frameSize.width > screenSize.width) {
-                        frameSize.width = screenSize.width;
-                    }
-                    _this.setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
-                    _this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-                    _this.setVisible(true);
-                }
-            });
-        } catch ( Exception ex ) {
-          // ignore
+    try {
+      SwingUtilities.invokeAndWait(new Runnable() {
+        public void run() {
+          Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+          Dimension frameSize = _this.getSize();
+          if (frameSize.height > screenSize.height) {
+            frameSize.height = screenSize.height;
+          }
+          if (frameSize.width > screenSize.width) {
+            frameSize.width = screenSize.width;
+          }
+          _this.setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
+          _this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+          _this.setVisible(true);
         }
+      });
+    } catch (Exception ex) {
+      // ignore
     }
+  }
 
-    public void increment() {
-        increment(1);
-    }
+  public void increment() {
+    increment(1);
+  }
 
-    public synchronized void increment(int val) {
+  public synchronized void increment(int val) {
 
-        counterValue += val;
-        if (counterValue > maxValue)
-            counterValue = maxValue;
+    counterValue += val;
+    if (counterValue > maxValue)
+      counterValue = maxValue;
 
-        //System.out.println("counterValue now " + counterValue + "; max " + maxValue);
+    if (pbar.isIndeterminate())
+      return;
 
-        if (pbar.isIndeterminate())
-            return;
-
-        try {
-            //SwingUtilities.invokeAndWait(new Runnable() {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    //System.out.println("update running");
-                    pbar.setValue(counterValue);
-                }
-            });
-        } catch (Exception ex) {
-            ex.printStackTrace();
+    try {
+      SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+          pbar.setValue(counterValue);
         }
+      });
+    } catch (Exception ex) {
+      ex.printStackTrace();
     }
+  }
 
-    private void initComponents() {
-        label = new javax.swing.JLabel();
-        pbar = new javax.swing.JProgressBar(1, maxValue);
+  private void initComponents() {
+    label = new javax.swing.JLabel();
+    pbar = new javax.swing.JProgressBar(1, maxValue);
 
-        getContentPane().setLayout(new java.awt.GridBagLayout());
-        java.awt.GridBagConstraints gridBagConstraints1;
+    getContentPane().setLayout(new java.awt.GridBagLayout());
+    java.awt.GridBagConstraints gridBagConstraints1;
 
-        setPreferredSize(new java.awt.Dimension(200, 100));
-        label.setText("Progress");
-        gridBagConstraints1 = new java.awt.GridBagConstraints();
-        gridBagConstraints1.insets = new java.awt.Insets(5, 5, 5, 5);
-        getContentPane().add(label, gridBagConstraints1);
+    setPreferredSize(new java.awt.Dimension(200, 100));
+    label.setText("Progress");
+    gridBagConstraints1 = new java.awt.GridBagConstraints();
+    gridBagConstraints1.insets = new java.awt.Insets(5, 5, 5, 5);
+    getContentPane().add(label, gridBagConstraints1);
 
-        gridBagConstraints1 = new java.awt.GridBagConstraints();
-        gridBagConstraints1.gridx = 0;
-        gridBagConstraints1.gridy = 1;
-        gridBagConstraints1.insets = new java.awt.Insets(5, 5, 5, 5);
-        gridBagConstraints1.weightx = 1.0;
-        getContentPane().add(pbar, gridBagConstraints1);
+    gridBagConstraints1 = new java.awt.GridBagConstraints();
+    gridBagConstraints1.gridx = 0;
+    gridBagConstraints1.gridy = 1;
+    gridBagConstraints1.insets = new java.awt.Insets(5, 5, 5, 5);
+    gridBagConstraints1.weightx = 1.0;
+    getContentPane().add(pbar, gridBagConstraints1);
 
-        pack();
-    }
+    pack();
+  }
 
-    /**
-     * Getter for property counterValue.
-     *
-     * @return Value of property counterValue.
-     */
-    public int getCounterValue() {
-        return counterValue;
-    }
+  /**
+   * Getter for property counterValue.
+   *
+   * @return Value of property counterValue.
+   */
+  public int getCounterValue() {
+    return counterValue;
+  }
 
-    /**
-     * Setter for property counterValue.
-     *
-     * @param counterValue New value of property counterValue.
-     */
-    public void setCounterValue(int counterValue) {
-        this.counterValue = counterValue;
-    }
+  /**
+   * Setter for property counterValue.
+   *
+   * @param counterValue New value of property counterValue.
+   */
+  public void setCounterValue(int counterValue) {
+    this.counterValue = counterValue;
+  }
 
-    public void setLabel(String l) {
-        label.setText(l);
-    }
+  public void setLabel(String l) {
+    label.setText(l);
+  }
 
-    /**
-     * ActionEvents arrive as they are triggered by the timer.  When each
-     * event occurs, execute an instance of Update on the Swing event thread.
-     * *
-     */
-    public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
-        //SwingUtilities.invokeLater(new Update());
-    }
+  /**
+   * ActionEvents arrive as they are triggered by the timer.  When each
+   * event occurs, execute an instance of Update on the Swing event thread.
+   * *
+   */
+  public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+  }
 }

@@ -19,21 +19,21 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import java.awt.Component;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.JComboBox;
-import java.util.EventObject;
+
+import javax.swing.*;
 import javax.swing.event.CellEditorListener;
-import javax.swing.DefaultCellEditor;
 import javax.swing.table.TableCellEditor;
+import java.awt.*;
+import java.util.EventObject;
 
 public class CpoAttMapTableEditor implements TableCellEditor {
+
   JTextField jText = new JTextField();
   JComboBox jCombo;
   TableCellEditor editorText;
   TableCellEditor editorCombo;
   TableCellEditor editor;
+
   public CpoAttMapTableEditor(String[] cpoSqlTypes) {
     jCombo = new JComboBox(cpoSqlTypes);
     editorCombo = new DefaultCellEditor(jCombo);
@@ -47,7 +47,7 @@ public class CpoAttMapTableEditor implements TableCellEditor {
       jCombo.setSelectedItem(value);
     } else
       this.editor = this.editorText;
-    return editor.getTableCellEditorComponent(table,value,isSelected,row,column);
+    return editor.getTableCellEditorComponent(table, value, isSelected, row, column);
   }
 
   public Object getCellEditorValue() {

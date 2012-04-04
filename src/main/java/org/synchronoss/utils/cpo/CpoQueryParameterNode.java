@@ -20,58 +20,82 @@
  */
 package org.synchronoss.utils.cpo;
 
+import org.synchronoss.cpo.meta.domain.CpoQueryParameter;
+
 import javax.swing.*;
 import javax.swing.tree.TreeNode;
-import java.util.Enumeration;
+import java.util.*;
 
 public class CpoQueryParameterNode extends AbstractCpoNode {
-  private int seqNo;
-  private String inOutType = "IN";
-  private CpoAttributeMapNode cpoAMB;
-  
-  public CpoQueryParameterNode(CpoQueryNode qNode, int seqNo, CpoAttributeMapNode cpoAMB, String type) {
-    this.parent = qNode;
-    this.seqNo = seqNo;
-    this.cpoAMB = cpoAMB;
-    this.inOutType = type;
-    this.addObserver(parent.getProxy());
-    this.setProtected(qNode.isProtected());
 
-//    this.addObserver(parent);
+  private CpoQueryParameter queryParameter;
+  private CpoAttributeMapNode attributeMapNode;
+
+  public CpoQueryParameterNode(CpoQueryParameter queryParameter, CpoAttributeMapNode attributeMapNode, CpoQueryNode parent) {
+    this.queryParameter = queryParameter;
+    this.attributeMapNode = attributeMapNode;
+    this.parent = parent;
+    if (parent != null) {
+      this.addObserver(parent.getProxy());
+    }
   }
+
+  @Override
+  public CpoQueryNode getParent() {
+    return (CpoQueryNode)this.parent;
+  }
+
   public String getType() {
-    return this.inOutType;
+    return queryParameter.getParamType();
   }
 
   public void setType(String value) {
-    if (this.inOutType == null && value == null)
+    if (this.getType() == null && value == null)
       return;
-    if (this.inOutType == null || value == null || !value.equals(this.inOutType)) {
-      this.inOutType = value;
+
+    if (this.getType() == null || value == null || !value.equals(this.getType())) {
+      queryParameter.setParamType(value);
       this.setDirty(true);
     }
   }
 
+  public CpoQueryParameter getCpoQueryParameter() {
+    return queryParameter;
+  }
+
   public String getAttributeId() {
-    return this.cpoAMB.getAttributeId();
+    return queryParameter.getAttributeId();
   }
 
   public String getQueryId() {
-    return ((CpoQueryNode)this.parent).getQueryId();
+    return queryParameter.getQueryId();
   }
 
   public int getSeqNo() {
-    return this.seqNo;
+    return queryParameter.getSeqNo();
+  }
+
+  @Override
+  public String getUserName() {
+    return queryParameter.getUserid();
+  }
+
+  @Override
+  public Calendar getCreateDate() {
+    return queryParameter.getCreatedate();
   }
 
   public CpoAttributeMapNode getCpoAttributeMapBean() {
-    return this.cpoAMB;
+    return attributeMapNode;
   }
 
   public void setCpoAttributeMap(CpoAttributeMapNode cpoAMB) {
-    if (this.cpoAMB == null && cpoAMB == null) return;
-    if (this.cpoAMB == null || cpoAMB == null || !cpoAMB.equals(this.cpoAMB)) {
-      this.cpoAMB = cpoAMB;
+    if (this.attributeMapNode == null && cpoAMB == null) return;
+    if (this.attributeMapNode == null || cpoAMB == null || !cpoAMB.equals(this.attributeMapNode)) {
+      this.attributeMapNode = cpoAMB;
+      if (attributeMapNode != null) {
+        queryParameter.setAttributeId(attributeMapNode.getAttributeId());
+      }
       this.setDirty(true);
     }
   }
@@ -109,12 +133,18 @@ public class CpoQueryParameterNode extends AbstractCpoNode {
   public Enumeration<AbstractCpoNode> children() {
     return null;
   }
-  
+
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof CpoQueryParameterNode)) return false;
-    if (((CpoQueryParameterNode)obj).getQueryId().equals(this.getQueryId())
-        && ((CpoQueryParameterNode)obj).getSeqNo() == this.getSeqNo()) return true;
+    if (obj == null)
+      return false;
+
+    if (!(obj instanceof CpoQueryParameterNode))
+      return false;
+
+    if (((CpoQueryParameterNode) obj).getQueryId().equals(this.getQueryId()) && ((CpoQueryParameterNode) obj).getSeqNo() == this.getSeqNo())
+      return true;
+    
     return false;
   }
   
@@ -125,6 +155,6 @@ public class CpoQueryParameterNode extends AbstractCpoNode {
   
   @Override
   public String toString() {
-    return this.getQueryId()+" - "+this.getSeqNo();
+    return this.getQueryId() + " - " + this.getSeqNo();
   }
 }

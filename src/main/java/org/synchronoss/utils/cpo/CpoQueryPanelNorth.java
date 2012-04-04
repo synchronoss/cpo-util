@@ -29,8 +29,9 @@ import java.util.*;
 import java.util.List;
 
 public class CpoQueryPanelNorth extends JPanel  {
-    /** Version Id for this class. */
-    private static final long serialVersionUID=1L;
+
+  /** Version Id for this class. */
+  private static final long serialVersionUID=1L;
   private Logger OUT = Logger.getLogger(this.getClass());
 
   private JLabel jLabSeq = new JLabel();
@@ -67,7 +68,7 @@ public class CpoQueryPanelNorth extends JPanel  {
         CpoQueryGroupNode cgNode = (CpoQueryGroupNode)cpoQueryNode.getParent();
         if (cgNode.getType().equals("LIST")) {
           OUT.debug("LIST server: "+cgNode.getParent().getParent().getParent());
-          List<CpoClassNode> al = cgNode.getProxy().getClasses((AbstractCpoNode)cgNode.getParent().getParent().getParent());
+          List<CpoClassNode> al = cgNode.getProxy().getClasses(cgNode.getParent().getParent().getParent());
           jComQueryObject = new JComboBox(new Vector<CpoClassNode>(al));
         }
       }
@@ -97,7 +98,7 @@ public class CpoQueryPanelNorth extends JPanel  {
           jComQueryText.removeAllItems();
           List<CpoQueryTextNode> qts = cpoQueryNode.getProxy().getQueryTextMatches((CpoServerNode)cpoQueryNode.getParent().getParent().getParent().getParent(), jTextQuerySearch.getText());
           for (CpoQueryTextNode qt : qts) {
-            jComQueryText.addItem(qt);
+            jComQueryText.addItem(qt.getCpoQueryText());
           }
         } catch (Exception pe) {
           CpoUtil.showException(pe);
@@ -121,15 +122,15 @@ public class CpoQueryPanelNorth extends JPanel  {
         String description = JOptionPane.showInputDialog(newQueryTextButton,"Please type the description of your new query.","New Query", JOptionPane.PLAIN_MESSAGE);
         CpoQueryTextNode cQTnode = cpoQueryNode.getProxy().addQueryText(description);
         if (cQTnode != null) {
-          jComQueryText.addItem(cQTnode);
-          jComQueryText.setSelectedItem(cQTnode);
+          jComQueryText.addItem(cQTnode.getCpoQueryText());
+          jComQueryText.setSelectedItem(cQTnode.getCpoQueryText());
         }
       }
     });
     add(newQueryTextButton, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 
     for (CpoQueryTextNode qt : queryText) {
-      jComQueryText.addItem(qt);
+      jComQueryText.addItem(qt.getCpoQueryText());
     }
     add(jComQueryText, new GridBagConstraints(1, 2, 2, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 

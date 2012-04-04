@@ -21,6 +21,7 @@
 package org.synchronoss.utils.cpo;
 
 import org.apache.log4j.Logger;
+import org.synchronoss.cpo.meta.domain.CpoClass;
 
 import javax.swing.*;
 import javax.swing.tree.*;
@@ -28,6 +29,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.lang.reflect.Method;
+import java.text.*;
+import java.util.*;
 import java.util.List;
 
 public class CpoBrowserTree extends JTree {
@@ -85,19 +88,27 @@ public class CpoBrowserTree extends JTree {
 
   @Override
   public String getToolTipText(MouseEvent e) {
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     TreePath path = this.getPathForLocation( e.getX(), e.getY());
     if (path != null && path.getLastPathComponent() instanceof AbstractCpoNode) {
       sb.append("<html>");
       AbstractCpoNode node = (AbstractCpoNode)path.getLastPathComponent();
       if (node instanceof CpoClassNode) {
-        sb.append(((CpoClassNode)node).getClassName());
+        sb.append(((CpoClassNode)node).getCpoClass().getName());
         sb.append("<BR>");
       }
-      sb.append("User: ");
-      sb.append(node.getUserName());
-      sb.append("<BR>Changed: ");
-      sb.append(node.getCreateDate());
+
+      if (node.getUserName() != null) {
+        sb.append("User: ");
+        sb.append(node.getUserName());
+      }
+
+      if (node.getCreateDate() != null) {
+        SimpleDateFormat df = new SimpleDateFormat();
+        sb.append("<BR>Changed: ");
+        sb.append(df.format(node.getCreateDate().getTime()));
+      }
+
       sb.append("</html>");
     }
     return sb.toString();
@@ -374,10 +385,15 @@ public class CpoBrowserTree extends JTree {
     }
     CpoClassNode ccn;
     try {
-      ccn = new CpoClassNode(className,menuNode.getProxy().getNewGuid(),menuNode);
-      menuNode.getProxy().getClasses(menuNode).add(ccn);
-      menuNode.getProxy().getClassesById().put(ccn.getClassId(),ccn);
-      OUT.debug("Menu Node Class Count: "+menuNode.getProxy().getClasses(menuNode).size());
+      CpoClass cpoClass = new CpoClass();
+      cpoClass.setClassId(menuNode.getProxy().getNewGuid());
+      cpoClass.setName(className);
+
+      CpoServerNode serverNode = (CpoServerNode)menuNode;
+      ccn = new CpoClassNode(cpoClass, serverNode);
+      menuNode.getProxy().getClasses(serverNode).add(ccn);
+      menuNode.getProxy().getClassesById().put(cpoClass.getClassId(),ccn);
+      OUT.debug("Menu Node Class Count: "+menuNode.getProxy().getClasses(serverNode).size());
       ccn.setNew(true);
       menuNode.getProxy().generateNewAttributeMap(ccn,methods);
     } catch (Exception pe) {
@@ -391,21 +407,27 @@ public class CpoBrowserTree extends JTree {
 
   private void createNewCpoClass() {
     boolean happy = false;
-    String className = null;
     String sql = null;
     String classString = null;
+    
+    CpoClass cpoClass = new CpoClass();
+    cpoClass.setClassId(menuNode.getProxy().getNewGuid());
+    cpoClass.setUserid(CpoUtil.username);
+    cpoClass.setCreatedate(Calendar.getInstance());
+    
     while (!happy) {
       CpoNewClassPanel cncp = new CpoNewClassPanel();
       if (menuNode.getProxy().getDefaultPackageName() != null)
         cncp.jTextClassName.setText(menuNode.getProxy().getDefaultPackageName());
       int result = JOptionPane.showConfirmDialog(this,cncp,"Create new CPO Class", JOptionPane.OK_CANCEL_OPTION);
       if (result == 0) {
-        className = cncp.jTextClassName.getText();
-        if (className.lastIndexOf(".") != -1)
-          menuNode.getProxy().setDefaultPackageName(className.substring(0,className.lastIndexOf(".")));
+        cpoClass.setName(cncp.jTextClassName.getText());
+        if (cpoClass.getName().lastIndexOf(".") != -1) {
+          menuNode.getProxy().setDefaultPackageName(cpoClass.getName().substring(0, cpoClass.getName().lastIndexOf(".")));
+        }
         sql = cncp.jTextAsql.getText();
         try {
-          classString = menuNode.getProxy().makeClassOuttaSql(className, sql);
+          classString = menuNode.getProxy().makeClassOuttaSql(cpoClass, sql);
           happy = true;
         } catch (Exception pe) {
           CpoUtil.showException(pe);
@@ -418,15 +440,17 @@ public class CpoBrowserTree extends JTree {
         return;
       }
     }
-    saveClassSource(classString, className);
+    
+    saveClassSource(classString, cpoClass.getName());
     CpoClassNode ccn;
     try {
-      ccn = new CpoClassNode(className,menuNode.getProxy().getNewGuid(),menuNode);
-      menuNode.getProxy().getClasses(menuNode).add(ccn);
-      menuNode.getProxy().getClassesById().put(ccn.getClassId(),ccn);
-      OUT.debug("Menu Node Class Count: "+menuNode.getProxy().getClasses(menuNode).size());
+      CpoServerNode serverNode = (CpoServerNode)menuNode;
+      ccn = new CpoClassNode(cpoClass, serverNode);
+      menuNode.getProxy().getClasses(serverNode).add(ccn);
+      menuNode.getProxy().getClassesById().put(cpoClass.getClassId(),ccn);
+      OUT.debug("Menu Node Class Count: " + menuNode.getProxy().getClasses(serverNode).size());
       ccn.setNew(true);
-      menuNode.getProxy().generateNewAttributeMap(ccn,sql);
+      menuNode.getProxy().generateNewAttributeMap(ccn, sql);
     } catch (Exception pe) {
       CpoUtil.showException(pe);
       this.refreshFromDB();
@@ -436,12 +460,14 @@ public class CpoBrowserTree extends JTree {
 
   private void saveClassSource(String classString, String className) {
     String saveClassName = className;
-    if (className.indexOf(".") != -1)
+    if (className.contains(".")) {
       saveClassName = className.substring(className.lastIndexOf(".")+1);
+    }
     JFileChooser jFile = new JFileChooser();
-    if (menuNode.getProxy().getDefaultDir() != null)
+    if (menuNode.getProxy().getDefaultDir() != null) {
       jFile.setCurrentDirectory(menuNode.getProxy().getDefaultDir());
-    jFile.setDialogTitle("Choose a directory to save: "+saveClassName+".java");
+    }
+    jFile.setDialogTitle("Choose a directory to save: " + saveClassName + ".java");
     jFile.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
     int result = jFile.showSaveDialog(this);
     if (result != 0 || jFile.getSelectedFile() == null) {
@@ -473,12 +499,12 @@ public class CpoBrowserTree extends JTree {
 
   private void clearMetaClassCacheForClass() {
     try {
-      menuNode.getProxy().clearMetaClassCache(((CpoClassNode)menuNode).getClassName());
+      menuNode.getProxy().clearMetaClassCache(((CpoClassNode)menuNode).getCpoClass().getName());
     } catch (Exception pe) {
       CpoUtil.showException(pe);
       return;
     }
-    CpoUtil.updateStatus("Meta Class Cache Cleared for "+((CpoClassNode)menuNode).getClassName());
+    CpoUtil.updateStatus("Meta Class Cache Cleared for "+((CpoClassNode)menuNode).getCpoClass().getName());
   }
 
   private void exportSqlAllCpo() {
@@ -553,7 +579,7 @@ public class CpoBrowserTree extends JTree {
   }
 
   private void renameCpoClassNode() {
-    String result = (String)JOptionPane.showInputDialog(this,"Enter new class name","Edit Class Name",JOptionPane.INFORMATION_MESSAGE,null,null,((CpoClassNode)menuNode).getClassName());
+    String result = (String)JOptionPane.showInputDialog(this, "Enter new class name", "Edit Class Name", JOptionPane.INFORMATION_MESSAGE, null, null, ((CpoClassNode) menuNode).getCpoClass().getName());
     if (result == null) return;
     if (result.equals("")) result = null;
     ((CpoClassNode)menuNode).setClassName(result);
@@ -563,7 +589,7 @@ public class CpoBrowserTree extends JTree {
   private void generateClassSource() {
     try {
       String classString = menuNode.getProxy().makeClassOuttaNode((CpoClassNode)menuNode);
-      this.saveClassSource(classString, ((CpoClassNode)menuNode).getClassName());
+      this.saveClassSource(classString, ((CpoClassNode)menuNode).getCpoClass().getName());
     } catch (Exception e) {
       CpoUtil.showException(e);
     }

@@ -113,12 +113,12 @@ public class CpoTesterPanel extends JPanel implements ClipboardOwner  {
       if (result == JOptionPane.CANCEL_OPTION) return;
     }
     // find classname
-    String cpoClassName = cpoClassNode.getClassName();
+    String cpoClassName = cpoClassNode.getCpoClass().getName();
     String cpoClassNameReturnType = cpoClassName;
     CpoClassNode returnClassNode = cpoClassNode;
     if (((CpoQueryGroupNode)cpoTPnorth.jComQueryGroup.getSelectedItem()).getType().equals(Statics.CPO_TYPE_LIST)) {
       returnClassNode = (CpoClassNode)cpoTPnorth.jComClassOut.getSelectedItem();
-      cpoClassNameReturnType = returnClassNode.getClassName();
+      cpoClassNameReturnType = returnClassNode.getCpoClass().getName();
     }
     OUT.debug ("Class name tester will use: "+cpoClassName+" and "+cpoClassNameReturnType+" as the return type class");
     try  {

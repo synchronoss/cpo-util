@@ -83,12 +83,12 @@ public class ExportChangedSwingWorker extends SwingWorker {
 
                   SQLClassExport classExport = sqlEx.exportSQL(node);
 
-                  StringBuffer sql = new StringBuffer();
+                  StringBuilder sql = new StringBuilder();
                   sql.append(classExport.getDeleteSql());
                   sql.append(classExport.getInsertQueryTextSql());
                   sql.append(classExport.getInsertSql());
 
-                  String fileName = node.getClassName() + ".sql";
+                  String fileName = node.getCpoClass().getName() + ".sql";
 
                   File file = new File(dir, fileName);
                   fw = new FileWriter(file);

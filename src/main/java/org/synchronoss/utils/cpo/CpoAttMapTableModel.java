@@ -20,7 +20,10 @@
  */
 package org.synchronoss.utils.cpo;
 
+import org.synchronoss.cpo.meta.domain.*;
+
 import javax.swing.table.AbstractTableModel;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class CpoAttMapTableModel extends AbstractTableModel  {
@@ -29,7 +32,7 @@ public class CpoAttMapTableModel extends AbstractTableModel  {
   private static final long serialVersionUID=1L;
 
   private String[] columnNames = {"Attribute","Column Name","Column Type","DB Table", "DB Column","Transform Class","User","Date","Modified?"};
-  private Object[] columnClasses = {String.class, String.class, String.class, String.class, String.class,  String.class, String.class, Date.class, String.class};
+  private Object[] columnClasses = {String.class, String.class, String.class, String.class, String.class,  String.class, String.class, String.class, String.class};
   private CpoAttributeLabelNode cpoAttLabNode;
   private List<CpoAttributeMapNode> attMap; //CpoAttributeMapNode(s)
 
@@ -61,28 +64,35 @@ public class CpoAttMapTableModel extends AbstractTableModel  {
   }
 
   public Object getValueAt(int rowIndex, int columnIndex) {
+    CpoAttributeMapNode camn = attMap.get(rowIndex);
+    CpoAttribute att = camn.getCpoAttribute();
     if (columnIndex == 0) {
-      return (attMap.get(rowIndex)).getAttribute();
+      return att.getAttribute();
     } else if (columnIndex == 1) {
-      return (attMap.get(rowIndex)).getColumnName();
+      return att.getColumnName();
     } else if (columnIndex == 2) {
-      return (attMap.get(rowIndex)).getColumnType();
+      return att.getColumnType();
     } else if (columnIndex == 3) {
-      return (attMap.get(rowIndex)).getDbTable();
+      return att.getDbTable();
     } else if (columnIndex == 4) {
-      return (attMap.get(rowIndex)).getDbColumn();
+      return att.getDbColumn();
     } else if (columnIndex == 5) {
-      return (attMap.get(rowIndex)).getTransformClass();
+      return att.getTransformClass();
     } else if (columnIndex == 6) {
-      return (attMap.get(rowIndex)).getUserName();
+      return att.getUserid();
     } else if (columnIndex == 7) {
-      return (attMap.get(rowIndex)).getCreateDate();
+      String createDate = "";
+      if (att.getCreatedate() != null) {
+        SimpleDateFormat df = new SimpleDateFormat();
+        createDate = df.format(att.getCreatedate().getTime());
+      }
+      return createDate;
     } else if (columnIndex == 8) {
-      if ((attMap.get(rowIndex)).isNew()) {
+      if (camn.isNew()) {
         return "New";
-      } else if ((attMap.get(rowIndex)).isRemove()) {
+      } else if (camn.isRemove()) {
         return "Removed";
-      } else if ((attMap.get(rowIndex)).isDirty()) {
+      } else if (camn.isDirty()) {
         return "Changed";
       } else {
         return "";
@@ -111,14 +121,24 @@ public class CpoAttMapTableModel extends AbstractTableModel  {
     }
   }
 
-  public void removeRow(int rowIndex) {
-    (attMap.get(rowIndex)).setRemove(true);
+  public void removeRows(int[] rowIndex) {
+    List<CpoAttributeMapNode> nodesToRemove = new ArrayList<CpoAttributeMapNode>();
+    for (int i : rowIndex) {
+      nodesToRemove.add(attMap.get(i));
+    }
+
+    for (CpoAttributeMapNode node : nodesToRemove) {
+      node.setRemove(true);
+    }
+
     this.fireTableDataChanged();
   }
   
-  public void addNewAttribute(String columnName, String attribute, 
+  public void addNewAttribute(String columnName, String attributeName,
       String columnType, String transform, String dbTable, String dbColumn) {
-    CpoClassNode ccn = (CpoClassNode)cpoAttLabNode.getParent();
+    CpoClassNode ccn = cpoAttLabNode.getParent();
+    CpoClass cpoClass = ccn.getCpoClass();
+
     String attributeId;
     try {
       attributeId = cpoAttLabNode.getProxy().getNewGuid();
@@ -126,8 +146,20 @@ public class CpoAttMapTableModel extends AbstractTableModel  {
       CpoUtil.showException(pe);
       return;
     }
-    CpoAttributeMapNode camn = new CpoAttributeMapNode(cpoAttLabNode,attributeId,
-        ccn.getClassId(),columnName,attribute,columnType,transform, dbTable,dbColumn,"IN");
+
+    CpoAttribute attribute = new CpoAttribute();
+    attribute.setAttributeId(attributeId);
+    attribute.setClassId(cpoClass.getClassId());
+    attribute.setColumnName(columnName);
+    attribute.setAttribute(attributeName);
+    attribute.setColumnType(columnType);
+    attribute.setTransformClass(transform);
+    attribute.setDbTable(dbTable);
+    attribute.setDbColumn(dbColumn);
+    attribute.setUserid(CpoUtil.username);
+    attribute.setCreatedate(Calendar.getInstance());
+
+    CpoAttributeMapNode camn = new CpoAttributeMapNode(attribute, cpoAttLabNode);
     attMap.add(camn);
     camn.setNew(true);
     this.fireTableDataChanged();

@@ -21,6 +21,7 @@
 package org.synchronoss.utils.cpo;
 
 import org.apache.log4j.Logger;
+import org.synchronoss.cpo.meta.event.*;
 
 import java.io.*;
 import java.util.Enumeration;
@@ -89,7 +90,7 @@ public class ExportAllSwingWorker extends SwingWorker {
                 AbstractCpoNode child = menuEnum.nextElement();
                 if (child instanceof CpoClassNode) {
                     CpoClassNode classNode = (CpoClassNode)child;
-                    String fileName = classNode.getClassName() + ".sql";
+                    String fileName = classNode.getCpoClass().getName() + ".sql";
                     SQLClassExport classExport = sqlEx.exportSQL(classNode);
 
                     // write this for the create all script

@@ -19,12 +19,9 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import javax.swing.JTree;
-import javax.swing.JPanel;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.DefaultTreeModel;
+import javax.swing.*;
+import javax.swing.tree.*;
 import java.util.*;
-import java.sql.Timestamp;
 
 public abstract class AbstractCpoNode extends Observable implements TreeNode { //, Observer
   
@@ -36,13 +33,13 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
   protected Proxy prox;
   protected JTree jtree;
   protected AbstractCpoNode parent;
+
   private List<AbstractCpoNode> dirtyChildren = new ArrayList<AbstractCpoNode>();
   private List<AbstractCpoNode> newChildren = new ArrayList<AbstractCpoNode>();
   private List<AbstractCpoNode> removeChildren = new ArrayList<AbstractCpoNode>();
+
   public abstract void refreshChildren();
   public abstract JPanel getPanelForSelected();
-  private String userName;
-  private Date createDate;
 
   public Proxy getProxy() {
     if (this.parent != null)
@@ -50,13 +47,14 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
     
     return this.prox;
   }
-  
+
   public JTree getJtree() {
     if (this.jtree != null)
-     return this.jtree;
+      return this.jtree;
     else if (parent != null)
       return parent.getJtree();
-    else return null;
+    else
+      return null;
   }
   
   public TreeNode getParent() {
@@ -72,7 +70,8 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
   }
 
   public void setDirty(boolean dirty) {
-    if (this.dirty == dirty) return;
+    if (this.dirty == dirty)
+      return;
     this.dirty = dirty;
     this.setChanged();
     this.notifyObservers(this);
@@ -103,7 +102,8 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
   }
 
   public void setRemove(boolean remove) {
-    if (this.remove == remove) return;
+    if (this.remove == remove)
+      return;
     this.remove = remove;
     this.setChanged();
     this.notifyObservers(this);
@@ -114,7 +114,6 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
   }
 
   public void setChildRemove(AbstractCpoNode childNode) {
-//  OUT.debug ("SETCHILDREMOVE: "+this+", "+childNode+" isremove>"+childNode.isRemove()+" isnew>"+childNode.isNew());
     boolean notify = false;
     if (this.isChildRemove() != childNode.isRemove())
       notify = true;
@@ -141,7 +140,8 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
   }
 
   public void setNew(boolean isnew) {
-    if (this.isnew == isnew) return;
+    if (this.isnew == isnew)
+      return;
     this.isnew = isnew;
     this.setChanged();
     this.notifyObservers(this);
@@ -157,10 +157,8 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
       notify = true;
     if (childNode.isNew() && !newChildren.contains(childNode)) {
       newChildren.add(childNode);
-//      OUT.debug (this+" adding new for "+childNode);
     } else if (!childNode.isNew() && newChildren.contains(childNode)) {
       newChildren.remove(childNode);
-//      OUT.debug (this+" removing new for "+childNode);
     }
     if (notify) {
       this.setChanged();
@@ -175,74 +173,10 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
   public void refreshMe() {
     ((DefaultTreeModel)this.jtree.getModel()).nodeStructureChanged(this);
   }
-/*
-  public void update(Observable obs, Object obj) {
-//    OUT.debug (this+" was just updated by "+obs+" with object "+obj+".  About to notify "+this.countObservers()+" more observers");
-    if (obj instanceof AbstractCpoNode) {
-      this.setChildDirty((AbstractCpoNode)obj);
-      this.setChildNew((AbstractCpoNode)obj);
-      this.setChildRemove((AbstractCpoNode)obj);
-      // need to notify tree that the model has possibly changed
-//      if (this.getParent() == null)
-      OUT.debug ("object: "+((AbstractCpoNode)obj).getParent().getClass().getName()
-          +" is new?: "+((AbstractCpoNode)obj).isNew());
-      int index = ((AbstractCpoNode)obs).getParent().getIndex((TreeNode)obs);
-      OUT.debug ("parent class name: "+((AbstractCpoNode)obs).getParent().getClass().getName()
-          +" child: "+obs.getClass().getName()+" index: "+index+" new?: "+((AbstractCpoNode)obs).isNew());
-//      if (index > 0)
-        if (((AbstractCpoNode)obs).isRemove()) {
-          if (((AbstractCpoNode)obs).isNew()
-              && !((AbstractCpoNode)obs).getParent().isLeaf()) {        
-            ((DefaultTreeModel)this.getJtree().getModel()).nodesWereRemoved(((AbstractCpoNode)obs).getParent(),new int[]{index},new Object[]{obs});
-          }
-        }
-        else if (((AbstractCpoNode)obs).isNew())
-          ((DefaultTreeModel)this.getJtree().getModel()).nodesWereInserted(((AbstractCpoNode)obs).getParent(),new int[]{index});
-        else 
-          ((DefaultTreeModel)this.getJtree().getModel()).nodesChanged(((AbstractCpoNode)obs).getParent(),new int[]{index});
-//      ((DefaultTreeModel)this.getJtree().getModel()).nodeStructureChanged(((AbstractCpoNode)obj).getParent());
-    }
-    else {
-      OUT.debug ("Really shouldn't be in this segment of code ....");
-      ((DefaultTreeModel)this.getJtree().getModel()).nodeStructureChanged(this);
-    }
-  }
-*/
-/*
-  public void scrubNodes() {
-    this.dirtyChildren.clear();
-    this.newChildren.clear();
-    this.removeChildren.clear();
-    this.dirty = false;
-    this.isnew = false;
-    this.remove = false;
-    Enumeration enum = this.children();
-    if (enum != null) {
-      while (enum.hasMoreElements()) {
-        AbstractCpoNode workingNode = (AbstractCpoNode)enum.nextElement();
-        if (workingNode != null)
-          workingNode.scrubNodes();
-      }
-    }
-  }
-*/
-  
-  public String getUserName() {
-    return this.userName;
-  }
-  
-  public void setUserName(String userName) {
-    this.userName = userName;
-  }
 
-  public Date getCreateDate() {
-    return this.createDate;
-  }
+  public abstract String getUserName();
 
-  public void setCreateDate(Timestamp createDate) {
-    if (createDate == null) return;
-    this.createDate = new Date(createDate.getTime());
-  }
+  public abstract Calendar getCreateDate();
 
   public boolean isLabel() {
     return this.getClass().getName().toLowerCase().indexOf("label") != -1;

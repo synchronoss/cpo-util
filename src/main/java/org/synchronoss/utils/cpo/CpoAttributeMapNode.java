@@ -19,108 +19,141 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.utils.cpo;
-import javax.swing.JPanel;
+
+import org.synchronoss.cpo.meta.domain.CpoAttribute;
+
+import javax.swing.*;
 import javax.swing.tree.TreeNode;
-import java.util.Enumeration;
+import java.util.*;
 
 public class CpoAttributeMapNode extends AbstractCpoNode {
-  String attribute_id, class_id, column_name, attribute, column_type, transform, db_table, db_column;
-  String type= "IN";
-  
-  public CpoAttributeMapNode(CpoAttributeLabelNode parent,String attribute_id, String class_id, String column_name, 
-      String attribute, String column_type, String transform, String db_table, String db_column, String param_type) {
-    this.attribute_id = attribute_id;
-    this.class_id = class_id;
-    this.column_name = column_name;
+
+  private CpoAttribute attribute;
+
+  public CpoAttributeMapNode(CpoAttribute attribute, CpoAttributeLabelNode parent) {
     this.attribute = attribute;
-    this.column_type = column_type;
-    this.transform = transform;
-    this.db_table = db_table;
-    this.db_column = db_column;
     this.parent = parent;
-    this.type = param_type;
-    this.addObserver(parent.getProxy());
-    this.setProtected(parent.isProtected());
-//    this.addObserver(parent);
+    if (parent != null) {
+      this.addObserver(parent.getProxy());
+      this.setProtected(parent.isProtected());
+    }
   }
+
+  @Override
+  public CpoAttributeLabelNode getParent() {
+    return (CpoAttributeLabelNode)this.parent;
+  }
+
+  public CpoAttribute getCpoAttribute() {
+    return attribute;
+  }
+
   public String getAttributeId() {
-    return this.attribute_id;
+    return attribute.getAttributeId();
   }
+
   public String getClassId() {
-    return this.class_id;
+    return attribute.getClassId();
   }
+
   public String getColumnName() {
-    return this.column_name;
+    return attribute.getColumnName();
   }
+
   public String getAttribute() {
-    return this.attribute;
+    return attribute.getAttribute();
   }
+
   public String getColumnType() {
-    return this.column_type;
+    return attribute.getColumnType();
   }
-  public String getType() {
-    return this.type;
-  }
+
   public String getTransformClass() {
-    return this.transform;
+    return attribute.getTransformClass();
   }
+
   public String getDbTable() {
-    return this.db_table;
+    return attribute.getDbTable();
   }
+
   public String getDbColumn() {
-    return this.db_column;
+    return attribute.getDbColumn();
   }
+
+  @Override
+  public String getUserName() {
+    return attribute.getUserid();
+  }
+
+  @Override
+  public Calendar getCreateDate() {
+    return attribute.getCreatedate();
+  }
+
   @Override
   public String toString() {
-    return this.attribute;
+    return attribute.getAttribute();
   }
+
   public void setColumnName(String columnName) {
-    if (columnName.equals(this.column_name)) return;
-    this.column_name = columnName;
+    if (columnName.equals(this.getColumnName()))
+      return;
+    this.attribute.setColumnName(columnName);
     this.setDirty(true);
   }
+
   public void setAttribute(String attribute) {
-    if (attribute.equals(this.attribute)) return;
-    this.attribute = attribute;
+    if (attribute.equals(this.getAttribute()))
+      return;
+    this.attribute.setAttribute(attribute);
     this.setDirty(true);
   }
+
   public void setColumnType(String columnType) {
-    if (columnType.equals(this.column_type)) return;
-    this.column_type = columnType;
+    if (columnType.equals(this.getColumnType()))
+      return;
+    this.attribute.setColumnType(columnType);
     this.setDirty(true);
-  }
-  public void setType(String _type) {
-    this.type = _type;
   }
 
   public void setTransformClass(String transform) {
-    if (transform.equals(this.transform)) return;
-    this.transform = transform;
+    if (transform.equals(this.getTransformClass()))
+      return;
+    this.attribute.setTransformClass(transform);
     this.setDirty(true);
   }
 
   public void setDbTable(String dbTable) {
-    if (dbTable.equals(this.db_table)) return;
-    this.db_table = dbTable;
+    if (dbTable.equals(this.getDbTable()))
+      return;
+    this.attribute.setDbTable(dbTable);
     this.setDirty(true);
   }
+
   public void setDbColumn(String dbColumn) {
-    if (dbColumn.equals(this.db_column)) return;
-    this.db_column = dbColumn;
+    if (dbColumn.equals(this.getDbColumn()))
+      return;
+    this.attribute.setDbColumn(dbColumn);
     this.setDirty(true);
   }
+
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof CpoAttributeMapNode)) return false;
-    if (((CpoAttributeMapNode)obj).getAttributeId().equals(this.getAttributeId())) {
+    if (!(obj instanceof CpoAttributeMapNode))
+      return false;
+
+    if (((CpoAttributeMapNode) obj).getCpoAttribute().getAttributeId().equals(attribute.getAttributeId())) {
       return true;
     }
+
     return false;
   }
+
   @Override
   public int hashCode() {
-    return this.getAttributeId().hashCode();
+    return attribute.getAttributeId().hashCode();
   }
+
   public TreeNode getChildAt(int childIndex) {
     return null;
   }
@@ -145,10 +178,11 @@ public class CpoAttributeMapNode extends AbstractCpoNode {
   public Enumeration<AbstractCpoNode> children() {
     return null;
   }
+
   @Override
   public void refreshChildren() {
-    
   }
+
   @Override
   public JPanel getPanelForSelected() {
     return null;

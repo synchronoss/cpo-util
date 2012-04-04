@@ -24,6 +24,9 @@ import gnu.regexp.*;
 import org.apache.log4j.Logger;
 import org.synchronoss.cpo.*;
 import org.synchronoss.cpo.jdbc.*;
+import org.synchronoss.cpo.meta.dao.CpoMetaDAO;
+import org.synchronoss.cpo.meta.dao.jdbc.JdbcMetaDAO;
+import org.synchronoss.cpo.meta.domain.*;
 
 import javax.naming.*;
 import javax.sql.DataSource;
@@ -34,19 +37,25 @@ import java.sql.*;
 import java.util.*;
 
 public class Proxy implements Observer {
+
   private Context ctx;
   private Properties defProps;
   private String server;
   private Connection conn;
+
+  // caches
   private Hashtable<AbstractCpoNode, List<CpoClassNode>> classCache = new Hashtable<AbstractCpoNode, List<CpoClassNode>>();
   private Hashtable<String, CpoClassNode> classCacheById = new Hashtable<String, CpoClassNode>();
   private Hashtable<CpoAttributeLabelNode, List<CpoAttributeMapNode>> attMapCache = new Hashtable<CpoAttributeLabelNode, List<CpoAttributeMapNode>>();
   private Hashtable<CpoQueryNode, List<CpoQueryParameterNode>> queryParamCache = new Hashtable<CpoQueryNode, List<CpoQueryParameterNode>>();
   private Hashtable<CpoQueryGroupNode, List<CpoQueryNode>> queryCache = new Hashtable<CpoQueryGroupNode, List<CpoQueryNode>>();
-  private Hashtable<CpoQueryGroupLabelNode, List<CpoQueryGroupNode>> queryGroupCache = new Hashtable<CpoQueryGroupLabelNode, List<CpoQueryGroupNode>>();
-  private Hashtable<CpoQueryTextNode, List<CpoQueryGroupNode>> queryGroupByTextCache = new Hashtable<CpoQueryTextNode, List<CpoQueryGroupNode>>();
+  private Hashtable<CpoClassNode, List<CpoQueryGroupNode>> queryGroupCache = new Hashtable<CpoClassNode, List<CpoQueryGroupNode>>();
+  private Hashtable<CpoQueryTextNode, List<CpoQueryGroup>> queryGroupByTextCache = new Hashtable<CpoQueryTextNode, List<CpoQueryGroup>>();
   private List<CpoQueryTextNode> queryTextCache = new ArrayList<CpoQueryTextNode>();
+
+  // modified items
   private List<AbstractCpoNode> allChangedObjects = new ArrayList<AbstractCpoNode>();
+
   private CpoAdapter cpoMan;
   private String[] sqlTypes;
   private CpoBrowserTree cpoTree;
@@ -56,7 +65,8 @@ public class Proxy implements Observer {
   private Properties connProps;
   private boolean classNameToggle = false;
   private Logger OUT = Logger.getLogger(this.getClass());
-  private String connectionClassName = null;
+
+  private CpoMetaDAO metaDao = null;
 
   // connection based protected classes
   private HashSet<String> protectedClasses = new HashSet<String>();
@@ -147,43 +157,45 @@ public class Proxy implements Observer {
     sqlTypes = new String[coll.size()];
     coll.toArray(sqlTypes);
 
-    if (CpoUtil.props.getProperty(Statics.PROP_JDBC_URL+server) == null
-        && CpoUtil.localProps.getProperty(Statics.PROP_JDBC_URL+server) == null) {
+    DataSourceInfo dsi = null;
+    if (CpoUtil.props.getProperty(Statics.PROP_JDBC_URL + server) == null && CpoUtil.localProps.getProperty(Statics.PROP_JDBC_URL + server) == null) {
       getInitialContext();
-      conn = ((DataSource)ctx.lookup(connProps.getProperty(Statics.PROP_WLSCONNPOOL+server))).getConnection();
+      conn = ((DataSource) ctx.lookup(connProps.getProperty(Statics.PROP_WLSCONNPOOL + server))).getConnection();
       conn.setAutoCommit(false);
       databaseName = conn.getMetaData().getURL();
 
       // Replace the dynamic link with a hard link.
-      cpoMan = new JdbcCpoAdapter(new JndiDataSourceInfo(connProps.getProperty(Statics.PROP_WLSCONNPOOL+server),getTablePrefix()));
+      dsi = new JndiDataSourceInfo(connProps.getProperty(Statics.PROP_WLSCONNPOOL + server), getTablePrefix());
     } else {
       Class<?> driverClass;
       try {
-        driverClass = Class.forName(connProps.getProperty(Statics.PROP_JDBC_DRIVER+server));
+        driverClass = Class.forName(connProps.getProperty(Statics.PROP_JDBC_DRIVER + server));
       } catch (Exception e) {
-        driverClass = CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass(connProps.getProperty(Statics.PROP_JDBC_DRIVER+server));
+        driverClass = CpoUtilClassLoader.getInstance(CpoUtil.files, this.getClass().getClassLoader()).loadClass(connProps.getProperty(Statics.PROP_JDBC_DRIVER + server));
       }
-      OUT.debug("Class: "+driverClass);
-        Properties connectionProperties = new Properties();
-        if (connProps.getProperty(Statics.PROP_JDBC_PARAMS+server) != null && !connProps.getProperty(Statics.PROP_JDBC_PARAMS+server).equals("")) {
-          StringTokenizer st = new StringTokenizer(connProps.getProperty(Statics.PROP_JDBC_PARAMS+server),";");
-          while (st.hasMoreTokens()) {
-            String token = st.nextToken();
-            StringTokenizer stNameValue = new StringTokenizer(token,"=");
-            String name = null, value = null;
-            if (stNameValue.hasMoreTokens())
-              name = stNameValue.nextToken();
-            if (stNameValue.hasMoreTokens())
-              value = stNameValue.nextToken();
-            connectionProperties.setProperty(name,value);
-          }
+      OUT.debug("Class: " + driverClass);
+      Properties connectionProperties = new Properties();
+      if (connProps.getProperty(Statics.PROP_JDBC_PARAMS + server) != null && !connProps.getProperty(Statics.PROP_JDBC_PARAMS + server).equals("")) {
+        StringTokenizer st = new StringTokenizer(connProps.getProperty(Statics.PROP_JDBC_PARAMS + server), ";");
+        while (st.hasMoreTokens()) {
+          String token = st.nextToken();
+          StringTokenizer stNameValue = new StringTokenizer(token, "=");
+          String name = null, value = null;
+          if (stNameValue.hasMoreTokens())
+            name = stNameValue.nextToken();
+          if (stNameValue.hasMoreTokens())
+            value = stNameValue.nextToken();
+          connectionProperties.setProperty(name, value);
         }
-        conn = DriverManager.getConnection(connProps.getProperty(Statics.PROP_JDBC_URL+server),connectionProperties);
-        conn.setAutoCommit(false);
-        databaseName = conn.getMetaData().getURL();
-        // Replace the dynamic link with a hard link.
-        cpoMan = new JdbcCpoAdapter(new DriverDataSourceInfo(connProps.getProperty(Statics.PROP_JDBC_DRIVER+server),connProps.getProperty(Statics.PROP_JDBC_URL+server),connectionProperties,getTablePrefix()));
+      }
+      conn = DriverManager.getConnection(connProps.getProperty(Statics.PROP_JDBC_URL + server), connectionProperties);
+      conn.setAutoCommit(false);
+      databaseName = conn.getMetaData().getURL();
+      // Replace the dynamic link with a hard link.
+      dsi = new DriverDataSourceInfo(connProps.getProperty(Statics.PROP_JDBC_DRIVER + server), connProps.getProperty(Statics.PROP_JDBC_URL + server), connectionProperties, getTablePrefix());
     }
+    cpoMan = new JdbcCpoAdapter(dsi);
+    metaDao = new JdbcMetaDAO(dsi);
   }
   
   private void getInitialContext() throws Exception {
@@ -283,44 +295,26 @@ public class Proxy implements Observer {
     return this.classCacheById;
   }
 
-  public List<CpoClassNode> getClasses(AbstractCpoNode parent) throws Exception {
+  public List<CpoClassNode> getClasses(CpoServerNode parent) throws Exception {
     if (this.classCache.containsKey(parent)) {
       List<CpoClassNode> al = this.classCache.get(parent);
-      Collections.sort(al, new CpoClassNodeComparator());
+      // sort by the version of the class name we're displaying (full vs. short)
+      Collections.sort(al);
       return al;
     }
     List<CpoClassNode> al = new ArrayList<CpoClassNode>();
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
-    try {
-      StringBuilder sql = new StringBuilder();
-      sql.append("select class_id, name, userid, createdate from ");
-      sql.append(tablePrefix);
-      sql.append("cpo_class order by upper(name)");
-      pstmt = conn.prepareStatement(sql.toString());
-      rs = pstmt.executeQuery();
-      while (rs.next()) {
-        CpoClassNode cpoClassNode = new CpoClassNode(rs.getString("name"),rs.getString("class_id"),parent);
-        cpoClassNode.setUserName(rs.getString("userid"));
-        cpoClassNode.setCreateDate(rs.getTimestamp("createdate"));
-        cpoClassNode.setProtected(this.isClassProtected(cpoClassNode.getClassName()));
-        al.add(cpoClassNode);
-        classCacheById.put(cpoClassNode.getClassId(),cpoClassNode);
-      }
-      Collections.sort(al, new CpoClassNodeComparator());
-    } finally {
-      try {
-        if (rs != null) rs.close();
-      } catch (Exception e) {
-        // ignore
-      }
-      try {
-        if (pstmt != null) pstmt.close();
-      } catch (Exception e) {
-        // ignore
-      }
+    
+    for (CpoClass cpoClass : metaDao.getCpoClasses()) {
+      CpoClassNode cpoClassNode = new CpoClassNode(cpoClass, parent);
+      cpoClassNode.setProtected(this.isClassProtected(cpoClass.getName()));
+      al.add(cpoClassNode);
+      classCacheById.put(cpoClass.getClassId(), cpoClassNode);
     }
-    this.classCache.put(parent,al);
+
+    // sort by the version of the class name we're displaying (full vs. short)
+    Collections.sort(al);
+
+    this.classCache.put(parent, al);
     return al;
   }
 
@@ -339,14 +333,14 @@ public class Proxy implements Observer {
     if (desc == null || desc.equals(""))
       return null;
 
-    String textId;
-    try {
-      textId = getNewGuid();
-    } catch (Exception pe) {
-      CpoUtil.showException(pe);
-      return null;
-    }
-    CpoQueryTextNode cQTnode = new CpoQueryTextNode(textId, "", desc, getCpoQueryTextLabelNode(getServerNode()));
+    CpoQueryText queryText = new CpoQueryText();
+    queryText.setTextId(getNewGuid());
+    queryText.setSqlText("");
+    queryText.setDescription(desc);
+    queryText.setUserid(CpoUtil.username);
+    queryText.setCreatedate(Calendar.getInstance());
+    
+    CpoQueryTextNode cQTnode = new CpoQueryTextNode(queryText, getCpoQueryTextLabelNode(getServerNode()));
     cQTnode.setNew(true);
 
     // add to cache
@@ -364,118 +358,54 @@ public class Proxy implements Observer {
   }
 
   public List<CpoQueryTextNode> getQueryText(CpoServerNode cpoServer) throws Exception {
-    if (this.queryTextCache.size() != 0)
+    if (this.queryTextCache.size() != 0) {
       return this.queryTextCache;
+    }
+
     CpoQueryTextLabelNode parent = this.getCpoQueryTextLabelNode(cpoServer);
     List<CpoQueryTextNode> al = new ArrayList<CpoQueryTextNode>();
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
-    try {
-      StringBuilder sql = new StringBuilder();
-      sql.append("select text.text_id, text.sql_text, text.description, (select count(*) from ");
-      sql.append(tablePrefix);
-      sql.append("cpo_query where text_id = text.text_id) as usagecount, text.userid, text.createdate from ");
-      sql.append(tablePrefix);
-      sql.append("cpo_query_text text order by text.description");
-      pstmt = conn.prepareStatement(sql.toString());
-      rs = pstmt.executeQuery();
-      while (rs.next()) {
-        CpoQueryTextNode cpoQTNode = new CpoQueryTextNode(rs.getString("text_id"), rs.getString("sql_text"),rs.getString("description"),parent);
-        cpoQTNode.setUsageCount(rs.getInt("usagecount"));
-        cpoQTNode.setUserName(rs.getString("userid"));
-        cpoQTNode.setCreateDate(rs.getTimestamp("createdate"));
-        al.add(cpoQTNode);
-      }
-    } finally {
-      try {
-        if (rs != null) rs.close();
-      } catch (Exception e) {
-        // ignore
-      }
-      try {
-        if (pstmt != null) pstmt.close();
-      } catch (Exception e) {
-        // ignore
-      }
+
+    List<CpoQueryText> queryTexts = metaDao.getCpoQueryTexts();
+    Collections.sort(queryTexts);
+    for (CpoQueryText queryText : queryTexts) {
+      CpoQueryTextNode cpoQTNode = new CpoQueryTextNode(queryText, parent);
+      al.add(cpoQTNode);
     }
+
     queryTextCache = al;
     return al;
   }
   
-  public List<CpoQueryGroupNode> getQueryGroups(CpoQueryTextNode textNode) throws Exception {
+  public List<CpoQueryGroup> getQueryGroups(CpoQueryTextNode textNode) throws Exception {
     if (this.queryGroupByTextCache.containsKey(textNode)) {
       return this.queryGroupByTextCache.get(textNode);
     }
-    List<CpoQueryGroupNode> al = new ArrayList<CpoQueryGroupNode>();
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
-    try {
-    	StringBuilder sql = new StringBuilder();
-      sql.append("select group_id, class_id, group_type, name, userid, createdate from ");
-      sql.append(tablePrefix);
-      sql.append("cpo_query_group where group_id in ");
-      sql.append("(select group_id from ");
-      sql.append(tablePrefix);
-      sql.append("cpo_query where text_id = ?) order by name, group_type, group_id");
-      pstmt = conn.prepareStatement(sql.toString());
-      pstmt.setString(1,textNode.getTextId());
-      rs = pstmt.executeQuery();
-      while (rs.next()) {
-        CpoQueryGroupNode cpoQueryGroupNode = new CpoQueryGroupNode(rs.getString("name"),rs.getString("class_id"), rs.getString("group_id"), rs.getString("group_type"),null);
-        cpoQueryGroupNode.setUserName(rs.getString("userid"));
-        cpoQueryGroupNode.setCreateDate(rs.getTimestamp("createdate"));
-        al.add(cpoQueryGroupNode);
-      }
-    } finally {
-      try {
-        if (rs != null) rs.close();
-      } catch (Exception e) {
-        // ignore
-      }
-      try {
-        if (pstmt != null) pstmt.close();
-      } catch (Exception e) {
-        // ignore
-      }
+
+    List<CpoQueryGroup> al = new ArrayList<CpoQueryGroup>();
+    for (CpoQueryGroup queryGroup : metaDao.getCpoQueryGroups(textNode.getCpoQueryText())) {
+      al.add(queryGroup);
     }
-    this.queryGroupByTextCache.put(textNode,al);
+    this.queryGroupByTextCache.put(textNode, al);
     return al;
   }
 
-  public List<CpoQueryGroupNode> getQueryGroups(CpoQueryGroupLabelNode parent) throws Exception {
-    if (this.queryGroupCache.containsKey(parent)) {
-      return this.queryGroupCache.get(parent);
+  public List<CpoQueryGroupNode> getQueryGroups(CpoClassNode classNode) throws Exception {
+    if (this.queryGroupCache.containsKey(classNode)) {
+      return this.queryGroupCache.get(classNode);
     }
+    
     List<CpoQueryGroupNode> al = new ArrayList<CpoQueryGroupNode>();
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
-    try {
-    	StringBuilder sql = new StringBuilder();
-      sql.append("select group_id, class_id, group_type, name, userid, createdate from ");
-      sql.append(tablePrefix);
-      sql.append("cpo_query_group where class_id = ? order by name, group_type, group_id");
-      pstmt = conn.prepareStatement(sql.toString());
-      pstmt.setString(1,((CpoClassNode)parent.getParent()).getClassId());
-      rs = pstmt.executeQuery();
-      while (rs.next()) {
-        CpoQueryGroupNode cpoQueryGroupNode = new CpoQueryGroupNode(rs.getString("name"),rs.getString("class_id"), rs.getString("group_id"), rs.getString("group_type"),parent);
-        cpoQueryGroupNode.setUserName(rs.getString("userid"));
-        cpoQueryGroupNode.setCreateDate(rs.getTimestamp("createdate"));
-        al.add(cpoQueryGroupNode);
-      }
-    } finally {
-      try {
-        if (rs != null) rs.close();
-      } catch (Exception e) {
-        // ignore
-      }
-      try {
-        if (pstmt != null) pstmt.close();
-      } catch (Exception e) {
-        // ignore
-      }
+
+    CpoClass cpoClass = classNode.getCpoClass();
+
+    List<CpoQueryGroup> queryGroups = metaDao.getCpoQueryGroups(cpoClass);
+    cpoClass.setQueryGroups(queryGroups);
+
+    for (CpoQueryGroup queryGroup : queryGroups) {
+      CpoQueryGroupNode cpoQueryGroupNode = new CpoQueryGroupNode(queryGroup, getQueryGroupLabelNode(classNode));
+      al.add(cpoQueryGroupNode);
     }
-    this.queryGroupCache.put(parent,al);
+    this.queryGroupCache.put(classNode, al);
     return al;
   }
 
@@ -490,12 +420,13 @@ public class Proxy implements Observer {
   }
 
   public CpoQueryGroupNode getQueryGroupNode(CpoClassNode classNode, String name, String type) throws Exception {
-    CpoQueryGroupLabelNode cqgl = getQueryGroupLabelNode(classNode);
-    for (CpoQueryGroupNode node : getQueryGroups(cqgl)) {
+    for (CpoQueryGroupNode node : getQueryGroups(classNode)) {
       if (((name == null && node.getGroupName() == null) ||
           node.getGroupName() != null && name != null &&
           node.getGroupName().equals(name)) 
-          && node.getType().equals(type)) return node;
+          && node.getType().equals(type)) {
+        return node;
+      }
     }
     return null;
   }
@@ -508,35 +439,15 @@ public class Proxy implements Observer {
       return this.queryCache.get(parent);
     }
     List<CpoQueryNode> al = new ArrayList<CpoQueryNode>();
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
-    try {
-    	StringBuilder sql = new StringBuilder();
-      sql.append("select q.query_id, q.group_id, q.text_id, q.seq_no, q.userid, q.createdate from ");
-      sql.append(tablePrefix);
-      sql.append("cpo_query q where q.group_id = ? order by q.seq_no");
-      pstmt = conn.prepareStatement(sql.toString());
-      pstmt.setString(1,parent.getGroupId());
-      rs = pstmt.executeQuery();
-      while (rs.next()) {
-        CpoQueryTextNode cQTnode = this.getQueryText((CpoServerNode)parent.getParent().getParent().getParent(),rs.getString("text_id"));
-        CpoQueryNode cpoQueryNode = new CpoQueryNode(rs.getString("query_id"), rs.getString("group_id"), rs.getInt("seq_no"), cQTnode,parent);
-        cpoQueryNode.setUserName(rs.getString("userid"));
-        cpoQueryNode.setCreateDate(rs.getTimestamp("createdate"));
-        al.add(cpoQueryNode);
-      }
-    } finally {
-      try {
-        if (rs != null) rs.close();
-      } catch (Exception e) {
-        // ignore
-      }
-      try {
-        if (pstmt != null) pstmt.close();
-      } catch (Exception e) {
-        // ignore
-      }
+    
+    for (CpoQuery query : metaDao.getCpoQueries(parent.getCpoQueryGroup())) {
+      CpoQueryTextNode cQTnode = this.getQueryText((CpoServerNode) parent.getParent().getParent().getParent(), query.getTextId());
+      
+      query.setQueryText(cQTnode.getCpoQueryText());
+      CpoQueryNode cpoQueryNode = new CpoQueryNode(query, parent);
+      al.add(cpoQueryNode);
     }
+
     this.queryCache.put(parent,al);
     return al;
   }
@@ -549,36 +460,11 @@ public class Proxy implements Observer {
       return this.queryParamCache.get(qNode);
     }    
     List<CpoQueryParameterNode> al = new ArrayList<CpoQueryParameterNode>();
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
-    try {
-    	StringBuilder sql = new StringBuilder();
-      sql.append("select qp.attribute_id, qp.query_id, qp.seq_no, qp.param_type, qp.userid, qp.createdate from ");
-      sql.append(tablePrefix);
-      sql.append("cpo_query_parameter qp where query_id = ? order by qp.seq_no");
-      pstmt = conn.prepareStatement(sql.toString());
-      pstmt.setString(1,qNode.getQueryId());
-      rs = pstmt.executeQuery();
-      while (rs.next()) {
-        CpoQueryParameterNode cpoQPB = new CpoQueryParameterNode(qNode, rs.getInt("seq_no"),
-            getAttributeMap((CpoServerNode)qNode.getParent().getParent().getParent().getParent(),rs.getString("attribute_id")),
-            rs.getString("param_type"));
-        
-        cpoQPB.setUserName(rs.getString("userid"));
-        cpoQPB.setCreateDate(rs.getTimestamp("createdate"));
-        al.add(cpoQPB);
-      }
-    } finally {
-      try {
-        if (rs != null) rs.close();
-      } catch (Exception e) {
-        // ignore
-      }
-      try {
-        if (pstmt != null) pstmt.close();
-      } catch (Exception e) {
-        // ignore
-      }
+    
+    for (CpoQueryParameter parameter : metaDao.getCpoQueryParameters(qNode.getCpoQuery())) {
+      CpoAttributeMapNode camn = getAttributeMap((CpoServerNode)qNode.getParent().getParent().getParent().getParent(), parameter.getAttributeId());
+      CpoQueryParameterNode cpoQPB = new CpoQueryParameterNode(parameter, camn, qNode);
+      al.add(cpoQPB);
     }
     this.queryParamCache.put(qNode,al);
     return al;
@@ -603,12 +489,16 @@ public class Proxy implements Observer {
     }
     return null;
   }
-  
+
+  /**
+   * Returns the attribute w/ the specified id
+   */
   public CpoAttributeMapNode getAttributeMap(CpoServerNode cpoServerNode, String attributeId) throws Exception {
     for (CpoClassNode cpoClassNode : getClasses(cpoServerNode)) {
-      CpoAttributeMapNode attMapNode = getAttributeMap(cpoClassNode,attributeId);
-      if (attMapNode != null)
+      CpoAttributeMapNode attMapNode = getAttributeMap(cpoClassNode, attributeId);
+      if (attMapNode != null) {
         return attMapNode;
+      }
     }
     return null;
   }
@@ -621,7 +511,7 @@ public class Proxy implements Observer {
     }
     return null;
   }
-  
+
   /**
    * returns CpoAttributeMapNode(s)
    */
@@ -629,72 +519,19 @@ public class Proxy implements Observer {
     if (this.attMapCache.containsKey(cpoAttLabNode)) {
       return this.attMapCache.get(cpoAttLabNode);
     }
+    
     List<CpoAttributeMapNode> al = new ArrayList<CpoAttributeMapNode>();
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
-    try {
-    	StringBuilder sql = new StringBuilder();
-      sql.append("select am.attribute_id, am.class_id, am.column_name, am.attribute, am.column_type, ");
-      sql.append("am.transform_class, am.db_table, am.db_column, am.userid, am.createdate from ");
-      sql.append(tablePrefix);
-      sql.append("cpo_attribute_map am where am.class_id = ? order by am.attribute");
-      pstmt = conn.prepareStatement(sql.toString());
-      pstmt.setString(1,((CpoClassNode)cpoAttLabNode.getParent()).getClassId());
-      rs = pstmt.executeQuery();
-      while (rs.next()) {
-        CpoAttributeMapNode cpoAB = new CpoAttributeMapNode(cpoAttLabNode,rs.getString("attribute_id"),
-            rs.getString("class_id"), rs.getString("column_name"), 
-            rs.getString("attribute"), rs.getString("column_type"), rs.getString("transform_class"),
-            rs.getString("db_table"), rs.getString("db_column"),"IN");
-        cpoAB.setUserName(rs.getString("userid"));
-        cpoAB.setCreateDate(rs.getTimestamp("createdate"));
-        al.add(cpoAB);
-      }
-    } finally {
-      try {
-        if (rs != null) rs.close();
-      } catch (Exception e) {
-        // ignore
-      }
-      try {
-        if (pstmt != null) pstmt.close();
-      } catch (Exception e) {
-        // ignore
-      }
+    CpoClass cpoClass = cpoAttLabNode.getParent().getCpoClass();
+
+    List<CpoAttribute> attributes = metaDao.getCpoAttributes(cpoClass);
+    cpoClass.setAttributes(attributes);
+
+    for (CpoAttribute attribute : attributes) {
+      CpoAttributeMapNode cpoAB = new CpoAttributeMapNode(attribute, cpoAttLabNode);
+      al.add(cpoAB);
     }
-    this.attMapCache.put(cpoAttLabNode,al);
+    this.attMapCache.put(cpoAttLabNode, al);
     return al;
-  }
-  
-  /**
-   * return the number of times a query text is being used
-   */
-  public int getQueryTextUsageCount(String textId) throws Exception {
-    int result;
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
-    try {
-    	StringBuilder sql = new StringBuilder("select count(*) from ");
-      sql.append(tablePrefix);
-      sql.append("cpo_query where text_id = ?");
-      pstmt = conn.prepareStatement(sql.toString());
-      pstmt.setString(1,textId);
-      rs = pstmt.executeQuery();
-      rs.next();
-      result = rs.getInt(1);
-    } finally {
-      try {
-        if (rs != null) rs.close();
-      } catch (Exception e) {
-        // ignore
-      }
-      try {
-        if (pstmt != null) pstmt.close();
-      } catch (Exception e) {
-        // ignore
-      }
-    }
-    return result;
   }
   
   public void close() {
@@ -796,7 +633,7 @@ public class Proxy implements Observer {
   /**
    * retreives a new guid to use for newly created objects
    */
-  public String getNewGuid() throws Exception {
+  public String getNewGuid() {
     return GUID.getGUID();
   }
 
@@ -804,443 +641,135 @@ public class Proxy implements Observer {
    * saves all nodes passed to it to the db
    */
   public void saveNodes(List<AbstractCpoNode> nodes) throws Exception {
-    PreparedStatement pstmt = null;
-    try {
-      /**
-       * do class nodes first
-       */
-      List<AbstractCpoNode> toBeCleaned = new ArrayList<AbstractCpoNode>();
-      for (AbstractCpoNode node : nodes) {
-        if (node instanceof CpoClassNode) {
-          CpoClassNode ccn = (CpoClassNode) node;
-          if (ccn.isNew()) {
-            StringBuilder sql = new StringBuilder();
-            sql.append("insert into ");
-            sql.append(tablePrefix);
-            sql.append("cpo_class (class_id, name, userid) ");
-            sql.append("values (?,?,'");
-            sql.append(CpoUtil.username);
-            sql.append("')");
+    List<AbstractCpoNode> toBeCleaned = new ArrayList<AbstractCpoNode>();
 
-            pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1, ccn.getClassId());
-            pstmt.setString(2, ccn.getClassName());
-            pstmt.executeUpdate();
-          } else if (ccn.isRemove()) {
-            StringBuilder sqlDelQueryParam = new StringBuilder("delete from ");
-            sqlDelQueryParam.append(tablePrefix);
-            sqlDelQueryParam.append("cpo_query_parameter where query_id in ");
-            sqlDelQueryParam.append("(select query_id from ");
-            sqlDelQueryParam.append(tablePrefix);
-            sqlDelQueryParam.append("cpo_query where group_id in ");
-            sqlDelQueryParam.append("(select group_id from ");
-            sqlDelQueryParam.append(tablePrefix);
-            sqlDelQueryParam.append("cpo_query_group where class_id = ?))");
-
-            StringBuilder sqlDelAttMap = new StringBuilder("delete from ");
-            sqlDelAttMap.append(tablePrefix);
-            sqlDelAttMap.append("cpo_attribute_map where class_id = ?");
-
-            StringBuilder sqlDelQuery = new StringBuilder("delete from ");
-            sqlDelQuery.append(tablePrefix);
-            sqlDelQuery.append("cpo_query where group_id in ");
-            sqlDelQuery.append("(select group_id from ");
-            sqlDelQuery.append(tablePrefix);
-            sqlDelQuery.append("cpo_query_group where class_id = ?)");
-
-            StringBuilder sqlDelQueryGroup = new StringBuilder("delete from ");
-            sqlDelQueryGroup.append(tablePrefix);
-            sqlDelQueryGroup.append("cpo_query_group where class_id = ?");
-
-            StringBuilder sqlDelClass = new StringBuilder("delete from ");
-            sqlDelClass.append(tablePrefix);
-            sqlDelClass.append("cpo_class where class_id = ?");
-
-            pstmt = conn.prepareStatement(sqlDelQueryParam.toString());
-            pstmt.setString(1, ccn.getClassId());
-            pstmt.execute();
-            pstmt.close();
-
-            pstmt = conn.prepareStatement(sqlDelAttMap.toString());
-            pstmt.setString(1, ccn.getClassId());
-            pstmt.execute();
-            pstmt.close();
-
-            pstmt = conn.prepareStatement(sqlDelQuery.toString());
-            pstmt.setString(1, ccn.getClassId());
-            pstmt.execute();
-            pstmt.close();
-
-            pstmt = conn.prepareStatement(sqlDelQueryGroup.toString());
-            pstmt.setString(1, ccn.getClassId());
-            pstmt.execute();
-            pstmt.close();
-
-            pstmt = conn.prepareStatement(sqlDelClass.toString());
-            pstmt.setString(1, ccn.getClassId());
-            pstmt.execute();
-          } else if (ccn.isDirty()) {
-            StringBuilder sql = new StringBuilder();
-            sql.append("update ");
-            sql.append(tablePrefix);
-            sql.append("cpo_class set name = ?, userid = '");
-            sql.append(CpoUtil.username);
-            sql.append("' where class_id = ?");
-            pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1, ccn.getClassName());
-            pstmt.setString(2, ccn.getClassId());
-            pstmt.executeUpdate();
-          }
-        } else {
-          continue;
+    /**
+     * do class nodes first
+     */
+    for (AbstractCpoNode node : nodes) {
+      if (node instanceof CpoClassNode) {
+        CpoClassNode ccn = (CpoClassNode) node;
+        CpoClass cpoClass = ccn.getCpoClass();
+        if (ccn.isNew()) {
+          metaDao.createCpoClass(cpoClass);
+        } else if (ccn.isRemove()) {
+          metaDao.deleteCpoClass(cpoClass);
+        } else if (ccn.isDirty()) {
+          metaDao.updateCpoClass(cpoClass);
         }
         toBeCleaned.add(node);
-        if (pstmt != null) {
-          pstmt.close();
-        }
       }
+    }
 
-      /**
-       * do attribute maps second
-       */
-      for (AbstractCpoNode node : nodes) {
-        if (node instanceof CpoAttributeMapNode) {
-          CpoAttributeMapNode camn = (CpoAttributeMapNode) node;
-          if (camn.isNew()) {
-            StringBuilder sql = new StringBuilder();
-            sql.append("insert into ");
-            sql.append(tablePrefix);
-            sql.append("cpo_attribute_map (attribute_id, class_id, ");
-            sql.append("column_name, attribute, column_type, db_table, db_column, userid, transform_class) ");
-            sql.append("values (?,?,?,?,?,?,?,'");
-            sql.append(CpoUtil.username);
-            sql.append("',?)");
-
-            pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1, camn.getAttributeId());
-            pstmt.setString(2, camn.getClassId());
-            pstmt.setString(3, camn.getColumnName());
-            pstmt.setString(4, camn.getAttribute());
-            pstmt.setString(5, camn.getColumnType());
-            pstmt.setString(6, camn.getDbTable());
-            pstmt.setString(7, camn.getDbColumn());
-            pstmt.setString(8, camn.getTransformClass());
-            pstmt.executeUpdate();
-          } else if (camn.isRemove()) {
-            StringBuilder sql = new StringBuilder("delete from ");
-            sql.append(tablePrefix);
-            sql.append("cpo_attribute_map where attribute_id = ?");
-            pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1, camn.getAttributeId());
-            pstmt.execute();
-          } else if (camn.isDirty()) {
-            //  update everything except class_id - might want to change this later...
-            StringBuilder sql = new StringBuilder();
-            sql.append("update ");
-            sql.append(tablePrefix);
-            sql.append("cpo_attribute_map set ");
-            sql.append("column_name = ?, attribute = ?, column_type = ?, db_table = ?, ");
-            sql.append("db_column = ?, userid = '");
-            sql.append(CpoUtil.username);
-            sql.append("', transform_class=? where attribute_id = ?");
-
-            pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1, camn.getColumnName());
-            pstmt.setString(2, camn.getAttribute());
-            pstmt.setString(3, camn.getColumnType());
-            pstmt.setString(4, camn.getDbTable());
-            pstmt.setString(5, camn.getDbColumn());
-            pstmt.setString(6, camn.getTransformClass());
-            pstmt.setString(7, camn.getAttributeId());
-            pstmt.executeUpdate();
-          }
-        } else {
-          continue;
+    /**
+     * do attribute maps second
+     */
+    for (AbstractCpoNode node : nodes) {
+      if (node instanceof CpoAttributeMapNode) {
+        CpoAttributeMapNode camn = (CpoAttributeMapNode) node;
+        CpoAttribute attribute = camn.getCpoAttribute();
+        if (camn.isNew()) {
+          metaDao.createCpoAttribute(attribute);
+        } else if (camn.isRemove()) {
+          metaDao.deleteCpoAttribute(attribute);
+        } else if (camn.isDirty()) {
+          metaDao.updateCpoAttribute(attribute);
         }
         toBeCleaned.add(node);
-        if (pstmt != null) {
-          pstmt.close();
-        }
       }
+    }
 
-      /**
-       * do query groups
-       */
-      for (AbstractCpoNode node : nodes) {
-        if (node instanceof CpoQueryGroupNode) {
-          CpoQueryGroupNode cqgn = (CpoQueryGroupNode) node;
-          if (cqgn.isNew()) {
-            StringBuilder sql = new StringBuilder();
-            sql.append("insert into ");
-            sql.append(tablePrefix);
-            sql.append("cpo_query_group (group_id, class_id, group_type, name, userid) values (?,?,?,?,'");
-            sql.append(CpoUtil.username);
-            sql.append("')");
-
-            pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1, cqgn.getGroupId());
-            pstmt.setString(2, cqgn.getClassId());
-            pstmt.setString(3, cqgn.getType());
-            pstmt.setString(4, cqgn.getGroupName());
-            pstmt.executeUpdate();
-          } else if (cqgn.isRemove()) {
-            StringBuilder sqlDelQueryParam = new StringBuilder("delete from ");
-            sqlDelQueryParam.append(tablePrefix);
-            sqlDelQueryParam.append("cpo_query_parameter where query_id in ");
-            sqlDelQueryParam.append("(select query_id from ");
-            sqlDelQueryParam.append(tablePrefix);
-            sqlDelQueryParam.append("cpo_query where group_id = ?)");
-
-            StringBuilder sqlDelQuery = new StringBuilder("delete from ");
-            sqlDelQuery.append(tablePrefix);
-            sqlDelQuery.append("cpo_query where group_id = ?");
-
-            StringBuilder sqlDelQueryGroup = new StringBuilder("delete from ");
-            sqlDelQueryGroup.append(tablePrefix);
-            sqlDelQueryGroup.append("cpo_query_group where group_id = ?");
-
-            pstmt = conn.prepareStatement(sqlDelQueryParam.toString());
-            pstmt.setString(1, cqgn.getGroupId());
-            pstmt.execute();
-            pstmt.close();
-
-            pstmt = conn.prepareStatement(sqlDelQuery.toString());
-            pstmt.setString(1, cqgn.getGroupId());
-            pstmt.execute();
-            pstmt.close();
-
-            pstmt = conn.prepareStatement(sqlDelQueryGroup.toString());
-            pstmt.setString(1, cqgn.getGroupId());
-            pstmt.execute();
-          } else if (cqgn.isDirty()) {
-            StringBuilder sql = new StringBuilder();
-            sql.append("update ");
-            sql.append(tablePrefix);
-            sql.append("cpo_query_group set group_type = ?, name = ?, userid = '");
-            sql.append(CpoUtil.username);
-            sql.append("' where group_id = ?");
-
-            pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1, cqgn.getType());
-            pstmt.setString(2, cqgn.getGroupName());
-            pstmt.setString(3, cqgn.getGroupId());
-            pstmt.executeUpdate();
-          }
-        } else {
-          continue;
+    /**
+     * do query groups
+     */
+    for (AbstractCpoNode node : nodes) {
+      if (node instanceof CpoQueryGroupNode) {
+        CpoQueryGroupNode cqgn = (CpoQueryGroupNode) node;
+        CpoQueryGroup queryGroup = cqgn.getCpoQueryGroup();
+        if (cqgn.isNew()) {
+          metaDao.createCpoQueryGroup(queryGroup);
+        } else if (cqgn.isRemove()) {
+          metaDao.deleteCpoQueryGroup(queryGroup);
+        } else if (cqgn.isDirty()) {
+          metaDao.updateCpoQueryGroup(queryGroup);
         }
         toBeCleaned.add(node);
-        if (pstmt != null) {
-          pstmt.close();
+      }
+    }
+
+    /**
+     * do query text - only add / updates here
+     */
+    for (AbstractCpoNode node : nodes) {
+      if (node instanceof CpoQueryTextNode) {
+        CpoQueryTextNode cQTnode = (CpoQueryTextNode) node;
+        CpoQueryText queryText = cQTnode.getCpoQueryText();
+        if (cQTnode.isNew()) {
+          metaDao.createCpoQueryText(queryText);
+          toBeCleaned.add(node);
+        } else if (cQTnode.isDirty()) {
+          metaDao.updateCpoQueryText(queryText);
+          toBeCleaned.add(node);
         }
       }
+    }
 
-      /**
-       * do query text
-       */
-      for (AbstractCpoNode node : nodes) {
-        if (node instanceof CpoQueryTextNode) {
-          CpoQueryTextNode cQTnode = (CpoQueryTextNode) node;
-          // strip sql of CRs
-          String sqlText = cQTnode.getSQL();
-          if (sqlText == null)
-            sqlText = "";
-          else
-            sqlText = sqlText.trim();
-          try {
-            RE reStripBlankLines = new RE("\\r\\n\\s*\\r\\n");
-            sqlText = reStripBlankLines.substituteAll(sqlText, "\r\n");
-            RE reStripBlankLines2 = new RE("\\n\\s*\\n");
-            sqlText = reStripBlankLines2.substituteAll(sqlText, "\n");
-          } catch (REException ree) {
-            CpoUtil.showException(ree);
-          }
-          if (cQTnode.isNew()) {
-            StringBuilder insertTextId = new StringBuilder();
-            insertTextId.append("insert into ");
-            insertTextId.append(tablePrefix);
-            insertTextId.append("cpo_query_text (text_id, sql_text, description, userid) ");
-            insertTextId.append("values (?,?,?,'");
-            insertTextId.append(CpoUtil.username);
-            insertTextId.append("')");
-
-            pstmt = conn.prepareStatement(insertTextId.toString());
-            pstmt.setString(1, cQTnode.getTextId());
-            pstmt.setString(2, sqlText);
-            pstmt.setString(3, cQTnode.getDesc());
-            pstmt.executeUpdate();
-          } else if (cQTnode.isRemove()) {
-            StringBuilder removeTextId = new StringBuilder("delete from ");
-            removeTextId.append(tablePrefix);
-            removeTextId.append("cpo_query_text where text_id = ?");
-
-            pstmt = conn.prepareStatement(removeTextId.toString());
-            pstmt.setString(1, cQTnode.getTextId());
-            pstmt.execute();
-          } else if (cQTnode.isDirty()) {
-            StringBuilder updateTextId = new StringBuilder();
-            updateTextId.append("update ");
-            updateTextId.append(tablePrefix);
-            updateTextId.append("cpo_query_text set sql_text = ?, description = ?, userid = '");
-            updateTextId.append(CpoUtil.username);
-            updateTextId.append("' where text_id = ?");
-
-            pstmt = conn.prepareStatement(updateTextId.toString());
-            pstmt.setString(1, sqlText);
-            pstmt.setString(2, cQTnode.getDesc());
-            pstmt.setString(3, cQTnode.getTextId());
-            pstmt.executeUpdate();
-          }
-        } else {
-          continue;
+    /**
+     * do query node
+     */
+    for (AbstractCpoNode node : nodes) {
+      if (node instanceof CpoQueryNode) {
+        CpoQueryNode cqn = (CpoQueryNode) node;
+        CpoQuery query = cqn.getCpoQuery();
+        if (cqn.isNew()) {
+          metaDao.createCpoQuery(query);
+        } else if (cqn.isRemove()) {
+          metaDao.deleteCpoQuery(query);
+        } else if (cqn.isDirty()) {
+          metaDao.updateCpoQuery(query);
         }
         toBeCleaned.add(node);
-        if (pstmt != null) {
-          pstmt.close();
-        }
       }
+    }
 
-      /**
-       * do query node
-       */
-      for (AbstractCpoNode node : nodes) {
-        if (node instanceof CpoQueryNode) {
-          CpoQueryNode cqn = (CpoQueryNode) node;
-          if (cqn.isNew()) {
-            StringBuilder sql = new StringBuilder();
-            sql.append("insert into ");
-            sql.append(tablePrefix);
-            sql.append("cpo_query (query_id, group_id, text_id, seq_no, userid) ");
-            sql.append("values (?,?,?,?,'");
-            sql.append(CpoUtil.username);
-            sql.append("')");
-
-            pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1, cqn.getQueryId());
-            pstmt.setString(2, cqn.getGroupId());
-            pstmt.setString(3, cqn.getTextId());
-            pstmt.setInt(4, cqn.getSeqNo());
-            pstmt.executeUpdate();
-          } else if (cqn.isRemove()) {
-            StringBuilder sqlDelQueryParam = new StringBuilder("delete from ");
-            sqlDelQueryParam.append(tablePrefix);
-            sqlDelQueryParam.append("cpo_query_parameter where query_id = ?");
-
-            StringBuilder sqlDelQuery = new StringBuilder("delete from ");
-            sqlDelQuery.append(tablePrefix);
-            sqlDelQuery.append("cpo_query where query_id = ?");
-
-            pstmt = conn.prepareStatement(sqlDelQueryParam.toString());
-            pstmt.setString(1, cqn.getQueryId());
-            pstmt.execute();
-            pstmt.close();
-
-            pstmt = conn.prepareStatement(sqlDelQuery.toString());
-            pstmt.setString(1, cqn.getQueryId());
-            pstmt.execute();
-          } else if (cqn.isDirty()) {
-            // not updating group_id ... could change later
-            StringBuilder sql = new StringBuilder();
-            sql.append("update ");
-            sql.append(tablePrefix);
-            sql.append("cpo_query set text_id = ?, seq_no = ?, userid = '");
-            sql.append(CpoUtil.username);
-            sql.append("' where query_id = ?");
-
-            pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1, cqn.getTextId());
-            pstmt.setInt(2, cqn.getSeqNo());
-            pstmt.setString(3, cqn.getQueryId());
-            pstmt.executeUpdate();
-          }
-        } else {
-          continue;
+    /**
+     * do query parameters
+     */
+    for (AbstractCpoNode node : nodes) {
+      if (node instanceof CpoQueryParameterNode) {
+        CpoQueryParameterNode cqpn = (CpoQueryParameterNode) node;
+        CpoQueryParameter queryParameter = cqpn.getCpoQueryParameter();
+        if (cqpn.isNew()) {
+          metaDao.createCpoQueryParameter(queryParameter);
+        } else if (cqpn.isRemove()) {
+          metaDao.deleteCpoQueryParameter(queryParameter);
+        } else if (cqpn.isDirty()) {
+          metaDao.updateCpoQueryParameter(queryParameter);
         }
         toBeCleaned.add(node);
-        if (pstmt != null) {
-          pstmt.close();
+      }
+    }
+
+    /**
+     * do query text - removes last
+     */
+    for (AbstractCpoNode node : nodes) {
+      if (node instanceof CpoQueryTextNode) {
+        CpoQueryTextNode cQTnode = (CpoQueryTextNode) node;
+        CpoQueryText queryText = cQTnode.getCpoQueryText();
+        if (cQTnode.isRemove()) {
+          metaDao.deleteCpoQueryText(queryText);
+          toBeCleaned.add(node);
         }
       }
+    }
 
-      /**
-       * do query parameters
-       */
-      for (AbstractCpoNode node : nodes) {
-        if (node instanceof CpoQueryParameterNode) {
-          CpoQueryParameterNode cqpn = (CpoQueryParameterNode) node;
-          if (cqpn.isNew()) {
-            StringBuilder sql = new StringBuilder();
-            sql.append("insert into ");
-            sql.append(tablePrefix);
-            sql.append("cpo_query_parameter (attribute_id, query_id, seq_no, userid, param_type) ");
-            sql.append("values (?,?,?,'");
-            sql.append(CpoUtil.username);
-            sql.append("',?)");
-
-            pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1, cqpn.getAttributeId());
-            pstmt.setString(2, cqpn.getQueryId());
-            pstmt.setInt(3, cqpn.getSeqNo());
-            pstmt.setString(4, cqpn.getType());
-//            OUT.debug("Inserting query attribute parameter: "+cqpn.getSeqNo()+" for query node: "+cqpn.getQueryId()+" and attribute map node: "+cqpn.getAttributeId());
-            pstmt.executeUpdate();
-//            OUT.debug("Inserted query attribute parameter: "+cqpn.getSeqNo()+" for query node: "+cqpn.getQueryId()+" and attribute map node: "+cqpn.getAttributeId()+" "+result);
-          } else if (cqpn.isRemove()) {
-            StringBuilder sql = new StringBuilder("delete from ");
-            sql.append(tablePrefix);
-            sql.append("cpo_query_parameter where query_id = ? and seq_no = ?");
-
-            pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1, cqpn.getQueryId());
-            pstmt.setInt(2, cqpn.getSeqNo());
-            pstmt.execute();
-          } else if (cqpn.isDirty()) {
-            StringBuilder sql = new StringBuilder();
-            sql.append("update ");
-            sql.append(tablePrefix);
-            sql.append("cpo_query_parameter set attribute_id = ?, param_type = ?, userid = '");
-            sql.append(CpoUtil.username);
-            sql.append("' where query_id = ? and seq_no = ? ");
-
-            pstmt = conn.prepareStatement(sql.toString());
-            pstmt.setString(1, cqpn.getAttributeId());
-            pstmt.setString(2, cqpn.getType());
-            pstmt.setString(3, cqpn.getQueryId());
-            pstmt.setInt(4, cqpn.getSeqNo());
-            pstmt.executeUpdate();
-            //OUT.debug("updated parameter query_id="+cqpn.getQueryId()+" seq="+cqpn.getSeqNo()+ " group_type="+cqpn.getType());
-          }
-        } else {
-          continue;
-        }
-        toBeCleaned.add(node);
-        if (pstmt != null) {
-          pstmt.close();
-        }
-      }
-      conn.commit();
-      // commit completed ok - clean up objects
-
-      for (AbstractCpoNode node : toBeCleaned) {
-        node.setNew(false);
-        node.setDirty(false);
-        if (node.isRemove()) {
-          this.removeObjectFromAllCache(node);
-          node.setRemove(false);
-        }
-      }
-    } catch (SQLException se) {
-      try {
-        conn.rollback();
-      } catch (Exception e) {
-        // ignore
-      }
-      throw se;
-    } finally {
-      try {
-        pstmt.close();
-      } catch (Exception e) {
-        // ignore
+    for (AbstractCpoNode node : toBeCleaned) {
+      node.setNew(false);
+      node.setDirty(false);
+      if (node.isRemove()) {
+        this.removeObjectFromAllCache(node);
+        node.setRemove(false);
       }
     }
   }
@@ -1264,59 +793,76 @@ public class Proxy implements Observer {
    * removes a particular object from all caches, including changed object cache
    */
   public void removeObjectFromAllCache(AbstractCpoNode obj) {
-    if (queryTextCache.contains(obj))
-      queryTextCache.remove(obj);
-    if (allChangedObjects.contains(obj))
-      allChangedObjects.remove(obj);
-    this.allChangedObjects.remove(obj);
 
-    Enumeration<List<CpoClassNode>> classEnum = this.classCache.elements();
-    while (classEnum.hasMoreElements()) {
-      List<CpoClassNode> classes = classEnum.nextElement();
-      if (classes.contains(obj))
-        classes.remove(obj);
-    }   
-    if (this.classCache.contains(obj)) this.classCache.remove(obj);
+    this.allChangedObjects.remove(obj);
     
-    Enumeration<List<CpoAttributeMapNode>>attMapEnum = this.attMapCache.elements();
-    while (attMapEnum.hasMoreElements()) {
-      List<CpoAttributeMapNode> attMap = attMapEnum.nextElement();
-      if (attMap.contains(obj))
-        attMap.remove(obj);
+    if (this.classCache.containsKey(obj))
+      classCache.remove(obj);
+
+    // now check the cache values
+    if (obj instanceof CpoClassNode) {
+      CpoClassNode ccn = (CpoClassNode)obj;
+      for (List<CpoClassNode> classes : classCache.values()) {
+        if (classes.contains(ccn)) {
+          classes.remove(ccn);
+        }
+      }
+      if (queryGroupCache.containsKey(ccn)) {
+        queryGroupCache.remove(ccn);
+      }
+    } else if (obj instanceof CpoAttributeLabelNode) {
+      CpoAttributeLabelNode caln = (CpoAttributeLabelNode)obj;
+      if (attMapCache.containsKey(caln))
+        attMapCache.remove(caln);
+    } else if (obj instanceof CpoAttributeMapNode) {
+      CpoAttributeMapNode camn = (CpoAttributeMapNode)obj;
+      for (List<CpoAttributeMapNode> attMap : attMapCache.values()) {
+        if (attMap.contains(camn)) {
+          attMap.remove(camn);
+        }
+      }
+    } else if (obj instanceof CpoQueryNode) {
+      CpoQueryNode cqn = (CpoQueryNode)obj;
+      for (List<CpoQueryNode> attMap : queryCache.values()) {
+        if (attMap.contains(cqn)) {
+          attMap.remove(cqn);
+        }
+      }
+      if (queryParamCache.containsKey(cqn)) {
+        queryParamCache.remove(cqn);
+      }
+    } else if (obj instanceof CpoQueryGroupNode) {
+      CpoQueryGroupNode cqgn = (CpoQueryGroupNode)obj;
+      for (List<CpoQueryGroupNode> group : queryGroupCache.values()) {
+        if (group.contains(cqgn))
+          group.remove(cqgn);
+      }
+
+      CpoQueryGroup queryGroup = cqgn.getCpoQueryGroup();
+      for (List<CpoQueryGroup> groups : queryGroupByTextCache.values()) {
+        if (groups.contains(queryGroup))
+          groups.remove(queryGroup);
+      }
+
+      if (this.queryCache.containsKey(cqgn)) {
+        this.queryCache.remove(cqgn);
+      }
+    } else if (obj instanceof CpoQueryTextNode) {
+      CpoQueryTextNode cqtn = (CpoQueryTextNode)obj;
+      if (queryTextCache.contains(cqtn)) {
+        queryTextCache.remove(cqtn);
+      }
+
+      if (queryGroupByTextCache.containsKey(cqtn)) {
+        queryGroupByTextCache.remove(cqtn);
+      }
+    } else if (obj instanceof CpoQueryParameterNode) {
+      CpoQueryParameterNode cqpn = (CpoQueryParameterNode)obj;
+      for (List<CpoQueryParameterNode> params : queryParamCache.values()) {
+        if (params.contains(cqpn))
+          params.remove(cqpn);
+      }
     }
-    if (this.attMapCache.contains(obj)) this.attMapCache.remove(obj);
-    
-    Enumeration<List<CpoQueryNode>> queryEnum = this.queryCache.elements();
-    while (queryEnum.hasMoreElements()) {
-      List<CpoQueryNode> attMap = queryEnum.nextElement();
-      if (attMap.contains(obj))
-        attMap.remove(obj);
-    }
-    if (this.queryCache.contains(obj)) this.queryCache.remove(obj);
-    
-    Enumeration<List<CpoQueryGroupNode>> groupEnum = this.queryGroupCache.elements();
-    while (groupEnum.hasMoreElements()) {
-      List<CpoQueryGroupNode> group = groupEnum.nextElement();
-      if (group.contains(obj))
-        group.remove(obj);
-    }
-    if (this.queryGroupCache.contains(obj)) this.queryGroupCache.remove(obj);
-    
-    Enumeration<List<CpoQueryParameterNode>> paramEnum = this.queryParamCache.elements();
-    while (paramEnum.hasMoreElements()) {
-      List<CpoQueryParameterNode> params = paramEnum.nextElement();
-      if (params.contains(obj))
-        params.remove(obj);
-    }
-    if (this.queryParamCache.contains(obj)) this.queryParamCache.remove(obj);
-    
-    Enumeration<List<CpoQueryGroupNode>> qgEnum = this.queryGroupByTextCache.elements();
-    while (classEnum.hasMoreElements()) {
-      List<CpoQueryGroupNode> qGroups = qgEnum.nextElement();
-      if (qGroups.contains(obj))
-        qGroups.remove(obj);
-    }
-    if (this.queryGroupByTextCache.contains(obj)) this.queryGroupByTextCache.remove(obj);
   }
 
   /**
@@ -1353,18 +899,9 @@ public class Proxy implements Observer {
     this.cpoMan.clearMetaClass(className);
   }
 
-  public Class<?> getSqlTypeClass(String typeName) throws Exception {
-    return JavaSqlTypes.getSqlTypeClass(typeName);
-  }
-  
-  public Class<?> getSqlTypeClass(int typeInt) throws Exception {
-    return JavaSqlTypes.getSqlTypeClass(typeInt);
-  }
+  public String makeClassOuttaSql(CpoClass cpoClass, String sql) throws Exception {
 
-  public String makeClassOuttaSql(String className, String sql) throws Exception {
-
-    TreeMap<String, String> attributes = new TreeMap<String, String>();
-    TreeMap<String, Class> attClasses = new TreeMap<String, Class>();
+    TreeMap<String, Class> attributes = new TreeMap<String, Class>();
 
     if (sql != null && sql.length() > 0) {
       PreparedStatement pstmt = null;
@@ -1377,11 +914,9 @@ public class Proxy implements Observer {
         for (int i = 1 ; i <= columns ; i++) {
           String attName = makeAttFromColName(rsmd.getColumnName(i));
           OUT.debug("Column Type = "+rsmd.getColumnType(i));
-          Class<?> attClass = getSqlTypeClass(rsmd.getColumnType(i));
-          String attClassName = getRealClassName(attClass);
+          Class<?> attClass = JavaSqlTypes.getSqlTypeClass(rsmd.getColumnType(i));
 
-          attributes.put(attName, attClassName);
-          attClasses.put(attName, attClass);
+          attributes.put(attName, attClass);
         }
       } finally {
         try {
@@ -1397,20 +932,16 @@ public class Proxy implements Observer {
       }
     }
 
-    return generateClass(className, attributes, attClasses, null);
+    return cpoClass.generateSourceCode(attributes);
   }
 
   public String makeClassOuttaNode(CpoClassNode node) throws Exception {
-    String className = node.getClassName();
-
-    TreeMap<String, String> attributes = new TreeMap<String, String>();
-    TreeMap<String, Class> attClasses = new TreeMap<String, Class>();
+    TreeMap<String, Class> attributes = new TreeMap<String, Class>();
 
     List<CpoAttributeMapNode> alAttMap = this.getAttributeMap(node);
     for (CpoAttributeMapNode atMapNode : alAttMap) {
       String attName = atMapNode.getAttribute();
-      Class<?> attClass = getSqlTypeClass(atMapNode.getColumnType());
-      String attClassName = attClass.getName();
+      Class<?> attClass = JavaSqlTypes.getSqlTypeClass(atMapNode.getColumnType());
 
       // if the attribute uses a transform, figure out what class it really is
       if (atMapNode.getTransformClass() != null) {
@@ -1420,180 +951,20 @@ public class Proxy implements Observer {
           for (Method method : transformClass.getMethods()) {
             if (method.getName().equals("transformIn") && !method.isSynthetic() && !method.isBridge()) {
               attClass = method.getReturnType();
-              attClassName = getRealClassName(attClass);
             }
           }
         } catch (Exception e) {
           OUT.debug("Invalid Transform Class specified:<" + atMapNode.getTransformClass() + "> using default");
         }
       }
-      attributes.put(attName, attClassName);
-      attClasses.put(attName, attClass);
+      attributes.put(attName, attClass);
     }
 
-    return generateClass(className, attributes, attClasses, getQueryGroupLabelNode(node).children());
-  }
+    // HACK - ensure that the query groups have been loaded, so the class generates correctly
+    getQueryGroups(node);
 
-  private String generateClass(String className, Map<String, String> attributes, Map<String, Class> attClasses, Enumeration<CpoQueryGroupNode> queryGroupEnum) {
-    StringBuilder buf = new StringBuilder();
-
-    // generate class header
-    buf.append("/** This class auto-generated by " + this.getClass().getName() + " **/\n\n");
-    if (className.lastIndexOf(".") != -1) {
-      String packageName = className.substring(0, className.lastIndexOf("."));
-      className = className.substring(className.lastIndexOf(".") + 1);
-      buf.append("package " + packageName + ";\n\n");
-    }
-
-    // generate class declaration
-    buf.append("public class " + className + " implements java.io.Serializable {\n");
-    buf.append("\n");
-
-    // generate statics for query groups
-    buf.append("  /* Attribute name statics */\n");
-    for (String attName : attributes.keySet()) {
-      String staticName = "ATTR_" + attName.toUpperCase();
-      buf.append("  public final static String " + staticName + " = \"" + attName + "\";\n");
-    }
-    buf.append("\n");
-
-    // generate statics for query groups
-    buf.append("  /* Query group statics */\n");
-    if (queryGroupEnum != null) {
-      while (queryGroupEnum.hasMoreElements()) {
-        CpoQueryGroupNode cqgn = queryGroupEnum.nextElement();
-        String qgName = cqgn.getGroupName();
-        if (qgName == null)
-          qgName = "NULL";
-
-        String staticName = "QG_" + cqgn.getType() + "_" + qgName.toUpperCase();
-
-        if (cqgn.getGroupName() == null) {
-          buf.append("  public final static String " + staticName + " = null;\n");
-        } else {
-          buf.append("  public final static String " + staticName + " = \"" + qgName + "\";\n");
-        }
-      }
-    }
-    buf.append("\n");
-
-    // generate property declarations
-    buf.append("  /* Properties */\n");
-    for (String attName : attributes.keySet()) {
-      String attClassName = attributes.get(attName);
-      buf.append("  private " + attClassName + " " + attName + ";\n");
-    }
-    buf.append("\n");
-
-    // generate constructor
-    buf.append("  public " + className + "() {\n");
-    buf.append("  }\n\n");
-
-    // generate getters and setters
-    buf.append("  /* Getters and Setters */\n");
-    for (String attName : attributes.keySet()) {
-      String attClassName = attributes.get(attName);
-
-      // generate getter
-      buf.append(generateClassGetter(attClassName, attName));
-
-      // generate setter
-      buf.append(generateClassSetter(attClassName, attName));
-    }
-    buf.append("\n");
-
-    // generate equals()
-    buf.append("  public boolean equals(Object o) {\n");
-    buf.append("    if (this == o)\n");
-    buf.append("      return true;\n");
-    buf.append("    if (o == null || getClass() != o.getClass())\n");
-    buf.append("      return false;\n");
-    buf.append("\n");
-    buf.append("    " + className + " that = (" + className + ")o;\n");
-    buf.append("\n");
-
-    for (String attName : attributes.keySet()) {
-      // need to look at the classes here
-      Class attClass = attClasses.get(attName);
-      if (attClass.isPrimitive()) {
-        // primitive type, use ==
-        buf.append("    if (" + generateGetterName(attName) + " != that." + generateGetterName(attName) + ")\n");
-      } else if (attClass.isArray()) {
-        // array type, use Array.equals()
-        buf.append("    if (!java.util.Arrays.equals(" + generateGetterName(attName) + ", that." + generateGetterName(attName) + "))\n");
-      } else {
-        // object, use .equals
-        buf.append("    if (" + generateGetterName(attName) + " != null ? !" + generateGetterName(attName) + ".equals(that." + generateGetterName(attName) + ") : that." + generateGetterName(attName) + " != null)\n");
-      }
-      buf.append("      return false;\n");
-    }
-    buf.append("\n");
-    buf.append("    return true;\n");
-    buf.append("  }\n\n");
-
-    // generate hashCode()
-    buf.append("  public int hashCode() {\n");
-    buf.append("    int result = 0;\n");
-    buf.append("    result = 31 * result + getClass().getName().hashCode();\n");
-    for (String attName : attributes.keySet()) {
-      // need to look at the classes here
-      Class attClass = attClasses.get(attName);
-      if (attClass.isPrimitive()) {
-        // primitive type, need some magic
-        buf.append("    result = 31 * result + (String.valueOf(" + generateGetterName(attName) + ").hashCode());\n");
-      } else if (attClass.isArray()) {
-        // array type, use Array.hashCode()
-        buf.append("    result = 31 * result + (" + generateGetterName(attName) + "!= null ? java.util.Arrays.hashCode(" + generateGetterName(attName) + ") : 0);\n");
-      } else {
-        buf.append("    result = 31 * result + (" + generateGetterName(attName) + " != null ? " + generateGetterName(attName) + ".hashCode() : 0);\n");
-      }
-    }
-    buf.append("    return result;\n");
-    buf.append("  }\n\n");
-
-    // generate toString()
-    buf.append("  public String toString() {\n");
-    buf.append("    StringBuilder str = new StringBuilder();\n");
-    for (String attName : attributes.keySet()) {
-      buf.append("    str.append(\"" + attName + " = \" + " + generateGetterName(attName) + " + \"\\n\");\n");
-    }
-    buf.append("    return str.toString();\n");
-    buf.append("  }\n");
-
-    // end class
-    buf.append("}\n");
-
-    return buf.toString();
-  }
-  
-  private String generateGetterName(String attName) {
-    if (attName.length() > 1) {
-      return ("get" + attName.substring(0, 1).toUpperCase() + attName.substring(1) + "()");
-    }
-    return ("get" + attName.toUpperCase() + "()");
-  }
-
-  private String generateClassGetter(String attClassName, String attName) {
-    StringBuilder buf = new StringBuilder();
-    buf.append("  public " + attClassName + " " + generateGetterName(attName) + " {\n");
-    buf.append("    return this." + attName + ";\n");
-    buf.append("  }\n");
-
-    return buf.toString();
-  }
-
-  private String generateClassSetter(String attClassName, String attName) {
-    StringBuilder buf = new StringBuilder();
-    if (attName.length() > 1) {
-      buf.append("  public void set" + attName.substring(0, 1).toUpperCase() + attName.substring(1) + "(" + attClassName + " " + attName + ") {\n");
-    } else {
-      buf.append("  public void set" + attName.toUpperCase() + "(" + attClassName + " " + attName + ") {\n");
-    }
-
-    buf.append("    this." + attName + " = " + attName + ";\n");
-    buf.append("  }\n");
-
-    return buf.toString();
+    CpoClass cpoClass = node.getCpoClass();
+    return cpoClass.generateSourceCode(attributes);
   }
 
   String makeAttFromColName(String columnName) throws REException {
@@ -1615,15 +986,24 @@ public class Proxy implements Observer {
         attMapParent = (CpoAttributeLabelNode)child;
     }
     if (attMapParent == null) throw new Exception ("Can't find the Attribute Label for this node: "+ccn);
-    for (int i = 0 ; i < methods.length ; i++) {
-      if (methods[i].getName().startsWith("get")) {
-        //Class<?> returnClass = methods[i].getReturnType();
-        String columnTypeName = "VARCHAR"; // this needs to be fixed!!!!
-        String attributeName = methods[i].getName().substring(3);
-        String columnName = attributeName;
-        CpoAttributeMapNode camn = new CpoAttributeMapNode(attMapParent,this.getNewGuid(),
-            ccn.getClassId(),columnName,attributeName, 
-            columnTypeName,null, null,null,"IN");
+    for (Method method : methods) {
+      if (method.getName().startsWith("get")) {
+        String columnTypeName = "VARCHAR"; // FIXME this needs to be fixed!!!!
+        String attributeName = method.getName().substring(3);
+
+        CpoAttribute attribute = new CpoAttribute();
+        attribute.setAttributeId(getNewGuid());
+        attribute.setClassId(ccn.getCpoClass().getClassId());
+        attribute.setColumnName(attributeName);
+        attribute.setAttribute(attributeName);
+        attribute.setColumnType(columnTypeName);
+        attribute.setTransformClass(null);
+        attribute.setDbTable(null);
+        attribute.setDbColumn(null);
+        attribute.setUserid(CpoUtil.username);
+        attribute.setCreatedate(Calendar.getInstance());
+
+        CpoAttributeMapNode camn = new CpoAttributeMapNode(attribute, attMapParent);
         this.getAttributeMap(ccn).add(camn);
         camn.setNew(true);
       }
@@ -1640,6 +1020,7 @@ public class Proxy implements Observer {
     }
     if (attMapParent == null) throw new Exception ("Can't find the Attribute Label for this node: "+ccn);
 
+    // FIXME - figure out how to do this from the cpoMan object
     if (sql != null && sql.length() > 0) {
       PreparedStatement pstmt = null;
       ResultSet rs = null;
@@ -1649,9 +1030,19 @@ public class Proxy implements Observer {
         ResultSetMetaData rsmd = rs.getMetaData();
         int columns = rsmd.getColumnCount();
         for (int i = 1 ; i <= columns ; i++) {
-          CpoAttributeMapNode camn = new CpoAttributeMapNode(attMapParent,this.getNewGuid(),
-              ccn.getClassId(),rsmd.getColumnName(i),this.makeAttFromColName(rsmd.getColumnName(i)),
-              Statics.getJavaSqlType(rsmd.getColumnType(i)),null, null,null, "IN");
+          CpoAttribute attribute = new CpoAttribute();
+          attribute.setAttributeId(getNewGuid());
+          attribute.setClassId(ccn.getCpoClass().getClassId());
+          attribute.setColumnName(rsmd.getColumnName(i));
+          attribute.setAttribute(this.makeAttFromColName(rsmd.getColumnName(i)));
+          attribute.setColumnType(Statics.getJavaSqlType(rsmd.getColumnType(i)));
+          attribute.setTransformClass(null);
+          attribute.setDbTable(null);
+          attribute.setDbColumn(null);
+          attribute.setUserid(CpoUtil.username);
+          attribute.setCreatedate(Calendar.getInstance());
+
+          CpoAttributeMapNode camn = new CpoAttributeMapNode(attribute, attMapParent);
           this.getAttributeMap(ccn).add(camn);
           camn.setNew(true);
         }
@@ -1747,23 +1138,6 @@ public class Proxy implements Observer {
     return this.classNameToggle;
   }
 
-  public String getConnectionClassName() {
-    return this.connectionClassName;
-  }
-
-  private String getRealClassName(Class<?> clazz) {
-    String clazzName = clazz.getName();
-    byte[] b = new byte[0];
-    char[] c = new char[0];
-
-    if (b.getClass().getName().equals(clazzName)) {
-      clazzName = "byte[]";
-    } else if (c.getClass().getName().equals(clazzName)) {
-      clazzName = "char[]";
-    }
-    return clazzName;
-  }
-
   /**
    * Returns true if a class is protected.  This will match exact class names as well as packages
    * for example:
@@ -1785,11 +1159,4 @@ public class Proxy implements Observer {
 
     return false;
   }
-
-  public class CpoClassNodeComparator implements Comparator<CpoClassNode> {
-    public int compare(CpoClassNode c1, CpoClassNode c2) {
-      return c1.getDisplayClassName().compareTo(c2.getDisplayClassName());
-    }
-  }
-
 }

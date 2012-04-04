@@ -61,7 +61,6 @@ public class CpoServerNode extends AbstractCpoNode {
     if (this.classes == null) refreshChildren();
     if (node.equals(this.cpoQTLN)) return 0;
     for (int i = 0 ; i < classes.size() ; i++) {
-//      OUT.debug (classes.get(i).getClass().getName()+" "+i+" string: "+classes.get(i).toString());
       if (node.equals(classes.get(i))) return i+1;
     }
     return -1;
@@ -98,7 +97,7 @@ public class CpoServerNode extends AbstractCpoNode {
 
   @Override
   public String toString() {
-    return this.prox.toString();
+    return this.prox.getServer();
   }
   @Override
   public void refreshChildren() {
@@ -109,5 +108,15 @@ public class CpoServerNode extends AbstractCpoNode {
       CpoUtil.showException(pe);
     }
     this.cpoQTLN = new CpoQueryTextLabelNode(this);
+  }
+
+  @Override
+  public String getUserName() {
+    return "";
+  }
+
+  @Override
+  public Calendar getCreateDate() {
+    return Calendar.getInstance();
   }
 }

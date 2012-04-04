@@ -20,25 +20,29 @@
  */
 package org.synchronoss.utils.cpo;
 
+import org.synchronoss.cpo.meta.domain.*;
+
 import javax.swing.*;
 import javax.swing.tree.TreeNode;
 import java.util.*;
 
 public class CpoQueryGroupNode extends AbstractCpoNode {
 
-  private String groupName, type, class_id, group_id;
+  private CpoQueryGroup queryGroup;
   private List<CpoQueryNode> qNodes;
 
-  public CpoQueryGroupNode(String groupName, String class_id, String group_id, String type, AbstractCpoNode parent) {
-    this.groupName = groupName;
-    this.type = type;
-    this.class_id = class_id;
-    this.group_id = group_id;
+  public CpoQueryGroupNode(CpoQueryGroup queryGroup, CpoQueryGroupLabelNode parent) {
+    this.queryGroup = queryGroup;
     this.parent = parent;
     if (parent != null) {
       this.addObserver(parent.getProxy());
       this.setProtected(parent.isProtected());
     }
+  }
+
+  @Override
+  public CpoQueryGroupLabelNode getParent() {
+    return (CpoQueryGroupLabelNode)this.parent;
   }
 
   @Override
@@ -70,7 +74,7 @@ public class CpoQueryGroupNode extends AbstractCpoNode {
 
   @Override
   public Enumeration<CpoQueryNode> children() {
-    if (qNodes == null) // due to panel not being removed from center pane ... this should be fixed
+    if (qNodes == null) 
       refreshChildren();
 
     return new Enumeration<CpoQueryNode>() {
@@ -97,23 +101,37 @@ public class CpoQueryGroupNode extends AbstractCpoNode {
 
   @Override
   public String toString() {
-    return this.groupName + " (" + this.type + ")";
+    return queryGroup.getName() + " (" + queryGroup.getGroupType() + ")";
+  }
+  
+  public CpoQueryGroup getCpoQueryGroup() {
+    return queryGroup;
   }
 
   public String getClassId() {
-    return this.class_id;
+    return queryGroup.getClassId();
   }
 
   public String getGroupId() {
-    return this.group_id;
+    return queryGroup.getGroupId();
   }
 
   public String getGroupName() {
-    return this.groupName;
+    return queryGroup.getName();
   }
 
   public String getType() {
-    return this.type;
+    return queryGroup.getGroupType();
+  }
+
+  @Override
+  public String getUserName() {
+    return queryGroup.getUserid();
+  }
+
+  @Override
+  public Calendar getCreateDate() {
+    return queryGroup.getCreatedate();
   }
 
   public CpoQueryNode addNewQueryNode() {
@@ -128,7 +146,15 @@ public class CpoQueryGroupNode extends AbstractCpoNode {
       CpoUtil.showException(pe);
       return null;
     }
-    CpoQueryNode cqn = new CpoQueryNode(queryId, this.getGroupId(), seqNo, null, this);
+    
+    CpoQuery query = new CpoQuery();
+    query.setQueryId(queryId);
+    query.setGroupId(getGroupId());
+    query.setSeqNo(seqNo);
+    query.setUserid(CpoUtil.username);
+    query.setCreatedate(Calendar.getInstance());
+    
+    CpoQueryNode cqn = new CpoQueryNode(query, this);
     this.qNodes.add(cqn);
     cqn.setNew(true);
     return cqn;
@@ -145,9 +171,11 @@ public class CpoQueryGroupNode extends AbstractCpoNode {
   }
 
   public void setGroupName(String groupName) {
-    if ((groupName == null && this.groupName == null) || (this.groupName != null && this.groupName.equals(groupName)))
+    if ((groupName == null && queryGroup.getName() == null) || (queryGroup.getName() != null && queryGroup.getName().equals(groupName))) {
       return;
-    this.groupName = groupName;
+    }
+    
+    queryGroup.setName(groupName);
     this.setDirty(true);
   }
 }

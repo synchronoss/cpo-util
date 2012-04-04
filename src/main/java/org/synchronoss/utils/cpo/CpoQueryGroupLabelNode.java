@@ -20,18 +20,27 @@
  */
 package org.synchronoss.utils.cpo;
 
+import org.synchronoss.cpo.meta.domain.CpoQueryGroup;
+
 import javax.swing.*;
 import javax.swing.tree.TreeNode;
 import java.util.*;
 
 public class CpoQueryGroupLabelNode extends AbstractCpoNode  {
-  private List<CpoQueryGroupNode> qGroups; // contains CpoQueryGroupNode(s)
-  
+
+  private List<CpoQueryGroupNode> qGroups;
+
   public CpoQueryGroupLabelNode(CpoClassNode parent) {
     this.parent = parent;
-    this.addObserver(parent.getProxy());
-//    this.addObserver(parent);
-    this.setProtected(parent.isProtected());
+    if (parent != null) {
+      this.addObserver(parent.getProxy());
+      this.setProtected(parent.isProtected());
+    }
+  }
+
+  @Override
+  public CpoClassNode getParent() {
+    return (CpoClassNode)this.parent;
   }
 
   @Override
@@ -41,9 +50,8 @@ public class CpoQueryGroupLabelNode extends AbstractCpoNode  {
 
   @Override
   public void refreshChildren() {
-//    OUT.debug ("Query Groups Label Refreshing Data");
     try {
-      this.qGroups = getProxy().getQueryGroups(this);
+      this.qGroups = getProxy().getQueryGroups((CpoClassNode)parent);
     } catch (Exception pe) {
       CpoUtil.showException(pe);
     }    
@@ -54,7 +62,6 @@ public class CpoQueryGroupLabelNode extends AbstractCpoNode  {
   }
 
   public int getChildCount() {
-//    OUT.debug ("Query Group Label Node Child Count: "+this.qGroups.size());
     return this.qGroups.size();
   }
 
@@ -90,9 +97,15 @@ public class CpoQueryGroupLabelNode extends AbstractCpoNode  {
       this.refreshChildren();
     CpoQueryGroupNode cqgn;
     try {
-      cqgn = new CpoQueryGroupNode(groupName,
-          ((CpoClassNode)this.getParent()).getClassId(),
-          this.getProxy().getNewGuid(), groupType, this);
+      CpoQueryGroup queryGroup = new CpoQueryGroup();
+      queryGroup.setClassId(((CpoClassNode)this.getParent()).getCpoClass().getClassId());
+      queryGroup.setGroupId(this.getProxy().getNewGuid());
+      queryGroup.setName(groupName);
+      queryGroup.setGroupType(groupType);
+      queryGroup.setUserid(CpoUtil.username);
+      queryGroup.setCreatedate(Calendar.getInstance());
+
+      cqgn = new CpoQueryGroupNode(queryGroup, this);
       cqgn.setProtected(this.isProtected());
     } catch (Exception pe) {
       CpoUtil.showException(pe);
@@ -106,5 +119,15 @@ public class CpoQueryGroupLabelNode extends AbstractCpoNode  {
   @Override
   public String toString() {
     return "Query Groups";
+  }
+
+  @Override
+  public String getUserName() {
+    return "";
+  }
+
+  @Override
+  public Calendar getCreateDate() {
+    return Calendar.getInstance();
   }
 }

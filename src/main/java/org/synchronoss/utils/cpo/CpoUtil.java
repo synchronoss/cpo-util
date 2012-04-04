@@ -68,10 +68,7 @@ public class CpoUtil {
     frame.addWindowListener(new WindowAdapter() {
       @Override
       public void windowClosing(WindowEvent e) {
-        if (CpoUtil.checkUnsavedData("You have unsaved data, are you sure you wish to exit??"))
-          return;
-//        frame.setVisible(false);
-        System.exit(0);      
+        CpoUtil.exit();
       }
     });
     frame.setVisible(true);
@@ -236,7 +233,7 @@ public class CpoUtil {
 
       // bootstrapping
       String bootstrapUrl = props.getProperty("cpoutil.bootstrapUrl");
-      if (bootstrapUrl != null) {
+      if (bootstrapUrl != null && bootstrapUrl.length() > 0) {
         if (OUT.isDebugEnabled()) OUT.debug("Bootstrap Url: " + bootstrapUrl);
         try {
           UrlLoader loader = new UrlLoader(bootstrapUrl);
@@ -310,7 +307,7 @@ public class CpoUtil {
   
   public static void setCustomClassPath(String message) {
     JOptionPane.showMessageDialog(frame,new CpoUtilClassPathPanel(files),message,JOptionPane.PLAIN_MESSAGE);
-    StringBuffer sbClasspath = new StringBuffer();
+    StringBuilder sbClasspath = new StringBuilder();
     for (File f : files) {
       sbClasspath.append(f);
       sbClasspath.append(File.pathSeparator);
@@ -458,22 +455,41 @@ public class CpoUtil {
   }
 
   static void removeConnection(String server) {
-    localProps.remove(Statics.PROP_CPONAME+server);
-    localProps.remove(Statics.PROP_JDBC_DRIVER+server);
-    localProps.remove(Statics.PROP_JDBC_URL+server);
-    localProps.remove(Statics.PROP_JDBC_SQL_DIR +server);
-    localProps.remove(Statics.PROP_THEME_URL+server);
-    localProps.remove(Statics.PROP_WLSCONNPOOL+server);
-    localProps.remove(Statics.PROP_WLSINITCTXFCTRY+server);
-    localProps.remove(Statics.PROP_WLSPASS+server);
-    localProps.remove(Statics.PROP_WLSURL+server);
-    localProps.remove(Statics.PROP_WLSUSER+server);
-    localProps.remove(Statics.PROP_JDBC_TABLE_PREFIX+server);
+    localProps.remove(Statics.PROP_CPONAME + server);
+    localProps.remove(Statics.PROP_THEME_URL + server);
+
+    localProps.remove(Statics.PROP_JDBC_DRIVER + server);
+    localProps.remove(Statics.PROP_JDBC_URL + server);
+    localProps.remove(Statics.PROP_JDBC_SQL_DIR + server);
+    localProps.remove(Statics.PROP_JDBC_TABLE_PREFIX + server);
+    localProps.remove(Statics.PROP_JDBC_PARAMS + server);
+    localProps.remove(Statics.PROP_JDBC_SQL_STATEMENT_DELIMITER + server);
+    localProps.remove(Statics.PROP_JDBC_DEFDIR + server);
+    localProps.remove(Statics.PROP_JDBC_DEFPACK + server);
+    localProps.remove(Statics.PROP_JDBC_IGNORE_PROTECTED + server);
+
+    localProps.remove(Statics.PROP_WLSCONNPOOL + server);
+    localProps.remove(Statics.PROP_WLSINITCTXFCTRY + server);
+    localProps.remove(Statics.PROP_WLSPASS + server);
+    localProps.remove(Statics.PROP_WLSURL + server);
+    localProps.remove(Statics.PROP_WLSUSER + server);
     saveLocalProps();
   }
 
   static boolean checkUnsavedData(String message) {
     return checkUnsavedData(message, -1);
+  }
+
+  static void exit() {
+    if (checkUnsavedData("You have unsaved data, are you sure you wish to exit??"))
+      return;
+
+    int tabCount = frame.jTabbedPane.getTabCount();
+    for (int i = 0 ; i < tabCount ; i++) {
+      CpoBrowserPanel panel = (CpoBrowserPanel)frame.jTabbedPane.getComponentAt(i);
+      panel.getProxy().close();
+    }
+    System.exit(0);
   }
 
   /**
