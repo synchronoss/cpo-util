@@ -26,6 +26,7 @@ import org.synchronoss.cpo.jdbc.*;
 import org.synchronoss.cpo.meta.dao.CpoMetaDAO;
 import org.synchronoss.cpo.meta.dao.jdbc.JdbcMetaDAO;
 import org.synchronoss.cpo.meta.domain.*;
+import org.synchronoss.cpo.meta.parser.ExpressionParser;
 
 import javax.naming.*;
 import javax.sql.DataSource;
@@ -1158,5 +1159,9 @@ public class Proxy implements Observer {
     }
 
     return false;
+  }
+
+  public ExpressionParser getExpressionParser(String expression) {
+    return metaDao.getExpressionParser(expression);
   }
 }

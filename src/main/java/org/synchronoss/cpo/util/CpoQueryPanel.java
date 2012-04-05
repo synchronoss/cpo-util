@@ -23,7 +23,6 @@ package org.synchronoss.cpo.util;
 import org.slf4j.*;
 import org.synchronoss.cpo.meta.domain.CpoQueryText;
 import org.synchronoss.cpo.meta.parser.ExpressionParser;
-import org.synchronoss.cpo.meta.parser.jdbc.SQLExpressionParser;
 
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
@@ -218,9 +217,8 @@ public class CpoQueryPanel extends JPanel {
     if (cpoQPnorth.jTextASQL.getText().length() < 1)
       return;
 
-    ExpressionParser expressionParser = new SQLExpressionParser();
-    expressionParser.setExpression(cpoQPnorth.jTextASQL.getText());
-    int tokenCount = expressionParser.countBindMarkers();
+    ExpressionParser expressionParser = queryNode.getProxy().getExpressionParser(cpoQPnorth.jTextASQL.getText());
+    int tokenCount = expressionParser.countArguments();
 
     int attRowCount = cpoQTM.getNonRemovedRows();
 
@@ -333,8 +331,7 @@ public class CpoQueryPanel extends JPanel {
 
   private void guessAttributes() {
     String query = cpoQPnorth.jTextASQL.getText().trim();
-    ExpressionParser expressionParser = new SQLExpressionParser();
-    expressionParser.setExpression(query);
+    ExpressionParser expressionParser = queryNode.getProxy().getExpressionParser(query);
 
     Vector<String> errors = new Vector<String>();
 
