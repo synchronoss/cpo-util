@@ -15,7 +15,6 @@
 <resources>
   <j2se version="1.2+"/>
   <jar href="cpoutil/utilscpo.jar"/>
-  <jar href="libs/gnu-regexp-1.1.4.jar"/>
   <jar href="libs/weblogic.jar"/>
   <jar href="libs/log4j.jar"/>
   <jar href="libs/cpo.jar"/>

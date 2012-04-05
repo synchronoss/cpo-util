@@ -12,7 +12,6 @@
         <include>mysql:mysql-connector-java</include>
         <include>postgresql:postgresql</include>
         <include>hsqldb:hsqldb</include>
-        <include>gnu-regexp:gnu-regexp</include>
       </includes>
     </dependencySet>
   </dependencySets>

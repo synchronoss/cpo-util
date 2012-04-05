@@ -20,7 +20,6 @@
  */
 package org.synchronoss.cpo.util;
 
-import gnu.regexp.*;
 import org.slf4j.*;
 import org.synchronoss.cpo.meta.domain.*;
 import org.synchronoss.cpo.meta.event.*;
@@ -258,18 +257,15 @@ public class SQLExporter  {
               if (queryTextSql != null) {
                  queryTextSql = queryTextSql.trim();
               }
-                  
+              if (queryTextSql != null) {
+                // replace ' with ''
+                queryTextSql = queryTextSql.replaceAll("'", "''");
+              }
+
               String queryTextDesc = queryText.getDescription();
-              try {
-                RE reQuote = new RE("'");
-                if (queryTextSql != null)
-                  queryTextSql = reQuote.substituteAll(queryTextSql,"''");
-                if (queryTextDesc != null)
-                  queryTextDesc = reQuote.substituteAll(queryTextDesc,"''");
-                    
-              } catch (REException ree) {
-                CpoUtil.showException(ree);
-                return null;
+              if (queryTextDesc != null) {
+                // replace ' with ''
+                queryTextDesc = queryTextDesc.replaceAll("'", "''");
               }
 
               if (!createdQueryTexts.contains(queryText.getTextId())) {

@@ -20,7 +20,6 @@
  */
 package org.synchronoss.cpo.util;
 
-import gnu.regexp.*;
 import org.slf4j.*;
 import org.synchronoss.cpo.*;
 import org.synchronoss.cpo.jdbc.*;
@@ -967,12 +966,13 @@ public class Proxy implements Observer {
     return cpoClass.generateSourceCode(attributes);
   }
 
-  String makeAttFromColName(String columnName) throws REException {
+  String makeAttFromColName(String columnName) {
     columnName = columnName.toLowerCase();
-    RE reFixCol = new RE("_.");
-    REMatch match = null;
-    while ((match = reFixCol.getMatch(columnName)) != null ) {
-      columnName = columnName.substring(0,match.getStartIndex())+reFixCol.substitute(columnName,match.toString().substring(1).toUpperCase(),match.getStartIndex());
+
+    int idx;
+    while ((idx = columnName.indexOf("_")) > 0) {
+      // remove the underscore, upper case the following character
+      columnName = columnName.substring(0, idx) + columnName.substring(idx + 1, idx + 2).toUpperCase() + columnName.substring(idx + 2);
     }
     return columnName;
   }
