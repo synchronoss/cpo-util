@@ -20,7 +20,7 @@
  */
 package org.synchronoss.cpo.util;
 
-import org.apache.log4j.Logger;
+import org.slf4j.*;
 
 import java.io.*;
 import java.util.*;
@@ -31,7 +31,7 @@ public class CpoUtilClassLoader extends ClassLoader {
 
   private static List<File> files;
   private static CpoUtilClassLoader loader;
-  private Logger OUT = Logger.getLogger(this.getClass());
+  private Logger OUT = LoggerFactory.getLogger(this.getClass());
 
   private CpoUtilClassLoader (ClassLoader parent) {
     super(parent);

@@ -20,7 +20,7 @@
  */
 package org.synchronoss.cpo.util;
 
-import org.apache.log4j.Logger;
+import org.slf4j.*;
 
 import javax.swing.table.AbstractTableModel;
 import java.lang.reflect.Method;
@@ -34,7 +34,7 @@ public class CpoTesterResultsModel extends AbstractTableModel {
   private Collection<?> results;
   private List<CpoAttributeMapNode> cpoAttMap; //CpoAttributeMapNode(s)
   private String[] columnNames;
-  private Logger OUT = Logger.getLogger(this.getClass());
+  private Logger OUT = LoggerFactory.getLogger(this.getClass());
   
   public CpoTesterResultsModel(Collection<?> results, CpoClassNode cpoClassNode) throws Exception {
     this.results = results;

@@ -20,19 +20,19 @@
  */
 package org.synchronoss.cpo.util;
 
-import org.apache.log4j.Logger;
+import org.slf4j.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class CpoQueryPanelNorth extends JPanel  {
 
   /** Version Id for this class. */
   private static final long serialVersionUID=1L;
-  private Logger OUT = Logger.getLogger(this.getClass());
+  private Logger OUT = LoggerFactory.getLogger(this.getClass());
 
   private JLabel jLabSeq = new JLabel();
   JTextField jTextSeq = new JTextField();

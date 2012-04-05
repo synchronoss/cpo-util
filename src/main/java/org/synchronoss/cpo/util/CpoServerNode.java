@@ -20,7 +20,7 @@
  */
 package org.synchronoss.cpo.util;
 
-import org.apache.log4j.Logger;
+import org.slf4j.*;
 
 import javax.swing.*;
 import javax.swing.tree.TreeNode;
@@ -29,7 +29,7 @@ import java.util.*;
 public class CpoServerNode extends AbstractCpoNode {
   private List<CpoClassNode> classes; // CpoClassNode(s)
   private CpoQueryTextLabelNode cpoQTLN;
-  private Logger OUT = Logger.getLogger(this.getClass());
+  private Logger OUT = LoggerFactory.getLogger(this.getClass());
   
   public CpoServerNode(Proxy prox, JTree jtree) {
     this.jtree = jtree;

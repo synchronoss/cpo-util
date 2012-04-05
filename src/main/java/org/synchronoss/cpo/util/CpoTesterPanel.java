@@ -20,7 +20,7 @@
  */
 package org.synchronoss.cpo.util;
 
-import org.apache.log4j.Logger;
+import org.slf4j.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -44,7 +44,7 @@ public class CpoTesterPanel extends JPanel implements ClipboardOwner  {
   private CpoClassNode cpoClassNode;
   private JScrollPane jScrollResults = new JScrollPane();
   private JTable jTableResults = new JTable();
-  private Logger OUT = Logger.getLogger(this.getClass());
+  private Logger OUT = LoggerFactory.getLogger(this.getClass());
   
   public CpoTesterPanel(CpoClassNode cpoClassNode) {
     this.cpoClassNode = cpoClassNode;

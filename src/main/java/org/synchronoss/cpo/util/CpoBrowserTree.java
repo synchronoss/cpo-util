@@ -20,7 +20,7 @@
  */
 package org.synchronoss.cpo.util;
 
-import org.apache.log4j.Logger;
+import org.slf4j.*;
 import org.synchronoss.cpo.meta.domain.CpoClass;
 
 import javax.swing.*;
@@ -29,7 +29,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.lang.reflect.Method;
-import java.text.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -45,7 +45,7 @@ public class CpoBrowserTree extends JTree {
   private static ImageIcon iconGreen = new ImageIcon(CpoBrowserTree.class.getResource("/green.gif"));
   private static ImageIcon iconBlue = new ImageIcon(CpoBrowserTree.class.getResource("/blue.gif"));
 
-  private Logger OUT = Logger.getLogger(this.getClass());
+  private Logger OUT = LoggerFactory.getLogger(this.getClass());
 
   public CpoBrowserTree() {
     this.setCellRenderer(new DefaultTreeCellRenderer() {

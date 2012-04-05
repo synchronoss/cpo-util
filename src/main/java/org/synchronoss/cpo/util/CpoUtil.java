@@ -20,7 +20,7 @@
  */
 package org.synchronoss.cpo.util;
 
-import org.apache.log4j.Logger;
+import org.slf4j.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -45,7 +45,7 @@ public class CpoUtil {
   // globally protected classes
   static HashSet<String> globallyProtectedClasses = new HashSet<String>();
 
-  private static Logger OUT = Logger.getLogger(CpoUtil.class);
+  private static Logger OUT = LoggerFactory.getLogger(CpoUtil.class);
   
   public CpoUtil(String propsLocation) {
     loadProps(propsLocation);

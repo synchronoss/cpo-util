@@ -20,7 +20,7 @@
  */
 package org.synchronoss.cpo.util;
 
-import org.apache.log4j.Logger;
+import org.slf4j.*;
 import org.synchronoss.cpo.meta.domain.CpoQueryText;
 import org.synchronoss.cpo.meta.parser.ExpressionParser;
 import org.synchronoss.cpo.meta.parser.jdbc.SQLExpressionParser;
@@ -36,7 +36,7 @@ import java.util.List;
 
 public class CpoQueryPanel extends JPanel {
 
-  private Logger OUT = Logger.getLogger(this.getClass());
+  private Logger OUT = LoggerFactory.getLogger(this.getClass());
 
   // location of the divider
   private static int divLocation = -1;

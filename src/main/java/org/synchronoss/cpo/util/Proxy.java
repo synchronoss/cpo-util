@@ -21,7 +21,7 @@
 package org.synchronoss.cpo.util;
 
 import gnu.regexp.*;
-import org.apache.log4j.Logger;
+import org.slf4j.*;
 import org.synchronoss.cpo.*;
 import org.synchronoss.cpo.jdbc.*;
 import org.synchronoss.cpo.meta.dao.CpoMetaDAO;
@@ -64,7 +64,7 @@ public class Proxy implements Observer {
   private String sqlDelimiter;
   private Properties connProps;
   private boolean classNameToggle = false;
-  private Logger OUT = Logger.getLogger(this.getClass());
+  private Logger OUT = LoggerFactory.getLogger(this.getClass());
 
   private CpoMetaDAO metaDao = null;
 

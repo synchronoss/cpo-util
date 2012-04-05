@@ -20,7 +20,7 @@
  */
 package org.synchronoss.cpo.util;
 
-import org.apache.log4j.Logger;
+import org.slf4j.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -42,7 +42,7 @@ public class CpoTesterPanelNorth extends JPanel  {
   JCheckBox jCheckPersist = new JCheckBox();
   private CpoTesterParamModel cpoTesterParamModel;
   JComboBox jComClassOut = new JComboBox();
-  private Logger OUT = Logger.getLogger(this.getClass());
+  private Logger OUT = LoggerFactory.getLogger(this.getClass());
 
   public CpoTesterPanelNorth(CpoClassNode cpoClassNode) {
     this.cpoClassNode = cpoClassNode;

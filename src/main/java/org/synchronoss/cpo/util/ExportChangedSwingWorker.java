@@ -20,7 +20,7 @@
  */
 package org.synchronoss.cpo.util;
 
-import org.apache.log4j.Logger;
+import org.slf4j.*;
 
 import java.io.*;
 import java.util.List;
@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class ExportChangedSwingWorker extends SwingWorker {
 
-    private static final Logger logger = Logger.getLogger(ExportChangedSwingWorker.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExportChangedSwingWorker.class);
 
     ProgressFrame pf = null;
     List<AbstractCpoNode> nodeList = null;

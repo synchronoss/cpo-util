@@ -22,7 +22,7 @@
 package org.synchronoss.util.cpo.test;
 
 import junit.framework.*;
-import org.apache.log4j.Logger;
+import org.slf4j.*;
 
 import javax.naming.*;
 import javax.sql.DataSource;
@@ -33,7 +33,7 @@ import java.util.Properties;
  * @author jcolson
  */
 public class WebLogicConnPoolTest extends TestCase {
-  public static Logger OUT = Logger.getLogger(WebLogicConnPoolTest.class);
+  public static Logger OUT = LoggerFactory.getLogger(WebLogicConnPoolTest.class);
   private Connection conn;
   private Context ctx;
   private final static String _URL = "t3://localhost:7001";

@@ -19,7 +19,8 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.cpo.util;
-import org.apache.log4j.Logger;
+
+import org.slf4j.*;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.*;
@@ -34,7 +35,7 @@ public class CpoTesterParamModel extends AbstractTableModel {
   private Object[] columnClasses = {Integer.class, String.class, String.class, String.class, String.class};
   CpoQueryGroupNode cpoQGnode;
   Hashtable<Object, Object> parameter = new Hashtable<Object, Object>();
-  private Logger OUT = Logger.getLogger(this.getClass());
+  private Logger OUT = LoggerFactory.getLogger(this.getClass());
   
   public CpoTesterParamModel(CpoQueryGroupNode cpoQGnode) {
     this.cpoQGnode = cpoQGnode;

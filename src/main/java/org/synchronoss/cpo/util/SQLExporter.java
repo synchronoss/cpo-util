@@ -21,7 +21,7 @@
 package org.synchronoss.cpo.util;
 
 import gnu.regexp.*;
-import org.apache.log4j.Logger;
+import org.slf4j.*;
 import org.synchronoss.cpo.meta.domain.*;
 import org.synchronoss.cpo.meta.event.*;
 
@@ -31,7 +31,7 @@ import java.util.*;
 // FIXME - this class needs to export createDate, but it isn't currently doing that
 public class SQLExporter  {
 
-  private static Logger OUT = Logger.getLogger(SQLExporter.class);
+  private static Logger OUT = LoggerFactory.getLogger(SQLExporter.class);
 
   private String tablePrefix = "";
   private final static String DELIMITER_SLASH = "\n/\n";

@@ -20,7 +20,7 @@
  */
 package org.synchronoss.cpo.util;
 
-import org.apache.log4j.Logger;
+import org.slf4j.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -33,7 +33,7 @@ public class CpoJDBCPropertyPanel extends JPanel  {
   /** Version Id for this class. */
   private static final long serialVersionUID=1L;
 
-  private Logger OUT = Logger.getLogger(this.getClass());
+  private Logger OUT = LoggerFactory.getLogger(this.getClass());
 
   private GridBagLayout gridBagLayout1 = new GridBagLayout();
   private JLabel jLabJdbcUrl = new JLabel();

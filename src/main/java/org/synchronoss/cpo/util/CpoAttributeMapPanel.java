@@ -20,7 +20,7 @@
  */
 package org.synchronoss.cpo.util;
 
-import org.apache.log4j.Logger;
+import org.slf4j.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -41,7 +41,7 @@ public class CpoAttributeMapPanel extends JPanel  {
   private CpoAttMapTableModel model;
   TableSorter ts;
   private JPopupMenu menu = new JPopupMenu();
-  private Logger OUT = Logger.getLogger(this.getClass());
+  private Logger OUT = LoggerFactory.getLogger(this.getClass());
   
   public CpoAttributeMapPanel(CpoAttributeLabelNode cpoAttLabelNode) {
     this.cpoAttLabNode = cpoAttLabelNode;

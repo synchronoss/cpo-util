@@ -20,7 +20,7 @@
  */
 package org.synchronoss.cpo.util;
 
-import org.apache.log4j.Logger;
+import org.slf4j.*;
 import org.synchronoss.cpo.meta.domain.*;
 
 import javax.swing.*;
@@ -37,7 +37,7 @@ public class CpoQueryTableModel extends AbstractTableModel {
   private String[] columnNames = {"Seq Num", "Attribute", "Column Name", "Column Type", "In/Out/Both", "DB Table", "DB Column", "Get Transform Class", "User", "Date", "Changed?"};
   private Object[] columnClasses = {String.class, CpoAttributeMapNode.class, String.class, String.class, JComboBox.class, String.class, String.class, String.class, String.class, String.class, String.class};
   CpoClassNode attributeCpoClassNode;
-  private Logger OUT = Logger.getLogger(this.getClass());
+  private Logger OUT = LoggerFactory.getLogger(this.getClass());
 
   public CpoQueryTableModel(CpoQueryNode cpoQueryNode) throws Exception {
     this.cpoQueryNode = cpoQueryNode;
