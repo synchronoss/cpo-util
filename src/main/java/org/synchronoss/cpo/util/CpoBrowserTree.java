@@ -40,10 +40,10 @@ public class CpoBrowserTree extends JTree {
 
 	private JPopupMenu menu;
   private AbstractCpoNode menuNode;            
-  private static ImageIcon iconRed = new ImageIcon(CpoBrowserTree.class.getResource("/red.gif"));
-  private static ImageIcon iconYellow = new ImageIcon(CpoBrowserTree.class.getResource("/yellow.gif"));
-  private static ImageIcon iconGreen = new ImageIcon(CpoBrowserTree.class.getResource("/green.gif"));
-  private static ImageIcon iconBlue = new ImageIcon(CpoBrowserTree.class.getResource("/blue.gif"));
+  private static ImageIcon iconRed = new ImageIcon(CpoBrowserTree.class.getResource("/images/red.gif"));
+  private static ImageIcon iconYellow = new ImageIcon(CpoBrowserTree.class.getResource("/images/yellow.gif"));
+  private static ImageIcon iconGreen = new ImageIcon(CpoBrowserTree.class.getResource("/images/green.gif"));
+  private static ImageIcon iconBlue = new ImageIcon(CpoBrowserTree.class.getResource("/images/blue.gif"));
 
   private Logger OUT = LoggerFactory.getLogger(this.getClass());
 

@@ -4,7 +4,7 @@
   <groupId>org.synchronoss</groupId>
   <artifactId>cpoUtil</artifactId>
   <name>cpoUtil</name>
-  <version>4.2-SNAPSHOT</version>
+  <version>5.0-SNAPSHOT</version>
   <description>cpoUtil is the utility that configures the metadata for cpo</description>
   <packaging>jar</packaging>
   <url>http://cpo.sourceforge.net/cpo-util-sourceforge/</url>
@@ -294,7 +294,7 @@
         <version>1.0-alpha-2</version>
         <configuration>
           <mainClass>org.synchronoss.cpo.util.CpoUtil</mainClass>
-          <iconFile>${basedir}/src/main/resources/sync-logo-sm.icns</iconFile>
+          <iconFile>${basedir}/src/main/resources/images/sync-logo-sm.icns</iconFile>
           <javaApplicationStub>${basedir}/src/assemble/JavaApplicationStub</javaApplicationStub>
           <bundleName>${cpo.osx.bundleName}</bundleName>
           <diskImageFile>${project.build.directory}/${cpo.osx.filename}</diskImageFile>

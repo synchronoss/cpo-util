@@ -40,11 +40,11 @@ public class MainFrame extends JFrame {
   private JMenuBar menuBar = new JMenuBar();
   private JPanel panelCenter = new JPanel();
   private BorderLayout layoutMain = new BorderLayout();
-  JTabbedPane jTabbedPane = new JTabbedPane();
+  protected JTabbedPane jTabbedPane = new JTabbedPane();
   private BorderLayout layoutPanel = new BorderLayout();
   private int tabCounter = 0;
 
-  private static ImageIcon closeIcon = new ImageIcon(CpoBrowserTree.class.getResource("/close.png"));
+  private static ImageIcon closeIcon = new ImageIcon(CpoBrowserTree.class.getResource("/images/close.png"));
 
   public MainFrame() {
     try {
@@ -55,7 +55,7 @@ public class MainFrame extends JFrame {
   }
 
   private void jbInit() throws Exception {
-    setIconImage(Toolkit.getDefaultToolkit().createImage(MainFrame.class.getResource("/sync-logo-sm.gif")));
+    setIconImage(Toolkit.getDefaultToolkit().createImage(MainFrame.class.getResource("/images/sync-logo-sm.gif")));
     this.setJMenuBar(menuBar);
     this.getContentPane().setLayout(layoutMain);
     this.setSize(new Dimension(850, 650));
