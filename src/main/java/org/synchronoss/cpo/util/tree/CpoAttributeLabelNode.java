@@ -18,7 +18,9 @@
  *  A copy of the GNU Lesser General Public License may also be found at 
  *  http://www.gnu.org/licenses/lgpl.txt
  */
-package org.synchronoss.cpo.util;
+package org.synchronoss.cpo.util.tree;
+
+import org.synchronoss.cpo.util.*;
 
 import javax.swing.tree.TreeNode;
 import javax.swing.JPanel;

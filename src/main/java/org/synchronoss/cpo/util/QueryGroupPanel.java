@@ -19,6 +19,8 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.cpo.util;
+import org.synchronoss.cpo.util.tree.AbstractCpoNode;
+
 import javax.swing.*;
 import java.awt.*;
 

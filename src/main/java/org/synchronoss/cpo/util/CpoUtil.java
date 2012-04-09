@@ -202,8 +202,12 @@ public class CpoUtil {
       propsLocation = args[0];
     new CpoUtil(propsLocation);
   }
+
+  public static String getUserName() {
+    return username;
+  }
   
-  static void showException(Throwable e) {
+  public static void showException(Throwable e) {
     if (OUT.isDebugEnabled())
       OUT.debug("Exception caught", e);
     

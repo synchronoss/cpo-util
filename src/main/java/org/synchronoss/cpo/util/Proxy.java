@@ -27,6 +27,7 @@ import org.synchronoss.cpo.meta.dao.CpoMetaDAO;
 import org.synchronoss.cpo.meta.dao.jdbc.JdbcMetaDAO;
 import org.synchronoss.cpo.meta.domain.*;
 import org.synchronoss.cpo.meta.parser.ExpressionParser;
+import org.synchronoss.cpo.util.tree.*;
 
 import javax.naming.*;
 import javax.sql.DataSource;

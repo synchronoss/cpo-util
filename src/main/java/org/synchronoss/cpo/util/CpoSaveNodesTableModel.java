@@ -19,6 +19,8 @@
  *  http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.cpo.util;
+import org.synchronoss.cpo.util.tree.*;
+
 import javax.swing.table.AbstractTableModel;
 import java.util.*;
 

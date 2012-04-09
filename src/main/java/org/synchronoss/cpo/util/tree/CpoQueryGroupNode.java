@@ -18,9 +18,10 @@
  *  A copy of the GNU Lesser General Public License may also be found at 
  *  http://www.gnu.org/licenses/lgpl.txt
  */
-package org.synchronoss.cpo.util;
+package org.synchronoss.cpo.util.tree;
 
 import org.synchronoss.cpo.meta.domain.*;
+import org.synchronoss.cpo.util.CpoUtil;
 
 import javax.swing.*;
 import javax.swing.tree.TreeNode;
@@ -151,7 +152,7 @@ public class CpoQueryGroupNode extends AbstractCpoNode {
     query.setQueryId(queryId);
     query.setGroupId(getGroupId());
     query.setSeqNo(seqNo);
-    query.setUserid(CpoUtil.username);
+    query.setUserid(CpoUtil.getUserName());
     query.setCreatedate(Calendar.getInstance());
     
     CpoQueryNode cqn = new CpoQueryNode(query, this);

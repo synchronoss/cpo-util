@@ -18,7 +18,9 @@
  *  A copy of the GNU Lesser General Public License may also be found at 
  *  http://www.gnu.org/licenses/lgpl.txt
  */
-package org.synchronoss.cpo.util;
+package org.synchronoss.cpo.util.tree;
+import org.synchronoss.cpo.util.Proxy;
+
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.util.*;
@@ -178,8 +180,11 @@ public abstract class AbstractCpoNode extends Observable implements TreeNode { /
 
   public abstract Calendar getCreateDate();
 
+  /**
+   * Returns true if the node represents a label
+   */
   public boolean isLabel() {
-    return this.getClass().getName().toLowerCase().indexOf("label") != -1;
+    return false;
   }
   
   public abstract Enumeration<? extends AbstractCpoNode> children();

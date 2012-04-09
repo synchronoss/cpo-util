@@ -18,9 +18,10 @@
  *  A copy of the GNU Lesser General Public License may also be found at 
  *  http://www.gnu.org/licenses/lgpl.txt
  */
-package org.synchronoss.cpo.util;
+package org.synchronoss.cpo.util.tree;
 
 import org.synchronoss.cpo.meta.domain.CpoQueryGroup;
+import org.synchronoss.cpo.util.CpoUtil;
 
 import javax.swing.*;
 import javax.swing.tree.TreeNode;
@@ -51,7 +52,7 @@ public class CpoQueryGroupLabelNode extends AbstractCpoNode  {
   @Override
   public void refreshChildren() {
     try {
-      this.qGroups = getProxy().getQueryGroups((CpoClassNode)parent);
+      this.qGroups = getProxy().getQueryGroups(getParent());
     } catch (Exception pe) {
       CpoUtil.showException(pe);
     }    
@@ -98,11 +99,11 @@ public class CpoQueryGroupLabelNode extends AbstractCpoNode  {
     CpoQueryGroupNode cqgn;
     try {
       CpoQueryGroup queryGroup = new CpoQueryGroup();
-      queryGroup.setClassId(((CpoClassNode)this.getParent()).getCpoClass().getClassId());
+      queryGroup.setClassId(this.getParent().getCpoClass().getClassId());
       queryGroup.setGroupId(this.getProxy().getNewGuid());
       queryGroup.setName(groupName);
       queryGroup.setGroupType(groupType);
-      queryGroup.setUserid(CpoUtil.username);
+      queryGroup.setUserid(CpoUtil.getUserName());
       queryGroup.setCreatedate(Calendar.getInstance());
 
       cqgn = new CpoQueryGroupNode(queryGroup, this);
@@ -129,5 +130,10 @@ public class CpoQueryGroupLabelNode extends AbstractCpoNode  {
   @Override
   public Calendar getCreateDate() {
     return Calendar.getInstance();
+  }
+
+  @Override
+  public boolean isLabel() {
+    return true;
   }
 }

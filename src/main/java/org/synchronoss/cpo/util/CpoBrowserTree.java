@@ -22,6 +22,7 @@ package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
 import org.synchronoss.cpo.meta.domain.CpoClass;
+import org.synchronoss.cpo.util.tree.*;
 
 import javax.swing.*;
 import javax.swing.tree.*;
@@ -39,7 +40,7 @@ public class CpoBrowserTree extends JTree {
   private static final long serialVersionUID=1L;
 
 	private JPopupMenu menu;
-  private AbstractCpoNode menuNode;            
+  private AbstractCpoNode menuNode;
   private static ImageIcon iconRed = new ImageIcon(CpoBrowserTree.class.getResource("/images/red.gif"));
   private static ImageIcon iconYellow = new ImageIcon(CpoBrowserTree.class.getResource("/images/yellow.gif"));
   private static ImageIcon iconGreen = new ImageIcon(CpoBrowserTree.class.getResource("/images/green.gif"));

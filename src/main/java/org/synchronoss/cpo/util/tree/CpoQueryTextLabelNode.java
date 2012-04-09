@@ -18,7 +18,9 @@
  *  A copy of the GNU Lesser General Public License may also be found at 
  *  http://www.gnu.org/licenses/lgpl.txt
  */
-package org.synchronoss.cpo.util;
+package org.synchronoss.cpo.util.tree;
+
+import org.synchronoss.cpo.util.CpoQueryTextPanel;
 
 import javax.swing.*;
 import javax.swing.tree.TreeNode;
@@ -40,7 +42,7 @@ public class CpoQueryTextLabelNode extends AbstractCpoNode {
 
   @Override
   public JPanel getPanelForSelected() {
-    return new CpoQueryTextPanel((CpoServerNode)getParent());
+    return new CpoQueryTextPanel(getParent());
   }
 
   @Override
@@ -85,5 +87,10 @@ public class CpoQueryTextLabelNode extends AbstractCpoNode {
   @Override
   public Calendar getCreateDate() {
     return Calendar.getInstance();
+  }
+
+  @Override
+  public boolean isLabel() {
+    return true;
   }
 }

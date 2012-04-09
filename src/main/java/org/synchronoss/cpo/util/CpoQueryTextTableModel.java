@@ -21,6 +21,7 @@
 package org.synchronoss.cpo.util;
 
 import org.synchronoss.cpo.meta.domain.CpoQueryText;
+import org.synchronoss.cpo.util.tree.*;
 
 import javax.swing.table.AbstractTableModel;
 import java.text.SimpleDateFormat;
@@ -31,7 +32,7 @@ public class CpoQueryTextTableModel extends AbstractTableModel  {
   /** Version Id for this class. */
   private static final long serialVersionUID=1L;
   private CpoServerNode serverNode;
-  private String[] columnNames = {"Description","SQL","UsageCount","User","Date","Modified?"};
+  private String[] columnNames = {"Description","SQL","RefCount","User","Date","Modified?"};
   private Object[] columnClasses = {String.class, String.class, Integer.class, String.class, String.class, String.class};
   private List<CpoQueryTextNode> cpoQueryText;
   private List<CpoQueryTextNode> cpoQueryTextFiltered;
@@ -129,11 +130,11 @@ public class CpoQueryTextTableModel extends AbstractTableModel  {
     for (int i : rowIndex) {
       CpoQueryTextNode cqtn = workingQueryList.get(i);
       CpoQueryText text = cqtn.getCpoQueryText();
-      int usageCount = text.getRefCount();
-      if (usageCount == 0) {
+      int refCount = text.getRefCount();
+      if (refCount == 0) {
         nodesToRemove.add(cqtn);
       } else {
-        CpoUtil.showErrorMessage("You can not remove a node that has dependencies.\n" + "This text id is used in " + usageCount + " cpo query(ies), please change them first!");
+        CpoUtil.showErrorMessage("You can not remove a node that has dependencies.\n" + "This text id is used in " + refCount + " cpo query(ies), please change them first!");
       }
     }
 

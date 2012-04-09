@@ -18,7 +18,7 @@
  *  A copy of the GNU Lesser General Public License may also be found at 
  *  http://www.gnu.org/licenses/lgpl.txt
  */
-package org.synchronoss.cpo.util;
+package org.synchronoss.cpo.util.tree;
 
 import org.synchronoss.cpo.meta.domain.CpoQueryText;
 
@@ -84,7 +84,7 @@ public class CpoQueryTextNode extends AbstractCpoNode {
     return queryText.getTextId();
   }
 
-  public int getUsageCount() {
+  public int getRefCount() {
     return queryText.getRefCount();
   }
 
@@ -129,8 +129,8 @@ public class CpoQueryTextNode extends AbstractCpoNode {
     this.setDirty(true);
   }
 
-  public void setUsageCount(int usageCount) {
-    queryText.setRefCount(usageCount);
+  public void setRefCount(int refCount) {
+    queryText.setRefCount(refCount);
   }
 
   @Override
