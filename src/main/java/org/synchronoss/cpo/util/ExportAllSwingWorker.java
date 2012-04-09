@@ -22,6 +22,7 @@ package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
 import org.synchronoss.cpo.meta.event.*;
+import org.synchronoss.cpo.meta.exporter.ClassExport;
 
 import java.io.*;
 import java.util.Enumeration;
@@ -91,18 +92,18 @@ public class ExportAllSwingWorker extends SwingWorker {
                 if (child instanceof CpoClassNode) {
                     CpoClassNode classNode = (CpoClassNode)child;
                     String fileName = classNode.getCpoClass().getName() + ".sql";
-                    SQLClassExport classExport = sqlEx.exportSQL(classNode);
+                    ClassExport classExport = sqlEx.exportSQL(classNode);
 
                     // write this for the create all script
-                    allFw.write(classExport.getInsertQueryTextSql());
-                    allFw.write(classExport.getInsertSql());
+                    allFw.write(classExport.getCreateExpressions());
+                    allFw.write(classExport.getCreateClass());
 
                     // write the single class file
                     file = new File(dir, fileName);
                     fw = new FileWriter(file);
-                    fw.write(classExport.getDeleteSql());
-                    fw.write(classExport.getInsertQueryTextSql());
-                    fw.write(classExport.getInsertSql());
+                    fw.write(classExport.getDelete());
+                    fw.write(classExport.getCreateExpressions());
+                    fw.write(classExport.getCreateClass());
 
                     fw.flush();
                     fw.close();

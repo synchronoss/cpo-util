@@ -22,7 +22,7 @@ package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
 import org.synchronoss.cpo.meta.domain.*;
-import org.synchronoss.cpo.meta.event.*;
+import org.synchronoss.cpo.meta.exporter.ClassExport;
 
 import javax.swing.tree.TreeNode;
 import java.util.*;
@@ -59,11 +59,11 @@ public class SQLExporter  {
     }
  }
 
-  public SQLClassExport exportSQL(TreeNode parent) {
+  public ClassExport exportSQL(TreeNode parent) {
     return exportSQL(parent, false);
   }
 
-  public SQLClassExport exportSQL(TreeNode parent, boolean skipDeletes) {
+  public ClassExport exportSQL(TreeNode parent, boolean skipDeletes) {
     HashSet<String> createdQueryTexts = new HashSet<String>();
     StringBuilder sqlDeleteClassBuffer = new StringBuilder();
     StringBuilder sqlInsertBuffer = new StringBuilder();
@@ -341,10 +341,10 @@ public class SQLExporter  {
       }
     }
 
-    SQLClassExport ce = new SQLClassExport();
-    ce.setDeleteSql(sqlDeleteClassBuffer.toString());
-    ce.setInsertQueryTextSql(sqlInsertQueryText.toString());
-    ce.setInsertSql(sqlInsertBuffer.toString());
+    ClassExport ce = new ClassExport();
+    ce.setDelete(sqlDeleteClassBuffer.toString());
+    ce.setCreateExpressions(sqlInsertQueryText.toString());
+    ce.setCreateClass(sqlInsertBuffer.toString());
     return ce;
   }
 
@@ -383,33 +383,5 @@ public class SQLExporter  {
     sqlDeleteAll.append("cpo_class");
     sqlDeleteAll.append(sqlDelimiter);
     return sqlDeleteAll.toString();
-  }
-
-  /**
-   * Generates a create all with deletes string
-   */
-  public String exportCreateAll(CpoServerNode menuNode, ProgressEventListener pel) {
-    StringBuilder buf = new StringBuilder();
-
-    // create the delete all statements
-    String delSql = exportDeleteAll();
-    buf.append(delSql);
-
-    // make the class files
-    Enumeration<AbstractCpoNode> menuEnum = menuNode.children();
-    while (menuEnum.hasMoreElements()) {
-      AbstractCpoNode child = menuEnum.nextElement();
-      if (child instanceof CpoClassNode) {
-        CpoClassNode classNode = (CpoClassNode)child;
-        SQLClassExport classExport = exportSQL(classNode, true);
-
-        buf.append(classExport.getInsertQueryTextSql());
-        buf.append(classExport.getInsertSql());
-
-        pel.progressMade(new ProgressValueEvent(this, 1));
-      }
-    }
-
-    return buf.toString();
   }
 }

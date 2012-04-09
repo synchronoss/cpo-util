@@ -21,6 +21,7 @@
 package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
+import org.synchronoss.cpo.meta.exporter.ClassExport;
 
 import java.io.*;
 
@@ -52,12 +53,12 @@ public class ExportClassSwingWorker extends SwingWorker {
         FileWriter fw = null;
         try {
             SQLExporter sqlEx = new SQLExporter(menuNode.getProxy().getTablePrefix(), menuNode.getProxy().getSqlDelimiter());
-            SQLClassExport classExport = sqlEx.exportSQL(menuNode);
+            ClassExport classExport = sqlEx.exportSQL(menuNode);
 
             StringBuilder sql = new StringBuilder();
-            sql.append(classExport.getDeleteSql());
-            sql.append(classExport.getInsertQueryTextSql());
-            sql.append(classExport.getInsertSql());
+            sql.append(classExport.getDelete());
+            sql.append(classExport.getCreateExpressions());
+            sql.append(classExport.getCreateClass());
 
             CpoClassNode classNode = (CpoClassNode)menuNode;
             String fileName = classNode.getCpoClass().getName() + ".sql";
