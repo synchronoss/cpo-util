@@ -20,40 +20,32 @@
  */
 package org.synchronoss.cpo.util;
 
-import java.io.*;
-import java.net.*;
+import org.slf4j.*;
 
-/**
- * User: Michael Bellomo
- * Date: Nov 7, 2009
- * Time: 9:14:41 PM
- */
-public class UrlLoader implements Runnable {
+import javax.swing.*;
+import java.awt.*;
 
-  private URL url;
-  private InputStream connInputStream = null;
+public class SaveNodesPanel extends JPanel {
 
-  public UrlLoader(String url) throws MalformedURLException {
-    this(new URL(url));
-  }
+  private Logger OUT = LoggerFactory.getLogger(this.getClass());
 
-  public UrlLoader(URL url) {
-    this.url = url;
-  }
+  private static final long serialVersionUID = 1L;
+  private SaveNodesTableModel model;
 
-  public InputStream getInputStream() {
-    return connInputStream;
-  }
-
-  public void run() {
+  public SaveNodesPanel(CpoRootNode rootNode) {
+    model = new SaveNodesTableModel(rootNode);
     try {
-      URLConnection conn = url.openConnection();
-      conn.setConnectTimeout(3000);
-      conn.connect();
-
-      connInputStream = conn.getInputStream();
-    } catch (Exception ex) {
-      // ignore
+      jbInit();
+    } catch (Exception e) {
+      OUT.error(e.getMessage(), e);
     }
+  }
+
+  private void jbInit() throws Exception {
+    this.setLayout(new BorderLayout());
+
+    JScrollPane jScrollSave = new JScrollPane();
+    jScrollSave.getViewport().add(new JTable(model));
+    this.add(jScrollSave, BorderLayout.CENTER);
   }
 }

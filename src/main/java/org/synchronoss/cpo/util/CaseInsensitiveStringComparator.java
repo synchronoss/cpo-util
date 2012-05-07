@@ -20,40 +20,22 @@
  */
 package org.synchronoss.cpo.util;
 
-import java.io.*;
-import java.net.*;
+import java.util.Comparator;
 
 /**
- * User: Michael Bellomo
- * Date: Nov 7, 2009
- * Time: 9:14:41 PM
+ * Comparator that does a case insensitive comparison of two string values.
+ *
+ * @author Michael Bellomo
+ * @since 5/5/12
  */
-public class UrlLoader implements Runnable {
+public class CaseInsensitiveStringComparator implements Comparator<String> {
 
-  private URL url;
-  private InputStream connInputStream = null;
-
-  public UrlLoader(String url) throws MalformedURLException {
-    this(new URL(url));
+  public CaseInsensitiveStringComparator() {
+    super();
   }
 
-  public UrlLoader(URL url) {
-    this.url = url;
-  }
-
-  public InputStream getInputStream() {
-    return connInputStream;
-  }
-
-  public void run() {
-    try {
-      URLConnection conn = url.openConnection();
-      conn.setConnectTimeout(3000);
-      conn.connect();
-
-      connInputStream = conn.getInputStream();
-    } catch (Exception ex) {
-      // ignore
-    }
+  @Override
+  public int compare(String s1, String s2) {
+    return s1.compareToIgnoreCase(s2);
   }
 }

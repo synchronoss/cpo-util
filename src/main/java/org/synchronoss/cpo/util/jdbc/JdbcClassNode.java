@@ -18,42 +18,26 @@
  * A copy of the GNU Lesser General Public License may also be found at
  * http://www.gnu.org/licenses/lgpl.txt
  */
-package org.synchronoss.cpo.util;
+package org.synchronoss.cpo.util.jdbc;
 
-import java.io.*;
-import java.net.*;
+import org.synchronoss.cpo.meta.domain.CpoClass;
+import org.synchronoss.cpo.util.*;
 
-/**
- * User: Michael Bellomo
- * Date: Nov 7, 2009
- * Time: 9:14:41 PM
- */
-public class UrlLoader implements Runnable {
+public class JdbcClassNode extends CpoClassNode {
 
-  private URL url;
-  private InputStream connInputStream = null;
-
-  public UrlLoader(String url) throws MalformedURLException {
-    this(new URL(url));
+  public JdbcClassNode(CpoClass cpoClass) {
+    super(cpoClass);
   }
 
-  public UrlLoader(URL url) {
-    this.url = url;
+  protected void createLabelNodes() {
+    // create the attribute label node
+    this.add(new JdbcAttributeLabelNode());
+
+    // create the function group label node
+    this.add(new CpoFunctionGroupLabelNode());
   }
 
-  public InputStream getInputStream() {
-    return connInputStream;
-  }
-
-  public void run() {
-    try {
-      URLConnection conn = url.openConnection();
-      conn.setConnectTimeout(3000);
-      conn.connect();
-
-      connInputStream = conn.getInputStream();
-    } catch (Exception ex) {
-      // ignore
-    }
+  public JdbcAttributeLabelNode getAttributeLabelNode() {
+    return (JdbcAttributeLabelNode)super.getAttributeLabelNode();
   }
 }

@@ -1,45 +1,45 @@
-/*
- *  Copyright (C) 2006  Jay Colson
+/**
+ * Copyright (C) 2003-2012 David E. Berry, Michael A. Bellomo
  *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 2.1 of the License, or (at your option) any later version.
- *  
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
  *
- *  You should have received a copy of the GNU Lesser General Public
- *  License along with this library; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- *  
- *  A copy of the GNU Lesser General Public License may also be found at 
- *  http://www.gnu.org/licenses/lgpl.txt
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * A copy of the GNU Lesser General Public License may also be found at
+ * http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
-import org.synchronoss.cpo.meta.domain.CpoClass;
-import org.synchronoss.cpo.util.tree.*;
+import org.synchronoss.cpo.CpoException;
+import org.synchronoss.cpo.meta.domain.CpoAttribute;
 
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
 public class CpoBrowserTree extends JTree {
 
-  /** Version Id for this class. */
-  private static final long serialVersionUID=1L;
+  /**
+   * Version Id for this class.
+   */
+  private static final long serialVersionUID = 1L;
 
-	private JPopupMenu menu;
+  private JPopupMenu menu;
   private AbstractCpoNode menuNode;
   private static ImageIcon iconRed = new ImageIcon(CpoBrowserTree.class.getResource("/images/red.gif"));
   private static ImageIcon iconYellow = new ImageIcon(CpoBrowserTree.class.getResource("/images/yellow.gif"));
@@ -49,8 +49,14 @@ public class CpoBrowserTree extends JTree {
   private Logger OUT = LoggerFactory.getLogger(this.getClass());
 
   public CpoBrowserTree() {
+
+    // single select
+    TreeSelectionModel treeSelectionModel = new DefaultTreeSelectionModel();
+    treeSelectionModel.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+    this.setSelectionModel(treeSelectionModel);
+
     this.setCellRenderer(new DefaultTreeCellRenderer() {
-      /** Version Id for this class. */
+      // Version Id for this class
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -76,8 +82,8 @@ public class CpoBrowserTree extends JTree {
         return this;
       }
     });
-		menu = new JPopupMenu();
-		addMouseListener(new MouseAdapter() {
+    menu = new JPopupMenu();
+    addMouseListener(new MouseAdapter() {
       @Override
       public void mouseReleased(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
@@ -85,71 +91,62 @@ public class CpoBrowserTree extends JTree {
         }
       }
     });
-	}
+  }
+
+  @Override
+  public DefaultTreeModel getModel() {
+    return (DefaultTreeModel)super.getModel();
+  }
+
+  protected CpoRootNode getRoot() {
+    return (CpoRootNode)getModel().getRoot();
+  }
 
   @Override
   public String getToolTipText(MouseEvent e) {
-    StringBuilder sb = new StringBuilder();
-    TreePath path = this.getPathForLocation( e.getX(), e.getY());
+    TreePath path = this.getPathForLocation(e.getX(), e.getY());
     if (path != null && path.getLastPathComponent() instanceof AbstractCpoNode) {
-      sb.append("<html>");
       AbstractCpoNode node = (AbstractCpoNode)path.getLastPathComponent();
-      if (node instanceof CpoClassNode) {
-        sb.append(((CpoClassNode)node).getCpoClass().getName());
-        sb.append("<BR>");
-      }
-
-      if (node.getUserName() != null) {
-        sb.append("User: ");
-        sb.append(node.getUserName());
-      }
-
-      if (node.getCreateDate() != null) {
-        SimpleDateFormat df = new SimpleDateFormat();
-        sb.append("<BR>Changed: ");
-        sb.append(df.format(node.getCreateDate().getTime()));
-      }
-
-      sb.append("</html>");
+      return (node.getToolTipText());
     }
-    return sb.toString();
+    return null;
   }
 
-	private void showMenu(Point p) {
-		TreePath path = getPathForLocation((int)p.getX(), (int)p.getY());
-		if (path != null) {
-			TreeNode node = (TreeNode)path.getLastPathComponent();
-			buildMenu(node);
-			menu.show(this, (int)p.getX(), (int)p.getY());
-		}
-	}
+  private void showMenu(Point p) {
+    TreePath path = getPathForLocation((int)p.getX(), (int)p.getY());
+    if (path != null) {
+      TreeNode node = (TreeNode)path.getLastPathComponent();
+      buildMenu(node);
+      menu.show(this, (int)p.getX(), (int)p.getY());
+    }
+  }
 
   private void buildMenu(TreeNode node) {
-    CpoUtil.updateStatus("");
+    CpoUtil.getInstance().setStatusBarText("");
     menu.removeAll();
     menu.setLabel("");
     if (node instanceof AbstractCpoNode) {
       menuNode = (AbstractCpoNode)node;
       menu.setLabel(menuNode.toString());
-      if (menuNode instanceof CpoServerNode) {
-        if (menuNode.isChildDirty()
-            || menuNode.isChildNew()
-            || menuNode.isChildRemove()) {
-          JMenuItem jMenuCommitChildren = new JMenuItem("Save Child Changes");
+      if (menuNode instanceof CpoRootNode) {
+        if (menuNode.isChildDirty() || menuNode.isChildNew() || menuNode.isChildRemove()) {
+          JMenuItem jMenuCommitChildren = new JMenuItem("Save Changes");
           jMenuCommitChildren.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-              saveNodes();
+              save(null);
             }
           });
           menu.add(jMenuCommitChildren);
-        }        
+        }
+
         JMenuItem jMenuFqdnToggle = new JMenuItem("Toggle Classnames");
         jMenuFqdnToggle.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae) {
             toggleClassnames();
           }
         });
-        menu.add(jMenuFqdnToggle);          
+        menu.add(jMenuFqdnToggle);
+
         JMenuItem jMenuAddClass = new JMenuItem("Add new Class");
         jMenuAddClass.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae) {
@@ -157,6 +154,7 @@ public class CpoBrowserTree extends JTree {
           }
         });
         menu.add(jMenuAddClass);
+
         JMenuItem jMenuAddClassFromClass = new JMenuItem("Add new Class from .class");
         jMenuAddClassFromClass.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae) {
@@ -164,51 +162,15 @@ public class CpoBrowserTree extends JTree {
           }
         });
         menu.add(jMenuAddClassFromClass);
-        JMenuItem jMenuRefresh = new JMenuItem("Refresh from DB");
+
+        JMenuItem jMenuRefresh = new JMenuItem("Reload Config");
         jMenuRefresh.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae) {
-            refreshFromDB();
+            refreshFromXml(null);
           }
         });
         menu.add(jMenuRefresh);
-        JMenuItem jMenuReloadCpo = new JMenuItem("Clear Meta Class Cache on Server");
-        jMenuReloadCpo.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent ae) {
-            clearMetaClassCache();
-          }
-        });
-        menu.add(jMenuReloadCpo);
-
-        JMenuItem jMenuSaveSqlDel = new JMenuItem("Export SQL for all of CPO");
-        jMenuSaveSqlDel.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent ae) {
-            exportSqlAllCpo();
-          }
-        });
-        menu.add(jMenuSaveSqlDel);
-        JMenuItem jMenuReconnect = new JMenuItem("Reconnect to Server");
-        jMenuReconnect.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent ae) {
-            reconnectServer();
-          }
-        });
-        menu.add(jMenuReconnect);
-      }
-      if (menuNode instanceof CpoClassNode) {
-        JMenuItem jMenuExportSql = new JMenuItem("Export SQL for Class");
-        jMenuExportSql.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent ae) {
-            exportSql();
-          }
-        });
-        menu.add(jMenuExportSql);
-        JMenuItem jMenuReloadCpo = new JMenuItem("Clear Meta Class Cache on Server for this class");
-        jMenuReloadCpo.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent ae) {
-            clearMetaClassCacheForClass();
-          }
-        });
-        menu.add(jMenuReloadCpo);
+      } else if (menuNode instanceof CpoClassNode) {
         JMenuItem jMenuRename = new JMenuItem("Rename Class");
         jMenuRename.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae) {
@@ -216,6 +178,7 @@ public class CpoBrowserTree extends JTree {
           }
         });
         menu.add(jMenuRename);
+
         JMenuItem jMenuGenerateClass = new JMenuItem("Generate Class Source");
         jMenuGenerateClass.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae) {
@@ -223,38 +186,55 @@ public class CpoBrowserTree extends JTree {
           }
         });
         menu.add(jMenuGenerateClass);
-      }
-      if (menuNode instanceof CpoQueryGroupLabelNode) {
-        JMenuItem jMenuAddGroup = new JMenuItem("Add Query Group to Class");
+      } else if (menuNode instanceof CpoFunctionGroupLabelNode) {
+        JMenuItem jMenuAddGroup = new JMenuItem("Add Function Group to Class");
         jMenuAddGroup.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae) {
-            createNewCpoQueryGroup();
+            addFunctionGroup();
           }
         });
         menu.add(jMenuAddGroup);
-      }
-      if (menuNode instanceof CpoQueryGroupNode) {
-        JMenuItem jMenuAddQuery = new JMenuItem("Add Query to Group");
+      } else if (menuNode instanceof CpoFunctionGroupNode) {
+        JMenuItem jMenuAddQuery = new JMenuItem("Add Function to Group");
         jMenuAddQuery.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae) {
-            addQueryToGroup();
+            addFunctionToGroup((CpoFunctionGroupNode)menuNode);
           }
         });
         menu.add(jMenuAddQuery);
-      }
-      if (menuNode instanceof CpoQueryGroupNode) {
+
         JMenuItem jMenuRenameQG = new JMenuItem("Rename Query Group");
         jMenuRenameQG.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae) {
-            renameQG();
+            renameFunctionGroup();
           }
         });
         menu.add(jMenuRenameQG);
+      } else if (menuNode instanceof CpoFunctionNode) {
+        final CpoFunctionNode functionNode = (CpoFunctionNode)menuNode;
+
+        JMenuItem jMenuMoveUp = new JMenuItem("Move Up");
+        // only available if it's not the first child
+        jMenuMoveUp.setEnabled(functionNode.getSeqNo() > 1);
+        jMenuMoveUp.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent ae) {
+            moveFunctionUp(functionNode);
+          }
+        });
+        menu.add(jMenuMoveUp);
+
+        JMenuItem jMenuMoveDown = new JMenuItem("Move Down");
+        // only available if it's not the last child
+        jMenuMoveDown.setEnabled(functionNode.getSeqNo() < functionNode.getParent().getChildCount());
+        jMenuMoveDown.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent ae) {
+            moveFunctionDown(functionNode);
+          }
+        });
+        menu.add(jMenuMoveDown);
       }
-      if (!(menuNode instanceof CpoServerNode) 
-          && (!(menuNode instanceof CpoAttributeLabelNode))
-          && (!(menuNode instanceof CpoQueryGroupLabelNode))
-          && (!(menuNode instanceof CpoQueryTextLabelNode))) {
+
+      if (!(menuNode instanceof CpoRootNode) && (!(menuNode instanceof CpoAttributeLabelNode)) && (!(menuNode instanceof CpoFunctionGroupLabelNode))) {
         JMenuItem jMenuRemove = new JMenuItem("Remove this object!");
         jMenuRemove.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae) {
@@ -266,111 +246,117 @@ public class CpoBrowserTree extends JTree {
     }
   }
 
-  private void createNewCpoQueryGroup() {
-    QueryGroupPanel cgp = new QueryGroupPanel(menuNode);
-    int result = JOptionPane.showConfirmDialog(this, cgp, "Create new Query Group", JOptionPane.OK_CANCEL_OPTION);
-    if (result == 0) {
-      if (menuNode instanceof CpoQueryGroupLabelNode) {
-        CpoQueryGroupNode cqgn = ((CpoQueryGroupLabelNode)menuNode).addNewQueryGroup(cgp.getGroupName().equals("") ? null : cgp.getGroupName(), cgp.getGroupType());
-        
-        // try to expand and select the node
-        if (cqgn != null) {
-          DefaultTreeModel model = (DefaultTreeModel)getModel();
-          this.expandPath(new TreePath(model.getPathToRoot(cqgn)));
-          CpoQueryNode cqn = cqgn.addNewQueryNode();
-          if (cqn != null) {
-            this.setSelectionPath(new TreePath(cqn));
-          }
-        }
-      }
-    }
-  }
-
-  private void addQueryToGroup() {
-    if (menuNode instanceof CpoQueryGroupNode) {
-      CpoQueryGroupNode cqgn = (CpoQueryGroupNode)menuNode;
-      CpoQueryNode cqn = cqgn.addNewQueryNode();
-      
-      // try to expand and select the node
-      if (cqn != null) {
-        DefaultTreeModel model = (DefaultTreeModel)getModel();
-        this.expandPath(new TreePath(model.getPathToRoot(cqgn)));
-        this.setSelectionPath(new TreePath(cqn));
-      }
-    }
-  }
-
-  private void saveNodes() {
-    CpoSaveNodesPanel saveNodesPanel = new CpoSaveNodesPanel((CpoServerNode)menuNode);
-    int result = JOptionPane.showConfirmDialog(this, saveNodesPanel, "Save Objects", JOptionPane.OK_CANCEL_OPTION);
-    if (result == 0) {
+  private void addFunctionGroup() {
+    FunctionGroupPanel fgp = new FunctionGroupPanel();
+    int result = JOptionPane.showConfirmDialog(this.getTopLevelAncestor(), fgp, "Create new Function Group", JOptionPane.OK_CANCEL_OPTION);
+    if (result == JOptionPane.OK_OPTION) {
       try {
-        List<AbstractCpoNode> nodeList = saveNodesPanel.getSelectedNodes();
-        menuNode.getProxy().saveNodes(nodeList);
+        Proxy proxy = getRoot().getProxy();
 
-        // bug 197 - force a refresh when someone saves
-        if (!refreshFromDB())
-          return;
+        String groupName = fgp.getGroupName().equals("") ? null : fgp.getGroupName();
 
-        ExportChangedSwingWorker exporter = new ExportChangedSwingWorker(nodeList);
-        exporter.start();
+        CpoFunctionGroupNode cpoFunctionGroupNode = proxy.addFunctionGroup((CpoClassNode)menuNode, groupName, fgp.getGroupType());
 
+        // create a function to the group
+        addFunctionToGroup(cpoFunctionGroupNode);
+
+      } catch (CpoException ex) {
+        CpoUtil.showException(ex);
+      }
+    }
+  }
+
+  private void addFunctionToGroup(CpoFunctionGroupNode cpoFunctionGroupNode) {
+    try {
+      Proxy proxy = getRoot().getProxy();
+
+      CpoFunctionNode cpoFunctionNode = proxy.addFunction(cpoFunctionGroupNode);
+
+      // try to expand and select the node
+      DefaultTreeModel model = getModel();
+      this.expandPath(new TreePath(model.getPathToRoot(cpoFunctionGroupNode)));
+      this.setSelectionPath(new TreePath(cpoFunctionNode));
+
+    } catch (CpoException ex) {
+      CpoUtil.showException(ex);
+    }
+  }
+
+  protected void save(File file) {
+    CpoRootNode rootNode = getRoot();
+    SaveNodesPanel saveNodesPanel = new SaveNodesPanel(rootNode);
+    int result = JOptionPane.showConfirmDialog(this.getTopLevelAncestor(), saveNodesPanel, "Save Objects", JOptionPane.OK_CANCEL_OPTION);
+    if (result == JOptionPane.OK_OPTION) {
+      try {
+        rootNode.getProxy().save(file);
+
+        refreshFromXml(file);
+
+        CpoUtil.getInstance().setStatusBarText("Xml saved successfully");
       } catch (Exception pe) {
         CpoUtil.showException(pe);
-        return;
       }
-//      OUT.debug ("Saved Objects");
     }
-    CpoUtil.updateStatus("Persisted Nodes to DB");
   }
 
-  private boolean refreshFromDB() {
+  protected void refreshFromXml(File file) {
     // figure out the index of this tab, so we only check unsaved data on this tab.
     int idx = -1;
 
     Component parent = this.getParent();
     while (idx == -1 && parent != null) {
       if (parent instanceof CpoBrowserPanel) {
-        idx = CpoUtil.frame.jTabbedPane.indexOfComponent(parent);
+        idx = CpoUtil.getInstance().jTabbedPane.indexOfComponent(parent);
       }
       parent = parent.getParent();
     }
 
-    if (CpoUtil.checkUnsavedData("There is unsaved data, are you sure you wish to refresh over it??", idx))
-      return false;
-    
-    menuNode.getProxy().removeObjectsFromAllCache();
-    CpoServerNode csn = new CpoServerNode(menuNode.getProxy(),this);
-//    menuNode.scrubNodes();
-//    ((DefaultTreeModel)this.getModel()).nodeStructureChanged(menuNode);n
-    ((DefaultTreeModel)this.getModel()).setRoot(csn);
+    // should never happen
+    if (idx == -1) {
+      CpoUtil.showErrorMessage("Unable to refresh");
+      return;
+    }
 
-    // force a selection on the root node
-    TreePath tp = new TreePath(getModel().getRoot());
-    this.setSelectionPath(tp);
+    if (CpoUtil.getInstance().checkUnsavedData("There is unsaved data, are you sure you wish to refresh over it??", idx)) {
+      return;
+    }
 
-    CpoUtil.updateStatus("Cleared Local Application Cache");
-    return true;
+    Proxy proxy = getRoot().getProxy();
+
+    try {
+      ProxyFactory.getInstance().refreshMetaDescriptor(proxy, file);
+
+      this.setModel(proxy.createTreeModel());
+
+      // force a toggle - this will sort the names
+      toggleClassnames();
+
+      // force a selection on the root node
+      TreePath tp = new TreePath(getModel().getRoot());
+      this.setSelectionPath(tp);
+
+      CpoUtil.getInstance().setStatusBarText("Reloaded " + proxy);
+    } catch (CpoException ex) {
+      CpoUtil.showException(ex);
+    }
   }
 
   private void createNewCpoClassFromClass() {
-    OUT.debug("creating new class");
-    boolean happy = false;
+    OUT.debug("creating new class from class");
+
+    Proxy proxy = getRoot().getProxy();
+
     String className = null;
-    Method methods[] = null;
+    List<CpoAttribute> attributes = new ArrayList<CpoAttribute>();
+
+    boolean happy = false;
     while (!happy) {
-      CpoNewClassClassPanel cnccp = new CpoNewClassClassPanel();
-      if (menuNode.getProxy().getDefaultPackageName() != null)
-        cnccp.jTextClassName.setText(menuNode.getProxy().getDefaultPackageName());
-      OUT.debug("opening joption pane ...");
-      int result = JOptionPane.showConfirmDialog(this,cnccp,"Create new CPO Class from Class", JOptionPane.OK_CANCEL_OPTION);
-      if (result == 0) {
-        className = cnccp.jTextClassName.getText();
-        if (className.lastIndexOf(".") != -1)
-          menuNode.getProxy().setDefaultPackageName(className.substring(0,className.lastIndexOf(".")));
+      CpoNewClassClassPanel cnccp = new CpoNewClassClassPanel(proxy);
+      int result = JOptionPane.showConfirmDialog(this.getTopLevelAncestor(), cnccp, "Create new CPO Class from Class", JOptionPane.OK_CANCEL_OPTION);
+      if (result == JOptionPane.OK_OPTION) {
         try {
-          System.out.println("CpoUtil: " + menuNode.getProxy().getDefaultPackageName() + " "  + className);
-          methods = CpoUtilClassLoader.getInstance(CpoUtil.files,this.getClass().getClassLoader()).loadClass(className).getMethods();
+          className = cnccp.getClassName();
+          attributes = proxy.createAttributesFromClass(className);
           happy = true;
         } catch (Exception pe) {
           CpoUtil.showException(pe);
@@ -379,56 +365,39 @@ public class CpoBrowserTree extends JTree {
         /**
          * user wishes to cancel creation
          */
-        CpoUtil.updateStatus("Aborted Class Creation");
+        CpoUtil.getInstance().setStatusBarText("Aborted Class Creation");
         return;
       }
-      
     }
-    CpoClassNode ccn;
-    try {
-      CpoClass cpoClass = new CpoClass();
-      cpoClass.setClassId(menuNode.getProxy().getNewGuid());
-      cpoClass.setName(className);
 
-      CpoServerNode serverNode = (CpoServerNode)menuNode;
-      ccn = new CpoClassNode(cpoClass, serverNode);
-      menuNode.getProxy().getClasses(serverNode).add(ccn);
-      menuNode.getProxy().getClassesById().put(cpoClass.getClassId(),ccn);
-      OUT.debug("Menu Node Class Count: "+menuNode.getProxy().getClasses(serverNode).size());
-      ccn.setNew(true);
-      menuNode.getProxy().generateNewAttributeMap(ccn,methods);
+    try {
+      CpoClassNode cpoClassNode = proxy.addClass(className);
+      proxy.addAttributes(cpoClassNode, attributes);
+
+      saveClassSource(cpoClassNode);
+
+      CpoUtil.getInstance().setStatusBarText("Class (" + cpoClassNode.getUserObject().getClass().getName() + ") successfully created");
     } catch (Exception pe) {
       CpoUtil.showException(pe);
-      this.refreshFromDB();
-      CpoUtil.updateStatus("Class could not be added to the db, please report this error");
-      return;
     }
-    CpoUtil.updateStatus("Class ("+className+") successfully created");    
   }
 
   private void createNewCpoClass() {
+    OUT.debug("creating new class");
+
+    Proxy proxy = getRoot().getProxy();
+
+    String className = null;
+    List<CpoAttribute> attributes = new ArrayList<CpoAttribute>();
+
     boolean happy = false;
-    String sql = null;
-    String classString = null;
-    
-    CpoClass cpoClass = new CpoClass();
-    cpoClass.setClassId(menuNode.getProxy().getNewGuid());
-    cpoClass.setUserid(CpoUtil.username);
-    cpoClass.setCreatedate(Calendar.getInstance());
-    
     while (!happy) {
-      CpoNewClassPanel cncp = new CpoNewClassPanel();
-      if (menuNode.getProxy().getDefaultPackageName() != null)
-        cncp.jTextClassName.setText(menuNode.getProxy().getDefaultPackageName());
-      int result = JOptionPane.showConfirmDialog(this,cncp,"Create new CPO Class", JOptionPane.OK_CANCEL_OPTION);
-      if (result == 0) {
-        cpoClass.setName(cncp.jTextClassName.getText());
-        if (cpoClass.getName().lastIndexOf(".") != -1) {
-          menuNode.getProxy().setDefaultPackageName(cpoClass.getName().substring(0, cpoClass.getName().lastIndexOf(".")));
-        }
-        sql = cncp.jTextAsql.getText();
+      CpoNewClassPanel cncp = new CpoNewClassPanel(proxy);
+      int result = JOptionPane.showConfirmDialog(this.getTopLevelAncestor(), cncp, "Create new CPO Class", JOptionPane.OK_CANCEL_OPTION);
+      if (result == JOptionPane.OK_OPTION) {
         try {
-          classString = menuNode.getProxy().makeClassOuttaSql(cpoClass, sql);
+          className = cncp.getClassName();
+          attributes = proxy.createAttributesFromExpression(cncp.getConnection(), cncp.getExpression());
           happy = true;
         } catch (Exception pe) {
           CpoUtil.showException(pe);
@@ -437,162 +406,122 @@ public class CpoBrowserTree extends JTree {
         /**
          * user wishes to cancel creation
          */
-        CpoUtil.updateStatus("Aborted Class Creation");
+        CpoUtil.getInstance().setStatusBarText("Aborted Class Creation");
         return;
       }
     }
-    
-    saveClassSource(classString, cpoClass.getName());
-    CpoClassNode ccn;
+
     try {
-      CpoServerNode serverNode = (CpoServerNode)menuNode;
-      ccn = new CpoClassNode(cpoClass, serverNode);
-      menuNode.getProxy().getClasses(serverNode).add(ccn);
-      menuNode.getProxy().getClassesById().put(cpoClass.getClassId(),ccn);
-      OUT.debug("Menu Node Class Count: " + menuNode.getProxy().getClasses(serverNode).size());
-      ccn.setNew(true);
-      menuNode.getProxy().generateNewAttributeMap(ccn, sql);
+      CpoClassNode cpoClassNode = proxy.addClass(className);
+      proxy.addAttributes(cpoClassNode, attributes);
+
+      saveClassSource(cpoClassNode);
+
+      CpoUtil.getInstance().setStatusBarText("Class (" + cpoClassNode.getUserObject().getClass().getName() + ") successfully created");
     } catch (Exception pe) {
       CpoUtil.showException(pe);
-      this.refreshFromDB();
-      CpoUtil.updateStatus("Class could not be added to the db, please report this error");
     }
   }
 
-  private void saveClassSource(String classString, String className) {
+  private void saveClassSource(CpoClassNode cpoClassNode) {
+    Proxy proxy = getRoot().getProxy();
+
+    String className = cpoClassNode.getUserObject().getName();
+
     String saveClassName = className;
     if (className.contains(".")) {
-      saveClassName = className.substring(className.lastIndexOf(".")+1);
+      saveClassName = className.substring(className.lastIndexOf(".") + 1);
     }
     JFileChooser jFile = new JFileChooser();
-    if (menuNode.getProxy().getDefaultDir() != null) {
-      jFile.setCurrentDirectory(menuNode.getProxy().getDefaultDir());
+    if (proxy.getLastDir() != null) {
+      jFile.setCurrentDirectory(proxy.getLastDir());
     }
     jFile.setDialogTitle("Choose a directory to save: " + saveClassName + ".java");
     jFile.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-    int result = jFile.showSaveDialog(this);
-    if (result != 0 || jFile.getSelectedFile() == null) {
-      CpoUtil.updateStatus("Aborted Class Creation: file not saved");
+    int result = jFile.showSaveDialog(this.getTopLevelAncestor());
+    if (result != JFileChooser.APPROVE_OPTION || jFile.getSelectedFile() == null) {
+      CpoUtil.getInstance().setStatusBarText("Aborted Class Creation: file not saved");
       return;
     }
-    menuNode.getProxy().setDefaultDir(jFile.getCurrentDirectory());
+
+    proxy.setLastDir(jFile.getCurrentDirectory());
     try {
-      FileWriter fw = new FileWriter(jFile.getSelectedFile()+File.separator+saveClassName+".java");
-      fw.write(classString);
+      FileWriter fw = new FileWriter(jFile.getSelectedFile() + File.separator + saveClassName + ".java");
+      fw.write(proxy.generateSourceCode(cpoClassNode));
       fw.close();
     } catch (IOException ioe) {
       CpoUtil.showException(ioe);
-      CpoUtil.updateStatus("Class not created: exception caught during save: "+ioe.getMessage());
+      CpoUtil.getInstance().setStatusBarText("Class not created: exception caught during save: " + ioe.getMessage());
       return;
     }
-    CpoUtil.updateStatus("Class ("+className+") successfully saved");    
+    CpoUtil.getInstance().setStatusBarText("Class (" + className + ") successfully saved");
   }
 
-  private void clearMetaClassCache() {
-    try {
-      menuNode.getProxy().clearMetaClassCache();
-    } catch (Exception pe) {
-      CpoUtil.showException(pe);
+  private void renameFunctionGroup() {
+    String result = (String)JOptionPane.showInputDialog(this.getTopLevelAncestor(), "Enter new group name", "Edit Group Name", JOptionPane.INFORMATION_MESSAGE, null, null, ((CpoFunctionGroupNode)menuNode).getGroupName());
+    if (result == null) {
       return;
     }
-    CpoUtil.updateStatus("Meta Class Cache Cleared");
-  }
-
-  private void clearMetaClassCacheForClass() {
-    try {
-      menuNode.getProxy().clearMetaClassCache(((CpoClassNode)menuNode).getCpoClass().getName());
-    } catch (Exception pe) {
-      CpoUtil.showException(pe);
-      return;
+    if (result.equals("")) {
+      result = null;
     }
-    CpoUtil.updateStatus("Meta Class Cache Cleared for "+((CpoClassNode)menuNode).getCpoClass().getName());
+    ((CpoFunctionGroupNode)menuNode).setGroupName(result);
+    CpoUtil.getInstance().setStatusBarText("Changed Group Name to: " + result);
   }
 
-  private void exportSqlAllCpo() {
+  public void toggleClassnames() {
+    CpoRootNode rootNode = getRoot();
+    List<CpoClassNode> nodes = new ArrayList<CpoClassNode>();
 
-    // bug 197 - force a refresh when someone saves
-    if (!refreshFromDB())
-        return;
+    while (rootNode.getChildCount() > 0) {
+      CpoClassNode node = (CpoClassNode)rootNode.getChildAt(0);
 
-    ExportAllSwingWorker exporter = new ExportAllSwingWorker(menuNode);
-    exporter.start();
-  }
+      // toggle the class name display
+      node.toggleClassNames();
 
-  private void exportSql() {
-    // bug 197 - force a refresh when someone saves
-    if (!refreshFromDB())
-      return;
-    
-    String sqlDir = menuNode.getProxy().getSqlDir();
-    JFileChooser chooser = new JFileChooser();
-    if (sqlDir != null) {
-      // if there is a sql dir, use that
-      chooser.setCurrentDirectory(new File(sqlDir));
-    } else if (menuNode.getProxy().getDefaultDir() != null) {
-      // if there wasn't a sql dir try the default dir
-      chooser.setCurrentDirectory(menuNode.getProxy().getDefaultDir());
+      // add to the list
+      nodes.add(node);
+
+      // unlink from the root
+      rootNode.remove(node);
     }
-    chooser.setApproveButtonText("Select");
-    chooser.setDialogTitle("Select directory to save sql:");
-    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-    int option = chooser.showSaveDialog(this);
-    if (option == JFileChooser.APPROVE_OPTION) {
-      File dir = chooser.getSelectedFile();
-      
-      if (OUT.isDebugEnabled())
-        OUT.debug("Directory: " + dir.getPath());
 
-      ExportClassSwingWorker exporter = new ExportClassSwingWorker(menuNode, dir);
-      exporter.start();
+    // sort them - note that this sorts by display name so it will work both for long and short names
+    Collections.sort(nodes);
+
+    // link them back into the tree
+    for (CpoClassNode node : nodes) {
+      rootNode.add(node);
     }
-  }
 
-  private void reconnectServer() {
-    try {
-      menuNode.getProxy().getConnection();
-      int result = JOptionPane.showConfirmDialog(this,"Refresh From DB Too?",
-          "Refresh from DB",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
-      if (result == 0)
-        refreshFromDB();
-    } catch (ClassNotFoundException cnfe) {
-      CpoUtil.setCustomClassPath("CPO Classes where not found, make sure ejb is in your classpath!");
-      return;
-    } catch (Exception pe) {
-      CpoUtil.showException(pe);
-      CpoUtil.updateStatus("Could not reconnect: "+pe.getMessage());
-      return;
-    }
-    CpoUtil.updateStatus("Reconnected to Server!");
-  }
-
-  private void renameQG() {
-    String result = (String)JOptionPane.showInputDialog(this,"Enter new group name","Edit Group Name",JOptionPane.INFORMATION_MESSAGE,null,null,((CpoQueryGroupNode)menuNode).getGroupName());
-    if (result == null) return;
-    if (result.equals("")) result = null;
-    ((CpoQueryGroupNode)menuNode).setGroupName(result);
-    CpoUtil.updateStatus("Changed Group Name to: "+result);
-  }
-
-  private void toggleClassnames() {
-    menuNode.getProxy().toggleClassNames();
-    menuNode.refreshChildren();
-    menuNode.refreshMe();
+    this.getModel().nodeStructureChanged(rootNode);
   }
 
   private void renameCpoClassNode() {
-    String result = (String)JOptionPane.showInputDialog(this, "Enter new class name", "Edit Class Name", JOptionPane.INFORMATION_MESSAGE, null, null, ((CpoClassNode) menuNode).getCpoClass().getName());
-    if (result == null) return;
-    if (result.equals("")) result = null;
+    String result = (String)JOptionPane.showInputDialog(this.getTopLevelAncestor(), "Enter new class name", "Edit Class Name", JOptionPane.INFORMATION_MESSAGE, null, null, ((CpoClassNode)menuNode).getUserObject().getName());
+    if (result == null) {
+      return;
+    }
+    if (result.equals("")) {
+      result = null;
+    }
     ((CpoClassNode)menuNode).setClassName(result);
-    CpoUtil.updateStatus("Changed Class Name to: "+result);    
+    CpoUtil.getInstance().setStatusBarText("Changed Class Name to: " + result);
   }
 
   private void generateClassSource() {
     try {
-      String classString = menuNode.getProxy().makeClassOuttaNode((CpoClassNode)menuNode);
-      this.saveClassSource(classString, ((CpoClassNode)menuNode).getCpoClass().getName());
+      this.saveClassSource((CpoClassNode)menuNode);
     } catch (Exception e) {
       CpoUtil.showException(e);
     }
+  }
+
+  private void moveFunctionUp(CpoFunctionNode functionNode) {
+    functionNode.getProxy().moveFunctionUp(functionNode);
+  }
+
+  private void moveFunctionDown(CpoFunctionNode functionNode) {
+    functionNode.getProxy().moveFunctionDown(functionNode);
   }
 }

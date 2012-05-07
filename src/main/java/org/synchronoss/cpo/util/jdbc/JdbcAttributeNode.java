@@ -18,42 +18,41 @@
  * A copy of the GNU Lesser General Public License may also be found at
  * http://www.gnu.org/licenses/lgpl.txt
  */
-package org.synchronoss.cpo.util;
+package org.synchronoss.cpo.util.jdbc;
 
-import java.io.*;
-import java.net.*;
+import org.synchronoss.cpo.jdbc.JdbcCpoAttribute;
+import org.synchronoss.cpo.util.CpoAttributeNode;
 
-/**
- * User: Michael Bellomo
- * Date: Nov 7, 2009
- * Time: 9:14:41 PM
- */
-public class UrlLoader implements Runnable {
+public class JdbcAttributeNode extends CpoAttributeNode {
 
-  private URL url;
-  private InputStream connInputStream = null;
-
-  public UrlLoader(String url) throws MalformedURLException {
-    this(new URL(url));
+  public JdbcAttributeNode(JdbcCpoAttribute attribute) {
+    super(attribute);
   }
 
-  public UrlLoader(URL url) {
-    this.url = url;
+  @Override
+  public JdbcCpoAttribute getUserObject() {
+    return (JdbcCpoAttribute)super.getUserObject();
   }
 
-  public InputStream getInputStream() {
-    return connInputStream;
+  public String getDbTable() {
+    return getUserObject().getDbTable();
   }
 
-  public void run() {
-    try {
-      URLConnection conn = url.openConnection();
-      conn.setConnectTimeout(3000);
-      conn.connect();
+  public String getDbColumn() {
+    return getUserObject().getDbColumn();
+  }
 
-      connInputStream = conn.getInputStream();
-    } catch (Exception ex) {
-      // ignore
-    }
+  public void setDbTable(String dbTable) {
+    if (dbTable.equals(this.getDbTable()))
+      return;
+    getUserObject().setDbTable(dbTable);
+    this.setDirty(true);
+  }
+
+  public void setDbColumn(String dbColumn) {
+    if (dbColumn.equals(this.getDbColumn()))
+      return;
+    getUserObject().setDbColumn(dbColumn);
+    this.setDirty(true);
   }
 }

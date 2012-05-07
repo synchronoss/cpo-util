@@ -20,40 +20,40 @@
  */
 package org.synchronoss.cpo.util;
 
-import java.io.*;
-import java.net.*;
+import javax.swing.*;
 
-/**
- * User: Michael Bellomo
- * Date: Nov 7, 2009
- * Time: 9:14:41 PM
- */
-public class UrlLoader implements Runnable {
-
-  private URL url;
-  private InputStream connInputStream = null;
-
-  public UrlLoader(String url) throws MalformedURLException {
-    this(new URL(url));
+public class CpoAttributeLabelNode extends AbstractCpoNode {
+  
+  public CpoAttributeLabelNode() {
+    super();
   }
 
-  public UrlLoader(URL url) {
-    this.url = url;
+  @Override
+  public CpoClassNode getParent() {
+    return (CpoClassNode)super.getParent();
   }
 
-  public InputStream getInputStream() {
-    return connInputStream;
+  @Override
+  public boolean isProtected() {
+    return getParent().isProtected();
   }
 
-  public void run() {
-    try {
-      URLConnection conn = url.openConnection();
-      conn.setConnectTimeout(3000);
-      conn.connect();
+  @Override
+  public JPanel getPanelForSelected() {
+    return new CpoAttributePanel(this, new CoreAttributeTableModel(this));
+  }
 
-      connInputStream = conn.getInputStream();
-    } catch (Exception ex) {
-      // ignore
-    }
+  public CpoNewAttributePanel getNewAttributePanel() {
+    return new CpoNewAttributePanel(this);
+  }
+
+  @Override
+  public String toString() {
+    return "Attributes";
+  }
+
+  @Override
+  public boolean isLeaf() {
+    return true;
   }
 }

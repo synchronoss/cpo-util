@@ -18,42 +18,34 @@
  * A copy of the GNU Lesser General Public License may also be found at
  * http://www.gnu.org/licenses/lgpl.txt
  */
-package org.synchronoss.cpo.util;
+package org.synchronoss.cpo.util.cassandra;
 
-import java.io.*;
-import java.net.*;
+import org.synchronoss.cpo.*;
+import org.synchronoss.cpo.meta.CpoMetaDescriptor;
+import org.synchronoss.cpo.util.Proxy;
+
+import java.io.File;
 
 /**
- * User: Michael Bellomo
- * Date: Nov 7, 2009
- * Time: 9:14:41 PM
+ * A Cassandra based proxy object.
+ *
+ * @author Michael Bellomo
+ * @since 5/5/12
  */
-public class UrlLoader implements Runnable {
+public class CassandraProxy extends Proxy {
 
-  private URL url;
-  private InputStream connInputStream = null;
-
-  public UrlLoader(String url) throws MalformedURLException {
-    this(new URL(url));
+  public CassandraProxy() {
+    super();
   }
 
-  public UrlLoader(URL url) {
-    this.url = url;
+  public CassandraProxy(File cpoMetaXml, CpoMetaDescriptor metaDescriptor) throws CpoException {
+    super();
+    this.setCpoMetaXml(cpoMetaXml);
+    this.setMetaDescriptor(metaDescriptor);
   }
-
-  public InputStream getInputStream() {
-    return connInputStream;
-  }
-
-  public void run() {
-    try {
-      URLConnection conn = url.openConnection();
-      conn.setConnectTimeout(3000);
-      conn.connect();
-
-      connInputStream = conn.getInputStream();
-    } catch (Exception ex) {
-      // ignore
-    }
+  @Override
+  protected CpoAdapter getCpoAdapter(String connectionName) throws CpoException {
+    // TODO - Implement org.synchronoss.cpo.util.cassandra.CassandraProxy.getCpoAdapter
+    throw new UnsupportedOperationException("org.synchronoss.cpo.util.cassandra.CassandraProxy.getCpoAdapter has not been implemented.");
   }
 }

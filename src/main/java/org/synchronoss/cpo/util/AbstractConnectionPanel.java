@@ -20,40 +20,36 @@
  */
 package org.synchronoss.cpo.util;
 
-import java.io.*;
-import java.net.*;
+import org.synchronoss.cpo.CpoException;
+import org.synchronoss.cpo.core.cpoCoreConfig.CtDataSourceConfig;
+
+import javax.swing.*;
 
 /**
- * User: Michael Bellomo
- * Date: Nov 7, 2009
- * Time: 9:14:41 PM
+ * Abstract class for creating and editing connections
+ *
+ * @author Michael Bellomo
+ * @since 5/5/12
  */
-public class UrlLoader implements Runnable {
+public abstract class AbstractConnectionPanel extends JPanel {
 
-  private URL url;
-  private InputStream connInputStream = null;
+  protected static final String DEFAULT_META_DESCRIPTOR = "cpoutil";
 
-  public UrlLoader(String url) throws MalformedURLException {
-    this(new URL(url));
+  private CtDataSourceConfig dataSourceConfig;
+
+  public abstract String getTitle();
+
+  protected abstract String getConfigProcessor();
+
+  public abstract CtDataSourceConfig newDataSourceConfig();
+
+  public abstract CtDataSourceConfig createDataSourceConfig() throws CpoException;
+
+  public CtDataSourceConfig getDataSourceConfig() {
+    return dataSourceConfig;
   }
 
-  public UrlLoader(URL url) {
-    this.url = url;
-  }
-
-  public InputStream getInputStream() {
-    return connInputStream;
-  }
-
-  public void run() {
-    try {
-      URLConnection conn = url.openConnection();
-      conn.setConnectTimeout(3000);
-      conn.connect();
-
-      connInputStream = conn.getInputStream();
-    } catch (Exception ex) {
-      // ignore
-    }
+  public void setDataSourceConfig(CtDataSourceConfig dataSourceConfig) {
+    this.dataSourceConfig = dataSourceConfig;
   }
 }

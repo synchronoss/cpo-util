@@ -20,40 +20,48 @@
  */
 package org.synchronoss.cpo.util;
 
-import java.io.*;
-import java.net.*;
+import javax.swing.*;
+import java.util.*;
 
-/**
- * User: Michael Bellomo
- * Date: Nov 7, 2009
- * Time: 9:14:41 PM
- */
-public class UrlLoader implements Runnable {
+public class CpoRootNode extends AbstractCpoNode {
 
-  private URL url;
-  private InputStream connInputStream = null;
-
-  public UrlLoader(String url) throws MalformedURLException {
-    this(new URL(url));
+  public CpoRootNode(Proxy proxy) {
+    super(proxy);
   }
 
-  public UrlLoader(URL url) {
-    this.url = url;
+  @Override
+  public Proxy getUserObject() {
+    return (Proxy)super.getUserObject();
   }
 
-  public InputStream getInputStream() {
-    return connInputStream;
+  @Override
+  public JPanel getPanelForSelected() {
+    return null;
   }
 
-  public void run() {
-    try {
-      URLConnection conn = url.openConnection();
-      conn.setConnectTimeout(3000);
-      conn.connect();
+  @Override
+  public String getToolTipText() {
+    return getUserObject().getMetaXmlFullName();
+  }
 
-      connInputStream = conn.getInputStream();
-    } catch (Exception ex) {
-      // ignore
-    }
+  public List<AbstractCpoNode> getChangedNodes() {
+    List<AbstractCpoNode> changedNodes = new ArrayList<AbstractCpoNode>();
+    changedNodes.addAll(newChildren);
+    changedNodes.addAll(dirtyChildren);
+    changedNodes.addAll(removeChildren);
+    return changedNodes;
+  }
+
+  public boolean isUnsaved() {
+    if (this.isChildDirty())
+      return true;
+
+    if (this.isChildNew())
+      return true;
+
+    if (this.isChildRemove())
+      return true;
+
+    return false;
   }
 }

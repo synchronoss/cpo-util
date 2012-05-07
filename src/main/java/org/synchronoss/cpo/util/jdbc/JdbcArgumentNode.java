@@ -18,42 +18,37 @@
  * A copy of the GNU Lesser General Public License may also be found at
  * http://www.gnu.org/licenses/lgpl.txt
  */
-package org.synchronoss.cpo.util;
+package org.synchronoss.cpo.util.jdbc;
 
-import java.io.*;
-import java.net.*;
+import org.synchronoss.cpo.jdbc.*;
+import org.synchronoss.cpo.util.CpoArgumentNode;
 
-/**
- * User: Michael Bellomo
- * Date: Nov 7, 2009
- * Time: 9:14:41 PM
- */
-public class UrlLoader implements Runnable {
+public class JdbcArgumentNode extends CpoArgumentNode {
 
-  private URL url;
-  private InputStream connInputStream = null;
-
-  public UrlLoader(String url) throws MalformedURLException {
-    this(new URL(url));
+  public JdbcArgumentNode(JdbcCpoArgument cpoArgument) {
+    super(cpoArgument);
   }
 
-  public UrlLoader(URL url) {
-    this.url = url;
+  @Override
+  public JdbcCpoArgument getUserObject() {
+    return (JdbcCpoArgument)super.getUserObject();
   }
 
-  public InputStream getInputStream() {
-    return connInputStream;
+  public String getScope() {
+    return getUserObject().getScope();
   }
 
-  public void run() {
-    try {
-      URLConnection conn = url.openConnection();
-      conn.setConnectTimeout(3000);
-      conn.connect();
+  public void setScope(String value) {
+    if (this.getScope() == null && value == null)
+      return;
 
-      connInputStream = conn.getInputStream();
-    } catch (Exception ex) {
-      // ignore
+    if (this.getScope() == null || value == null || !value.equals(this.getScope())) {
+      getUserObject().setScope(value);
+      this.setDirty(true);
     }
+  }
+
+  public JdbcCpoAttribute getCpoAttribute() {
+    return getUserObject().getAttribute();
   }
 }
