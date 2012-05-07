@@ -28,10 +28,9 @@ public class Statics {
 
   // CpoUtil config files
   public static final String CPOUTIL_CONFIG_DIRNAME = ".cpoutil";
-  public static final File CPOUTIL_CONFIG_DIR = new File(System.getProperties().getProperty("user.home") + File.separator + CPOUTIL_CONFIG_DIRNAME);
+  public static final File CPOUTIL_CONFIG_DIR = new File(System.getProperties().getProperty("user.home"), CPOUTIL_CONFIG_DIRNAME);
   public static final String CPOUTIL_CONFIG_FILE = "CpoUtilConfig.xml";
   public static final String CPOUTIL_PROPERTIES_FILE = "cpoutil.properties";
-  public static final String PROTECTED_CLASS_FILE = "protectedClasses.properties";
 
   public static final String BOOTSTRAP_URL_PROP = "cpoutil.bootstrapUrl";
   public static final String PROTECTED_CLASS_PROP = "cpoutil.protectedClasses";
@@ -42,23 +41,6 @@ public class Statics {
   public static final String CPOUTIL_AUTHOR = "cpoutil.author";
   public static final String CPOUTIL_COPYRIGHT = "cpoutil.copyright";
   public static final String CPOUTIL_COMPANY = "cpoutil.company";
-
-  public static final String PROP_WLSURL = "cpoutil.wls.url.";
-  public static final String PROP_WLSUSER = "cpoutil.wls.user.";
-  public static final String PROP_WLSPASS = "cpoutil.wls.pass.";
-  public static final String PROP_WLSCONNPOOL = "cpoutil.wls.connpool.";
-  public static final String PROP_WLSINITCTXFCTRY = "cpoutil.wls.initialcontextfactory.";
-  public static final String PROP_CPONAME = "cpoutil.wls.cponame.";
-
-  public static final String PROP_JDBC_URL = "cpoutil.jdbc.url.";
-  public static final String PROP_JDBC_DRIVER = "cpoutil.jdbc.driver.";
-  public static final String PROP_JDBC_PARAMS = "cpoutil.jdbc.params.";
-
-  public static final String LOAD_JDBC_URL = "cpoutil.jdbc.url";
-  public static final String LOAD_JDBC_DRIVER = "cpoutil.jdbc.driver";
-  public static final String LOAD_JDBC_PARAMS = "cpoutil.jdbc.params";
-
-  public static final String LPROP_CLASSPATH = "cpoutil.classpath";
 
   public static final String CPO_TYPE_CREATE = StFunctionGroupType.CREATE.toString();
   public static final String CPO_TYPE_DELETE = StFunctionGroupType.DELETE.toString();
