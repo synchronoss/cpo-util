@@ -60,31 +60,31 @@ public class AboutBoxPanel extends JPanel {
     titleLabel.setText("Title:");
     this.add(titleLabel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
-    titleValue.setText(CpoUtil.getInstance().getProperty(Statics.CPOUTIL_TITLE));
+    titleValue.setText(CpoUtil.getInstance().getProperty(CpoUtil.TITLE));
     this.add(titleValue, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
     versionLabel.setText("Version:");
     this.add(versionLabel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
-    versionValue.setText(CpoUtil.getInstance().getProperty(Statics.CPOUTIL_VERSION));
+    versionValue.setText(CpoUtil.getInstance().getProperty(CpoUtil.VERSION));
     this.add(versionValue, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
     authorLabel.setText("Authors:");
     this.add(authorLabel, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
-    authorValue.setText(CpoUtil.getInstance().getProperty(Statics.CPOUTIL_AUTHOR));
+    authorValue.setText(CpoUtil.getInstance().getProperty(CpoUtil.AUTHOR));
     this.add(authorValue, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
     copyrightLabel.setText("Copyright:");
     this.add(copyrightLabel, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
-    copyrightValue.setText(CpoUtil.getInstance().getProperty(Statics.CPOUTIL_COPYRIGHT));
+    copyrightValue.setText(CpoUtil.getInstance().getProperty(CpoUtil.COPYRIGHT));
     this.add(copyrightValue, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
     companyLabel.setText("Company:");
     this.add(companyLabel, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
-    companyValue.setText(CpoUtil.getInstance().getProperty(Statics.CPOUTIL_COMPANY));
+    companyValue.setText(CpoUtil.getInstance().getProperty(CpoUtil.COMPANY));
     this.add(companyValue, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
     jvmLabel.setText("Java Version:");

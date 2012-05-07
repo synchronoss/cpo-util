@@ -22,6 +22,7 @@ package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
 import org.synchronoss.cpo.*;
+import org.synchronoss.cpo.core.cpoCoreMeta.StFunctionGroupType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -166,7 +167,7 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
     String cpoClassNameReturnType = cpoClassName;
     CpoClassNode returnClassNode = cpoClassNode;
     CpoFunctionGroupNode cpoFunctionGroupNode = getSelectedCpoFunctionGroupNode();
-    if (cpoFunctionGroupNode.getType().equals(Statics.CPO_TYPE_LIST)) {
+    if (cpoFunctionGroupNode.getType().equals(StFunctionGroupType.LIST.toString())) {
       returnClassNode = (CpoClassNode)jComClassOut.getSelectedItem();
       cpoClassNameReturnType = returnClassNode.getUserObject().getName();
     }
@@ -394,13 +395,13 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
   }
 
   private void functionGroupActionPerformed(ActionEvent e) {
-    if (((CpoFunctionGroupNode)jComFunctionGroup.getSelectedItem()).getType().equals(Statics.CPO_TYPE_EXIST)) {
+    if (((CpoFunctionGroupNode)jComFunctionGroup.getSelectedItem()).getType().equals(StFunctionGroupType.EXIST.toString())) {
       jCheckPersist.setEnabled(true);
     } else {
       jCheckPersist.setSelected(false);
       jCheckPersist.setEnabled(false);
     }
-    if (((CpoFunctionGroupNode)jComFunctionGroup.getSelectedItem()).getType().equals(Statics.CPO_TYPE_LIST)) {
+    if (((CpoFunctionGroupNode)jComFunctionGroup.getSelectedItem()).getType().equals(StFunctionGroupType.LIST.toString())) {
       CpoFunctionGroupNode cqgn = (CpoFunctionGroupNode)jComFunctionGroup.getSelectedItem();
       try {
         CpoRootNode cpoRootNode = cqgn.getParent().getParent().getParent();
@@ -427,10 +428,10 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
       try {
         CpoFunctionGroupNode selectedNode = (CpoFunctionGroupNode)jComFunctionGroup.getSelectedItem();
 
-        CpoFunctionGroupNode node = getFunctionGroupNode(selectedNode.getGroupName(), Statics.CPO_TYPE_CREATE);
+        CpoFunctionGroupNode node = getFunctionGroupNode(selectedNode.getGroupName(), StFunctionGroupType.CREATE.toString());
 
         if (node == null) {
-          node = getFunctionGroupNode(selectedNode.getGroupName(), Statics.CPO_TYPE_UPDATE);
+          node = getFunctionGroupNode(selectedNode.getGroupName(), StFunctionGroupType.UPDATE.toString());
         }
         if (node == null) {
           JOptionPane.showMessageDialog(CpoUtil.getInstance(), "Can't locate a 'CREATE' or 'UPDATE' CPO Type with the Group Name of '" + selectedNode.getGroupName() + "'", "Sorry, no go", JOptionPane.INFORMATION_MESSAGE);

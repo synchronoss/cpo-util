@@ -44,10 +44,26 @@ public class CpoUtil extends JFrame {
   private static URL mainIcon = CpoBrowserTree.class.getResource("/images/sync-logo-sm.gif");
   private static ImageIcon closeIcon = new ImageIcon(CpoBrowserTree.class.getResource("/images/close.png"));
 
+  private static final String CPOUTIL_CONFIG_DIRNAME = ".cpoutil";
+  private static final File CPOUTIL_CONFIG_DIR = new File(System.getProperties().getProperty("user.home"), CPOUTIL_CONFIG_DIRNAME);
+  private static final String CPOUTIL_CONFIG_FILE = "CpoUtilConfig.xml";
+  private static final String CPOUTIL_PROPERTIES_FILE = "cpoutil.properties";
+
+  private static final String BOOTSTRAP_URL_PROP = "cpoutil.bootstrapUrl";
+  private static final String PROTECTED_CLASS_PROP = "cpoutil.protectedClasses";
+
+  public static final String TITLE = "cpoutil.title";
+  public static final String VERSION = "cpoutil.version";
+  public static final String AUTHOR = "cpoutil.author";
+  public static final String COPYRIGHT = "cpoutil.copyright";
+  public static final String COMPANY = "cpoutil.company";
+  public static final String MINIMUM_VERSION = "cpoutil.minimumVersion";
+
+
   // config
   private static CtCpoUtilConfig cpoUtilConfig = null;
 
-  private File configFile = new File(Statics.CPOUTIL_CONFIG_DIR, Statics.CPOUTIL_CONFIG_FILE);
+  private File configFile = new File(CPOUTIL_CONFIG_DIR, CPOUTIL_CONFIG_FILE);
   private Properties props = new Properties();
 
   // reference to the CpoUtil frame
@@ -521,14 +537,14 @@ public class CpoUtil extends JFrame {
       cpoUtilConfig = cpoUtilConfigDocument.getCpoUtilConfig();
 
       // read default props
-      InputStream is = getClass().getResourceAsStream("/" + Statics.CPOUTIL_PROPERTIES_FILE);
+      InputStream is = getClass().getResourceAsStream("/" + CPOUTIL_PROPERTIES_FILE);
       if (is == null) {
         throw new IOException("Could not find properties file!\nCPU Util will exit now.");
       }
       props.load(is);
 
       // bootstrapping
-      String bootstrapUrl = props.getProperty(Statics.BOOTSTRAP_URL_PROP);
+      String bootstrapUrl = props.getProperty(BOOTSTRAP_URL_PROP);
       if (bootstrapUrl != null && !bootstrapUrl.isEmpty()) {
         if (OUT.isDebugEnabled()) {
           OUT.debug("Bootstrap Url: " + bootstrapUrl);
@@ -580,13 +596,13 @@ public class CpoUtil extends JFrame {
   }
 
   protected void checkKillSwitch() {
-    String minimumVersion = props.getProperty(Statics.CPOUTIL_MINIMUM_VERSION);
+    String minimumVersion = props.getProperty(MINIMUM_VERSION);
     if (OUT.isDebugEnabled()) {
       OUT.debug("Minimum version: " + minimumVersion);
     }
     if (minimumVersion != null) {
       // if it's a snapshot, strip the -SNAPSHOT
-      String version = props.getProperty(Statics.CPOUTIL_VERSION);
+      String version = props.getProperty(VERSION);
       if (version.endsWith("-SNAPSHOT")) {
         version = version.substring(0, version.length() - 9);
       }
@@ -608,7 +624,7 @@ public class CpoUtil extends JFrame {
         double actual = Double.parseDouble(version);
         if (actual < min) {
           // kill it
-          showMessage("Your version (" + props.getProperty(Statics.CPOUTIL_VERSION) + ") is outdated.\nPlease upgrade to at least version " + minimumVersion);
+          showMessage("Your version (" + props.getProperty(VERSION) + ") is outdated.\nPlease upgrade to at least version " + minimumVersion);
           System.exit(2);
         }
       } catch (NumberFormatException ex) {
@@ -622,7 +638,7 @@ public class CpoUtil extends JFrame {
       return;
     }
 
-    String url = props.getProperty(Statics.PROTECTED_CLASS_PROP);
+    String url = props.getProperty(PROTECTED_CLASS_PROP);
     if (OUT.isDebugEnabled()) {
       OUT.debug("Protected Classes Url: " + url);
     }

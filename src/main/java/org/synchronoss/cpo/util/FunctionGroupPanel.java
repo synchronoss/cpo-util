@@ -21,6 +21,7 @@
 package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
+import org.synchronoss.cpo.core.cpoCoreMeta.StFunctionGroupType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -56,13 +57,13 @@ public class FunctionGroupPanel extends JPanel {
 
     this.add(jTextName, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
 
-    this.jComType.addItem(Statics.CPO_TYPE_CREATE);
-    this.jComType.addItem(Statics.CPO_TYPE_DELETE);
-    this.jComType.addItem(Statics.CPO_TYPE_LIST);
-    this.jComType.addItem(Statics.CPO_TYPE_RETRIEVE);
-    this.jComType.addItem(Statics.CPO_TYPE_UPDATE);
-    this.jComType.addItem(Statics.CPO_TYPE_EXIST);
-    this.jComType.addItem(Statics.CPO_TYPE_EXECUTE);
+    this.jComType.addItem(StFunctionGroupType.CREATE);
+    this.jComType.addItem(StFunctionGroupType.DELETE);
+    this.jComType.addItem(StFunctionGroupType.LIST);
+    this.jComType.addItem(StFunctionGroupType.RETRIEVE);
+    this.jComType.addItem(StFunctionGroupType.UPDATE);
+    this.jComType.addItem(StFunctionGroupType.EXIST);
+    this.jComType.addItem(StFunctionGroupType.EXECUTE);
     this.add(jComType, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
   }
 
@@ -71,6 +72,6 @@ public class FunctionGroupPanel extends JPanel {
   }
 
   public String getGroupType() {
-    return (String)this.jComType.getSelectedItem();
+    return this.jComType.getSelectedItem().toString();
   }
 }

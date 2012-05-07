@@ -23,6 +23,7 @@ package org.synchronoss.cpo.util;
 import org.slf4j.*;
 import org.synchronoss.cpo.*;
 import org.synchronoss.cpo.core.cpoCoreConfig.*;
+import org.synchronoss.cpo.core.cpoCoreMeta.StFunctionGroupType;
 import org.synchronoss.cpo.exporter.CpoClassSourceGenerator;
 import org.synchronoss.cpo.meta.CpoMetaDescriptor;
 import org.synchronoss.cpo.meta.domain.*;
@@ -592,26 +593,26 @@ public abstract class Proxy {
 
     List<Object> result = new ArrayList<Object>();
     Object resultObj = null;
-    if (cpoFGnode.getType().equals(Statics.CPO_TYPE_CREATE)) {
+    if (cpoFGnode.getType().equals(StFunctionGroupType.CREATE.toString())) {
       //insert
       resultObj = cpoAdapter.insertObject(cpoFGnode.getName(), obj);
-    } else if (cpoFGnode.getType().equals(Statics.CPO_TYPE_DELETE)) {
+    } else if (cpoFGnode.getType().equals(StFunctionGroupType.DELETE.toString())) {
       cpoAdapter.deleteObject(cpoFGnode.getName(), obj);
       // retrieve from cpo, so we can verify deletion
       resultObj = cpoAdapter.retrieveBean(cpoFGnode.getName(), obj);
-    } else if (cpoFGnode.getType().equals(Statics.CPO_TYPE_LIST)) {
+    } else if (cpoFGnode.getType().equals(StFunctionGroupType.LIST.toString())) {
       result = cpoAdapter.retrieveBeans(cpoFGnode.getName(), obj, objReturnType);
-    } else if (cpoFGnode.getType().equals(Statics.CPO_TYPE_RETRIEVE)) {
+    } else if (cpoFGnode.getType().equals(StFunctionGroupType.RETRIEVE.toString())) {
       resultObj = cpoAdapter.retrieveBean(cpoFGnode.getName(), obj);
-    } else if (cpoFGnode.getType().equals(Statics.CPO_TYPE_UPDATE)) {
+    } else if (cpoFGnode.getType().equals(StFunctionGroupType.UPDATE.toString())) {
       cpoAdapter.updateObject(cpoFGnode.getName(), obj);
       // retrieve from cpo, so we can verify update
       resultObj = cpoAdapter.retrieveBean(cpoFGnode.getName(), obj);
-    } else if (cpoFGnode.getType().equals(Statics.CPO_TYPE_EXIST) && persist) {
+    } else if (cpoFGnode.getType().equals(StFunctionGroupType.EXIST.toString()) && persist) {
       cpoAdapter.persistObject(cpoFGnode.getName(), obj);
       // retrieve from cpo, so we can verify update
       resultObj = cpoAdapter.retrieveBean(cpoFGnode.getName(), obj);
-    } else if (cpoFGnode.getType().equals(Statics.CPO_TYPE_EXIST)) {
+    } else if (cpoFGnode.getType().equals(StFunctionGroupType.EXIST.toString())) {
       resultObj = cpoAdapter.existsObject(cpoFGnode.getName(), obj);
     }
 
