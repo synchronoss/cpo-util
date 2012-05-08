@@ -328,11 +328,10 @@
         <configuration>
           <header>src/main/resources/license.txt</header>
           <strictCheck>true</strictCheck>
-          <includes>
-            <include>**/*.java</include>
-            <include>**/*.properties</include>
-            <include>src/**/*.xml</include>
-          </includes>
+          <excludes>
+            <!-- intellij folder -->
+            <exclude>.idea/**</exclude>
+          </excludes>
         </configuration>
         <executions>
           <execution>
