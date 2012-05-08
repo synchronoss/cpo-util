@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2003-2012 David E. Berry, Michael A. Bellomo
  *
  * This library is free software; you can redistribute it and/or

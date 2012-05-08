@@ -328,6 +328,10 @@
         <configuration>
           <header>src/main/resources/license.txt</header>
           <strictCheck>true</strictCheck>
+          <mapping>
+            <!-- use /* instead of /** for java files -->
+            <java>SLASHSTAR_STYLE</java>
+          </mapping>
           <excludes>
             <!-- intellij folder -->
             <exclude>.idea/**</exclude>
