@@ -51,14 +51,9 @@ public class TableSorter extends TableMap {
 
   // Version Id for this class
   private static final long serialVersionUID = 1L;
-  private int indexes[];
+  private int indexes[] = new int[0];
   private Vector<Integer> sortingColumns = new Vector<Integer>();
   private boolean ascending = true;
-  private int compares;
-
-  public TableSorter() {
-    indexes = new int[0]; // for consistency
-  }
 
   public TableSorter(TableModel model) {
     setModel(model);
@@ -135,12 +130,10 @@ public class TableSorter extends TableMap {
         return 0;
       }
     } else if (type == Boolean.class) {
-      Boolean bool1 = (Boolean)data.getValueAt(row1, column);
-      boolean b1 = bool1.booleanValue();
-      Boolean bool2 = (Boolean)data.getValueAt(row2, column);
-      boolean b2 = bool2.booleanValue();
+      Boolean b1 = (Boolean)data.getValueAt(row1, column);
+      Boolean b2 = (Boolean)data.getValueAt(row2, column);
 
-      if (b1 == b2) {
+      if (b1.booleanValue() == b2.booleanValue()) {
         return 0;
       } else if (b1) { // Define false < true
         return 1;
@@ -165,10 +158,9 @@ public class TableSorter extends TableMap {
   }
 
   public int compare(int row1, int row2) {
-    compares++;
     for (int level = 0; level < sortingColumns.size(); level++) {
       Integer column = sortingColumns.elementAt(level);
-      int result = compareRowsByColumn(row1, row2, column.intValue());
+      int result = compareRowsByColumn(row1, row2, column);
       if (result != 0) {
         return ascending ? result : -result;
       }
@@ -191,9 +183,7 @@ public class TableSorter extends TableMap {
 
   @Override
   public void tableChanged(TableModelEvent e) {
-    //OUT.debug("Sorter: tableChanged");
     reallocateIndexes();
-
     super.tableChanged(e);
   }
 
@@ -206,12 +196,7 @@ public class TableSorter extends TableMap {
 
   public void sort(Object sender) {
     checkModel();
-
-    compares = 0;
-    // n2sort();
-    // qsort(0, indexes.length-1);
     shuttlesort(indexes.clone(), indexes, 0, indexes.length);
-    //OUT.debug("Compares: "+compares);
   }
 
   public void n2sort() {
@@ -261,9 +246,7 @@ public class TableSorter extends TableMap {
      * order diminishes - it may drop very quickly.
      */
     if (high - low >= 4 && compare(from[middle - 1], from[middle]) <= 0) {
-      for (int i = low; i < high; i++) {
-        to[i] = from[i];
-      }
+      System.arraycopy(from, low, to, low, (high - low));
       return;
     }
 
@@ -318,7 +301,7 @@ public class TableSorter extends TableMap {
   public void sortByColumn(int column, boolean ascending) {
     this.ascending = ascending;
     sortingColumns.removeAllElements();
-    sortingColumns.addElement(new Integer(column));
+    sortingColumns.addElement(column);
     sort(this);
     super.tableChanged(new TableModelEvent(this));
   }
@@ -329,7 +312,6 @@ public class TableSorter extends TableMap {
   public void addMouseListenerToHeaderInTable(JTable table) {
     final TableSorter sorter = this;
     final JTable tableView = table;
-    //tableView.setColumnSelectionAllowed(false);
     MouseAdapter listMouseListener = new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
@@ -339,13 +321,12 @@ public class TableSorter extends TableMap {
             int viewColumn = columnModel.getColumnIndexAtX(e.getX());
             int column = tableView.convertColumnIndexToModel(viewColumn);
             if (e.getClickCount() == 1 && column != -1) {
-              //OUT.debug("Sorting ...");
               int shiftPressed = e.getModifiers() & InputEvent.SHIFT_MASK;
               boolean ascending = (shiftPressed == 0);
               sorter.sortByColumn(column, ascending);
             }
           } catch (Exception ex) {
-            ex.printStackTrace();
+            OUT.error(ex.getMessage(), ex);
           }
         }
       }

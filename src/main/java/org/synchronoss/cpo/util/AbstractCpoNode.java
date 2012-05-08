@@ -20,7 +20,6 @@
  */
 package org.synchronoss.cpo.util;
 
-import org.slf4j.*;
 import org.synchronoss.cpo.CpoException;
 
 import javax.swing.*;
@@ -28,8 +27,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.*;
 
 public abstract class AbstractCpoNode extends DefaultMutableTreeNode {
-
-  private static Logger OUT = LoggerFactory.getLogger(AbstractCpoNode.class);
 
   private boolean dirty = false;
   private boolean remove = false;

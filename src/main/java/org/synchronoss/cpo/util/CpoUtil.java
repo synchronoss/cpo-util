@@ -118,7 +118,6 @@ public class CpoUtil extends JFrame {
     setIconImage(Toolkit.getDefaultToolkit().createImage(mainIcon));
 
     this.getContentPane().setLayout(new BorderLayout());
-    // TODO - change? this.setSize(new Dimension(850, 650));
     this.setSize(new Dimension(1000, 800));
     this.setTitle("CPO Utility");
     panelCenter.setLayout(new BorderLayout());
@@ -331,7 +330,7 @@ public class CpoUtil extends JFrame {
       JButton tabCloseButton = new JButton(closeIcon);
       tabCloseButton.setContentAreaFilled(false);
       tabCloseButton.setBorderPainted(false);
-      tabCloseButton.setActionCommand("" + tabCounter++);
+      tabCloseButton.setActionCommand(Integer.toString(tabCounter++));
       tabCloseButton.setMaximumSize(new Dimension(16, 16));
       tabCloseButton.setMinimumSize(new Dimension(16, 16));
       tabCloseButton.setPreferredSize(new Dimension(16, 16));
@@ -619,16 +618,25 @@ public class CpoUtil extends JFrame {
       if (OUT.isDebugEnabled()) {
         OUT.debug("Version: " + version);
       }
+
+      double min = 0;
       try {
-        double min = Double.parseDouble(minimumVersion);
-        double actual = Double.parseDouble(version);
-        if (actual < min) {
-          // kill it
-          showMessage("Your version (" + props.getProperty(VERSION) + ") is outdated.\nPlease upgrade to at least version " + minimumVersion);
-          System.exit(2);
-        }
+        min = Double.parseDouble(minimumVersion);
       } catch (NumberFormatException ex) {
-        // ignore
+        OUT.error(ex.getMessage());
+      }
+
+      double actual = 0;
+      try {
+        actual = Double.parseDouble(version);
+      } catch (NumberFormatException ex) {
+        OUT.error(ex.getMessage());
+      }
+
+      if (actual < min) {
+        // kill it
+        showMessage("Your version (" + props.getProperty(VERSION) + ") is outdated.\nPlease upgrade to at least version " + minimumVersion);
+        System.exit(2);
       }
     }
   }

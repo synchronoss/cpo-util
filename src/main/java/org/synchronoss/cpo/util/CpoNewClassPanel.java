@@ -76,7 +76,7 @@ public class CpoNewClassPanel extends JPanel {
     JScrollPane jScrollPane = new JScrollPane();
     jScrollPane.getViewport().add(jTextAreaExpression, null);
     jScrollPane.setPreferredSize(new Dimension(300, 200));
-    this.add(jScrollPane, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0)); //169, 112));
+    this.add(jScrollPane, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
   }
 
   public String getClassName() {

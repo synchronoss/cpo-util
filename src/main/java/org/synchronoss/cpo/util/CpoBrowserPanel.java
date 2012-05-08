@@ -60,7 +60,6 @@ public class CpoBrowserPanel extends JPanel {
 
   private void jbInit() throws Exception {
     this.setLayout(borderLayout);
-    //this.setSize(new Dimension(800, 600));
     jSplitPane.add(jScrollWest, JSplitPane.LEFT);
     jSplitPane.add(emptyPanel, JSplitPane.RIGHT);
 

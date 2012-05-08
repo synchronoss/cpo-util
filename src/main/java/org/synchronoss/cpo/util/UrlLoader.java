@@ -20,7 +20,9 @@
  */
 package org.synchronoss.cpo.util;
 
-import java.io.*;
+import org.slf4j.*;
+
+import java.io.InputStream;
 import java.net.*;
 
 /**
@@ -29,6 +31,8 @@ import java.net.*;
  * Time: 9:14:41 PM
  */
 public class UrlLoader implements Runnable {
+
+  private Logger OUT = LoggerFactory.getLogger(this.getClass());
 
   private URL url;
   private InputStream connInputStream = null;
@@ -53,7 +57,7 @@ public class UrlLoader implements Runnable {
 
       connInputStream = conn.getInputStream();
     } catch (Exception ex) {
-      // ignore
+      OUT.error(ex.getMessage());
     }
   }
 }

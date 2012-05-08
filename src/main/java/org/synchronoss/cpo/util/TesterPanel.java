@@ -236,13 +236,13 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
       if (cls == String.class) {
         return param;
       } else if (cls == int.class) {
-        return new Integer(param);
+        return Integer.valueOf(param);
       } else if (cls == Integer.class) {
-        return new Integer(param);
+        return Integer.valueOf(param);
       } else if (cls == float.class) {
-        return new Float(param);
+        return Float.valueOf(param);
       } else if (cls == Float.class) {
-        return new Float(param);
+        return Float.valueOf(param);
       } else if (cls == BigDecimal.class) {
         return new BigDecimal(param);
       } else if (cls == BigInteger.class) {

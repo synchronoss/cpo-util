@@ -124,7 +124,7 @@ import java.util.StringTokenizer;
     JButton testConnectionButton = new JButton("Test");
     testConnectionButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        testConnectionButtonActionPerformed(e);
+        testConnectionButtonActionPerformed();
       }
     });
     this.add(testConnectionButton, new GridBagConstraints(2, 4, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
@@ -170,11 +170,13 @@ import java.util.StringTokenizer;
     return (CtJdbcConfig)super.getDataSourceConfig();
   }
 
-  private void testConnectionButtonActionPerformed(ActionEvent e) {
+  private void testConnectionButtonActionPerformed() {
     try {
       CtDataSourceConfig dataSourceConfig = createDataSourceConfig();
       CpoAdapter cpoAdapter = CpoAdapterFactory.makeCpoAdapter(dataSourceConfig);
-      JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "Connection successful", "Test Connection", JOptionPane.INFORMATION_MESSAGE);
+      if (cpoAdapter != null) {
+        JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "Connection successful", "Test Connection", JOptionPane.INFORMATION_MESSAGE);
+      }
     } catch (CpoException ex) {
       CpoUtil.showErrorMessage(ex.getMessage());
     }
@@ -226,7 +228,7 @@ import java.util.StringTokenizer;
 
     // dupe?
     CtDataSourceConfig dupe = CpoUtil.getInstance().getDataSourceConfig(connectionName);
-    if (dupe != null && dupe != myConfig) {
+    if (dupe != null && !dupe.equals(myConfig)) {
       throw new CpoException("Another connection is using the name: " + connectionName + "\n\nConnection names must be unique");
     }
 

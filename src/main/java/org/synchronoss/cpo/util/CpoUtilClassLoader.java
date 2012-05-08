@@ -36,14 +36,14 @@ public class CpoUtilClassLoader extends ClassLoader {
     super(parent);
   }
 
-  public static CpoUtilClassLoader getInstance(ClassLoader parent) {
+  public synchronized static CpoUtilClassLoader getInstance(ClassLoader parent) {
     if (loader == null) {
       loader = new CpoUtilClassLoader(parent);
     }
     return loader;
   }
 
-  public static void unloadLoader() {
+  public synchronized static void unloadLoader() {
     loader = null;
   }
 
@@ -74,7 +74,6 @@ public class CpoUtilClassLoader extends ClassLoader {
           JarFile jf = new JarFile(file);
           for (Enumeration<JarEntry> e = jf.entries(); e.hasMoreElements(); ) {
             ZipEntry entry = e.nextElement();
-            //OUT.debug (entry.getName());
             if (filename.equals(entry.getName())) {
               InputStream is = jf.getInputStream(entry);
               int l = (int)entry.getSize();

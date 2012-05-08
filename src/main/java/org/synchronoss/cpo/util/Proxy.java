@@ -514,36 +514,56 @@ public abstract class Proxy {
       parent.setChildRemove(changedNode);
 
       int index = parent.getIndex(notifier);
-      OUT.debug("Set parent flags - index is: " + index);
-      if (index >= 0 && notifier == changedNode) {
-        OUT.debug("Index: " + index + " size: " + notifier.getParent().getChildCount());
+      if (OUT.isDebugEnabled()) {
+        OUT.debug("Set parent flags - index is: " + index);
+      }
+      if (index >= 0 && notifier.equals(changedNode)) {
+        if (OUT.isDebugEnabled()) {
+          OUT.debug("Index: " + index + " size: " + notifier.getParent().getChildCount());
+        }
         if (notifier.isRemove()) {
           if (notifier.isNew() && !parent.isLeaf()) {
-            OUT.debug("Notifying non-leaf parent of node removal");
+            if (OUT.isDebugEnabled()) {
+              OUT.debug("Notifying non-leaf parent of node removal");
+            }
             treeModel.nodesWereRemoved(parent, new int[]{index}, new Object[]{notifier});
           } else if (!parent.isLeaf()) {
-            OUT.debug("Notifying non-leaf parent of node (marked deleted) change");
+            if (OUT.isDebugEnabled()) {
+              OUT.debug("Notifying non-leaf parent of node (marked deleted) change");
+            }
             treeModel.nodeChanged(changedNode);
           } else {
-            OUT.debug("Notifying a leaf parent of node (marked deleted) change");
+            if (OUT.isDebugEnabled()) {
+              OUT.debug("Notifying a leaf parent of node (marked deleted) change");
+            }
             treeModel.nodeChanged(parent);
           }
         } else if (notifier.isDirty()) {
-          OUT.debug("Notifying parent of node change (dirty and all else)");
+          if (OUT.isDebugEnabled()) {
+            OUT.debug("Notifying parent of node change (dirty and all else)");
+          }
           treeModel.nodeChanged(changedNode);
         } else if (notifier.isNew()) {
-          OUT.debug("Notifying parent (" + parent + ") of node insertion (" + changedNode + ")");
+          if (OUT.isDebugEnabled()) {
+            OUT.debug("Notifying parent (" + parent + ") of node insertion (" + changedNode + ")");
+          }
           treeModel.nodesWereInserted(parent, new int[]{index});
         }
-      } else if (notifier == changedNode) {
-        OUT.debug("Object equal to notifier: " + notifier + " : parent: " + parent);
+      } else if (notifier.equals(changedNode)) {
+        if (OUT.isDebugEnabled()) {
+          OUT.debug("Object equal to notifier: " + notifier + " : parent: " + parent);
+        }
         treeModel.nodeStructureChanged(parent);
       } else {
-        OUT.debug("object not equal to notifier: " + notifier + " : object: " + changedNode);
+        if (OUT.isDebugEnabled()) {
+          OUT.debug("object not equal to notifier: " + notifier + " : object: " + changedNode);
+        }
         treeModel.nodeChanged(parent);
       }
     } else {
-      OUT.debug("Parent of " + notifier.getClass() + " was null");
+      if (OUT.isDebugEnabled()) {
+        OUT.debug("Parent of " + notifier.getClass() + " was null");
+      }
     }
   }
 
