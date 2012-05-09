@@ -111,22 +111,4 @@ public class CoreAttributeTableModel extends AbstractTableModel  {
     }
     this.fireTableDataChanged();
   }
-
-  public void removeRows(int[] rowIndex) {
-    List<CpoAttributeNode> nodesToRemove = new ArrayList<CpoAttributeNode>();
-    for (int i : rowIndex) {
-      nodesToRemove.add((CpoAttributeNode)cpoAttLabNode.getChildAt(i));
-    }
-
-    for (CpoAttributeNode node : nodesToRemove) {
-      node.setRemove(true);
-
-      if (node.isNew() && node.isRemove()) {
-        // if it was new and is being removed, remove it from the table
-        cpoAttLabNode.remove(node);
-      }
-    }
-
-    this.fireTableDataChanged();
-  }
 }

@@ -22,13 +22,17 @@ package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
 import org.synchronoss.cpo.CpoException;
-import org.synchronoss.cpo.meta.domain.CpoAttribute;
+import org.synchronoss.cpo.meta.domain.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 import java.util.List;
 
+/**
+ * JPanel for displaying attributes
+ */
 public class CpoAttributePanel extends JPanel  {
 
   // Version Id for this class
@@ -45,7 +49,13 @@ public class CpoAttributePanel extends JPanel  {
   private TableSorter ts;
   private JPopupMenu menu = new JPopupMenu();
   private Logger OUT = LoggerFactory.getLogger(this.getClass());
-  
+
+  /**
+   * Constructs the panel
+   *
+   * @param cpoAttLabelNode The attribute label node
+   * @param model The AttributeTableModel to use to render the table
+   */
   public CpoAttributePanel(CpoAttributeLabelNode cpoAttLabelNode, CoreAttributeTableModel model) {
     this.cpoAttLabNode = cpoAttLabelNode;
     this.model = model;
@@ -57,6 +67,9 @@ public class CpoAttributePanel extends JPanel  {
     }
   }
 
+  /**
+   * Builds panel
+   */
   private void jbInit() throws Exception {
     this.setLayout(new BorderLayout());
 
@@ -108,12 +121,10 @@ public class CpoAttributePanel extends JPanel  {
     this.add(jScrollTable,BorderLayout.CENTER);
   }
 
+  /**
+   * Builds the right click menu
+   */
   public void showMenu(Point point) {
-    buildMenu();
-    menu.show(jTableAttMap, (int)point.getX(), (int)point.getY());
-  }
-
-  public void buildMenu() {
     menu.removeAll();
     JMenuItem jMenuRemove = new JMenuItem("Remove");
     jMenuRemove.addActionListener(new ActionListener() {
@@ -135,9 +146,15 @@ public class CpoAttributePanel extends JPanel  {
         addAttrToClassFromExpression();
       }
     });
-    menu.add(jMenuAddAttrWithSql);   
+    menu.add(jMenuAddAttrWithSql);
+
+    // show it
+    menu.show(jTableAttMap, (int)point.getX(), (int)point.getY());
   }
 
+  /**
+   * Prompts the user to add a new attribute
+   */
   public void addNewAttribute() {
     CpoClassNode ccn = cpoAttLabNode.getParent();
     CpoNewAttributePanel cnap = cpoAttLabNode.getNewAttributePanel();
@@ -157,6 +174,9 @@ public class CpoAttributePanel extends JPanel  {
     }
   }
 
+  /**
+   * Prompts the user to add a new attribute based on an expression
+   */
   private void addAttrToClassFromExpression() {
     CpoClassNode ccn = cpoAttLabNode.getParent();
     CpoNewClassPanel cncp = new CpoNewClassPanel(ccn.getProxy(), ccn.getUserObject().getName());
@@ -177,13 +197,48 @@ public class CpoAttributePanel extends JPanel  {
     }
   }
 
+  /**
+   * Removes an attribute
+   */
   private void removeAttribute() {
-    // TODO - don't let them delete attributes they're using in arguments
     int[] selectedRows = jTableAttMap.getSelectedRows();
     if (selectedRows.length < 1) {
       CpoUtil.showErrorMessage("Please select an attribute to remove.");
-    } else {
-      model.removeRows(ts.getTrueRows(selectedRows));
+      return;
     }
+
+    int[] trueRows = ts.getTrueRows(selectedRows);
+    List<CpoAttributeNode> nodesToRemove = new ArrayList<CpoAttributeNode>();
+    for (int i : trueRows) {
+      CpoAttributeNode cpoAttributeNode = (CpoAttributeNode)cpoAttLabNode.getChildAt(i);
+
+      // don't let them delete attributes that are used by functions
+      List<CpoFunctionGroup> functionGroups = cpoAttributeNode.getProxy().getFunctionGroupsUsingAttribute(cpoAttributeNode);
+      if (!functionGroups.isEmpty()) {
+        StringBuilder msg = new StringBuilder();
+        msg.append(cpoAttributeNode.getUserObject().getJavaName());
+        msg.append(" cannot be removed because it is used by function(s):");
+        for (CpoFunctionGroup functionGroup : functionGroups) {
+          msg.append("\n");
+          msg.append(functionGroup);
+        }
+        CpoUtil.showErrorMessage(msg.toString());
+        return;
+      }
+
+      nodesToRemove.add(cpoAttributeNode);
+    }
+
+
+    for (CpoAttributeNode node : nodesToRemove) {
+      node.setRemove(true);
+
+      if (node.isNew() && node.isRemove()) {
+        // if it was new and is being removed, remove it from the table
+        cpoAttLabNode.remove(node);
+      }
+    }
+
+    model.fireTableDataChanged();
   }
 }

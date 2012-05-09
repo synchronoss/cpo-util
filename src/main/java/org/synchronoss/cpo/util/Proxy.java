@@ -35,6 +35,9 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Proxy object that handles most of the GUI to domain logic
+ */
 public abstract class Proxy {
 
   protected Logger OUT = LoggerFactory.getLogger(this.getClass());
@@ -72,10 +75,16 @@ public abstract class Proxy {
     this.cpoMetaXml = cpoMetaXml;
   }
 
+  /**
+   * Sets the CpoMetaDescriptor
+   */
   protected final void setMetaDescriptor(CpoMetaDescriptor metaDescriptor) {
     this.metaDescriptor = metaDescriptor;
   }
 
+  /**
+   * Creates a new tree model that represents this proxy
+   */
   public final TreeModel createTreeModel() throws CpoException {
     CpoRootNode rootNode = new CpoRootNode(this);
 
@@ -88,6 +97,9 @@ public abstract class Proxy {
     return treeModel;
   }
 
+  /**
+   * @return The root of the tree
+   */
   protected CpoRootNode getRoot() {
     return (CpoRootNode)treeModel.getRoot();
   }
@@ -127,10 +139,16 @@ public abstract class Proxy {
     return cpoMetaXml.getName();
   }
 
+  /**
+   * @return The absolute path of the meta xml file
+   */
   public String getMetaXmlFullName() {
     return cpoMetaXml.getAbsolutePath();
   }
 
+  /**
+   * Returns a list of connections that will work with this proxy
+   */
   public Vector<String> getConnectionList() throws CpoException {
     Vector<String> result = new Vector<String>();
 
@@ -148,7 +166,7 @@ public abstract class Proxy {
   }
 
   /**
-   * returns the data types that this instance of cpo supports
+   * Returns the data types that this instance of cpo supports
    */
   public List<String> getAllowableDataTypes() {
     List<String> dataTypes = new ArrayList<String>();
@@ -163,7 +181,9 @@ public abstract class Proxy {
   }
 
   /**
-   * saves all the meta data
+   * Saves all the meta data to the specified file.
+   *
+   * If the file is null, uses the cpoMetaXml file.
    */
   public void save(File file) throws CpoException {
     File dest = file;
@@ -186,6 +206,9 @@ public abstract class Proxy {
     }
   }
 
+  /**
+   * Creates a new cpo class instance with the given class name
+   */
   protected CpoClass createCpoClass(String className) throws CpoException {
     CpoClass cpoClass = metaDescriptor.createCpoClass();
     cpoClass.setName(className);
@@ -198,10 +221,16 @@ public abstract class Proxy {
     return cpoClass;
   }
 
+  /**
+   * Creates a new cpo attribute instance
+   */
   protected CpoAttribute createCpoAttribute() throws CpoException {
     return metaDescriptor.createCpoAttribute();
   }
 
+  /**
+   * Creates a new cpo function group with the supplied name and type
+   */
   protected CpoFunctionGroup createCpoFunctionGroup(String name, String type) throws CpoException {
     CpoFunctionGroup functionGroup = metaDescriptor.createCpoFunctionGroup();
     functionGroup.setName(name);
@@ -209,37 +238,67 @@ public abstract class Proxy {
     return functionGroup;
   }
 
+  /**
+   * Creates a new cpo function
+   */
   protected CpoFunction createCpoFunction() throws CpoException {
     return metaDescriptor.createCpoFunction();
   }
 
+  /**
+   * Creates a new cpo argument
+   */
   protected CpoArgument createCpoArgument() throws CpoException {
     return metaDescriptor.createCpoArgument();
   }
 
   // node creation functions
+
+  /**
+   * Creates a new cpo class node for the supplied cpo class
+   */
   protected CpoClassNode createClassNode(CpoClass cpoClass) {
     return new CpoClassNode(cpoClass);
   }
 
+  /**
+   * Creates a new cpo attribute node for the supplied cpo attribute
+   */
   protected CpoAttributeNode createAttributeNode(CpoAttribute cpoAttribute) {
     return new CpoAttributeNode(cpoAttribute);
   }
 
+  /**
+   * Creates a new cpo function group node for the supplied cpo function group
+   */
   protected CpoFunctionGroupNode createFunctionGroupNode(CpoFunctionGroup cpoFunctionGroup) {
     return new CpoFunctionGroupNode(cpoFunctionGroup);
   }
 
+  /**
+   * Creates a new cpo function node for the supplied cpo function
+   */
   protected CpoFunctionNode createFunctionNode(CpoFunction cpoFunction) {
     return new CpoFunctionNode(cpoFunction);
   }
 
+  /**
+   * Creates a new cpo argument node for the supplied cpo argument
+   */
   protected CpoArgumentNode createArgumentNode(CpoArgument cpoArgument) {
     return new CpoArgumentNode(cpoArgument);
   }
   // node creation functions
 
   // add methods
+
+  /**
+   * Adds a new CpoClass to the meta descriptor
+   *
+   * @param className The name of the class
+   * @return The newly create class node
+   * @throws CpoException if any error occurs
+   */
   public CpoClassNode addClass(String className) throws CpoException {
     CpoClass cpoClass = createCpoClass(className);
     CpoClassNode cpoClassNode = createClassNode(cpoClass);
@@ -279,6 +338,15 @@ public abstract class Proxy {
     return added;
   }
 
+  /**
+   * Adds a new function group using the supplied name and type to the cpoClassNode
+   *
+   * @param cpoClassNode The class node
+   * @param name The name of the function group
+   * @param type The type of the function group
+   * @return The newly created function group node
+   * @throws CpoException if any error occurs
+   */
   public CpoFunctionGroupNode addFunctionGroup(CpoClassNode cpoClassNode, String name, String type) throws CpoException {
     CpoFunctionGroup cpoFunctionGroup = createCpoFunctionGroup(name, type);
     CpoFunctionGroupNode cpoFunctionGroupNode = createFunctionGroupNode(cpoFunctionGroup);
@@ -294,6 +362,13 @@ public abstract class Proxy {
     return cpoFunctionGroupNode;
   }
 
+  /**
+   * Adds a new function to the supplied function group node
+   *
+   * @param cpoFunctionGroupNode The function group node
+   * @return The newly created function node
+   * @throws CpoException if any error occurs
+   */
   public CpoFunctionNode addFunction(CpoFunctionGroupNode cpoFunctionGroupNode) throws CpoException {
     CpoFunction cpoFunction = createCpoFunction();
     CpoFunctionNode cpoFunctionNode = createFunctionNode(cpoFunction);
@@ -309,6 +384,14 @@ public abstract class Proxy {
     return cpoFunctionNode;
   }
 
+  /**
+   * Adds a new argument to the supplied function for the supplied cpoAttribute
+   *
+   * @param cpoFunctionNode The function to add the argument to
+   * @param cpoAttribute The cpo attribute
+   * @return The newly created argument node
+   * @throws CpoException if any error occurs
+   */
   public CpoArgumentNode addArgument(CpoFunctionNode cpoFunctionNode, CpoAttribute cpoAttribute) throws CpoException {
     CpoArgument cpoArgument = createCpoArgument();
     if (cpoAttribute != null) {
@@ -329,6 +412,13 @@ public abstract class Proxy {
   // add methods
 
   // remove methods
+
+  /**
+   * Removes the cpo class node from the meta descriptor
+   *
+   * @param cpoClassNode The class node to remove
+   * @throws CpoException if any error occurs
+   */
   public void removeClass(CpoClassNode cpoClassNode) throws CpoException {
     // remove from meta
     metaDescriptor.removeCpoClass(cpoClassNode.getUserObject());
@@ -337,6 +427,12 @@ public abstract class Proxy {
     cpoClassNode.removeFromParent();
   }
 
+  /**
+   * Removes the cpo attribute node from the meta descriptor
+   *
+   * @param cpoAttributeNode The attribute node to remove
+   * @throws CpoException if any error occurs
+   */
   public void removeAttribute(CpoAttributeNode cpoAttributeNode) throws CpoException {
     CpoClassNode cpoClassNode = cpoAttributeNode.getParent().getParent();
 
@@ -347,6 +443,12 @@ public abstract class Proxy {
     cpoAttributeNode.removeFromParent();
   }
 
+  /**
+   * Removes the cpo function group node from the meta descriptor
+   *
+   * @param cpoFunctionGroupNode The function group node to remove
+   * @throws CpoException if any error occurs
+   */
   public void removeFunctionGroup(CpoFunctionGroupNode cpoFunctionGroupNode) throws CpoException {
     CpoClassNode cpoClassNode = cpoFunctionGroupNode.getParent().getParent();
 
@@ -357,6 +459,12 @@ public abstract class Proxy {
     cpoFunctionGroupNode.removeFromParent();
   }
 
+  /**
+   * Removes the cpo function node from the meta descriptor
+   *
+   * @param cpoFunctionNode The function node to remove
+   * @throws CpoException if any error occurs
+   */
   public void removeFunction(CpoFunctionNode cpoFunctionNode) throws CpoException {
     CpoFunctionGroupNode cpoFunctionGroupNode = cpoFunctionNode.getParent();
 
@@ -367,6 +475,12 @@ public abstract class Proxy {
     cpoFunctionNode.removeFromParent();
   }
 
+  /**
+   * Removes the cpo argument node from the meta descriptor
+   *
+   * @param cpoArgumentNode The argument node to remove
+   * @throws CpoException if any error occurs
+   */
   public void removeArgument(CpoArgumentNode cpoArgumentNode) throws CpoException {
     CpoFunctionNode cpoFunctionNode = cpoArgumentNode.getParent();
 
@@ -378,7 +492,39 @@ public abstract class Proxy {
   }
   // remove methods
 
+  /**
+   * Returns a list of all function groups that have funtions having arguments using the supplied attribute
+   */
+  public List<CpoFunctionGroup> getFunctionGroupsUsingAttribute(CpoAttributeNode cpoAttributeNode) {
+    List<CpoFunctionGroup> functionGroups = new ArrayList<CpoFunctionGroup>();
+
+    Enumeration functionGroupNodes = cpoAttributeNode.getParent().getParent().getFunctionGroupLabelNode().children();
+    while (functionGroupNodes.hasMoreElements()) {
+      CpoFunctionGroupNode functionGroupNode = (CpoFunctionGroupNode)functionGroupNodes.nextElement();
+      CpoFunctionGroup functionGroup = functionGroupNode.getUserObject();
+      Enumeration functionNodes = functionGroupNode.children();
+      while (functionNodes.hasMoreElements()) {
+        CpoFunctionNode functionNode = (CpoFunctionNode)functionNodes.nextElement();
+        Enumeration argumentNodes = functionNode.children();
+        while (argumentNodes.hasMoreElements()) {
+          CpoArgumentNode argumentNode = (CpoArgumentNode)argumentNodes.nextElement();
+          if (argumentNode.getUserObject().getAttributeName().equals(cpoAttributeNode.getUserObject().getJavaName())) {
+            if (!functionGroups.contains(functionGroup)) {
+              functionGroups.add(functionGroup);
+            }
+          }
+        }
+      }
+    }
+
+    return functionGroups;
+  }
+
   // reorder methods
+
+  /**
+   * Reorders a function up one position within the function group
+   */
   public void moveFunctionUp(CpoFunctionNode cpoFunctionNode) {
     CpoFunctionGroupNode functionGroupNode = cpoFunctionNode.getParent();
     int idx = functionGroupNode.getIndex(cpoFunctionNode);
@@ -386,6 +532,9 @@ public abstract class Proxy {
     reorderFunctionNode(cpoFunctionNode, newIdx);
   }
 
+  /**
+   * Reorders a function down one position within the function group
+   */
   public void moveFunctionDown(CpoFunctionNode cpoFunctionNode) {
     CpoFunctionGroupNode functionGroupNode = cpoFunctionNode.getParent();
     int idx = functionGroupNode.getIndex(cpoFunctionNode);
@@ -393,6 +542,12 @@ public abstract class Proxy {
     reorderFunctionNode(cpoFunctionNode, newIdx);
   }
 
+  /**
+   * Reorders the specified cpoFunctionNode to the newIdx
+   *
+   * @param cpoFunctionNode The function node to move
+   * @param newIdx The new index of the function node
+   */
   private void reorderFunctionNode(CpoFunctionNode cpoFunctionNode, int newIdx) {
 
     CpoFunctionGroupNode functionGroupNode = cpoFunctionNode.getParent();
