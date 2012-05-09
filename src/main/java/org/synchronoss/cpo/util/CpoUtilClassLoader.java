@@ -30,21 +30,26 @@ import java.util.zip.ZipEntry;
 public class CpoUtilClassLoader extends ClassLoader {
 
   private static CpoUtilClassLoader loader;
-  private Logger OUT = LoggerFactory.getLogger(this.getClass());
+  private static final Object LOCK = new Object();
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private CpoUtilClassLoader(ClassLoader parent) {
     super(parent);
   }
 
-  public synchronized static CpoUtilClassLoader getInstance(ClassLoader parent) {
-    if (loader == null) {
-      loader = new CpoUtilClassLoader(parent);
+  public static CpoUtilClassLoader getInstance(ClassLoader parent) {
+    synchronized (LOCK) {
+      if (loader == null) {
+        loader = new CpoUtilClassLoader(parent);
+      }
     }
     return loader;
   }
 
-  public synchronized static void unloadLoader() {
-    loader = null;
+  public static void unloadLoader() {
+    synchronized (LOCK) {
+      loader = null;
+    }
   }
 
   @Override
@@ -58,9 +63,11 @@ public class CpoUtilClassLoader extends ClassLoader {
       if (c == null) {
         throw new ClassNotFoundException(name);
       }
-      OUT.debug("loaded class: " + name);
+      if (logger.isDebugEnabled()) {
+        logger.debug("loaded class: " + name);
+      }
     } catch (IOException e) {
-      OUT.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       throw new ClassNotFoundException("Error reading class: " + name);
     }
     return c;

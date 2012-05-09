@@ -45,7 +45,7 @@ public class CpoBrowserTree extends JTree {
   private static ImageIcon iconGreen = new ImageIcon(CpoBrowserTree.class.getResource("/images/green.gif"));
   private static ImageIcon iconBlue = new ImageIcon(CpoBrowserTree.class.getResource("/images/blue.gif"));
 
-  private Logger OUT = LoggerFactory.getLogger(this.getClass());
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   public CpoBrowserTree() {
 
@@ -343,7 +343,7 @@ public class CpoBrowserTree extends JTree {
   }
 
   private void createNewCpoClassFromClass() {
-    OUT.debug("creating new class from class");
+    logger.debug("creating new class from class");
 
     Proxy proxy = getRoot().getProxy();
 
@@ -384,7 +384,7 @@ public class CpoBrowserTree extends JTree {
   }
 
   private void createNewCpoClass() {
-    OUT.debug("creating new class");
+    logger.debug("creating new class");
 
     Proxy proxy = getRoot().getProxy();
 

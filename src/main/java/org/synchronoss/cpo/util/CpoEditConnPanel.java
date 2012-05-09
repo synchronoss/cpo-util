@@ -26,23 +26,34 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+/**
+ * Panel for displaying a list of connections to be edited
+ *
+ * @author Michael Bellomo
+ */
 public class CpoEditConnPanel extends JPanel {
 
-  private Logger OUT = LoggerFactory.getLogger(this.getClass());
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   // Version Id for this class
   private static final long serialVersionUID = 1L;
   private JComboBox connectionComboBox = new JComboBox();
 
+  /**
+   * Constructs a new CpoEditConnPanel
+   */
   public CpoEditConnPanel() {
     refreshConnectionList();
     try {
       jbInit();
     } catch (Exception e) {
-      OUT.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
     }
   }
 
+  /**
+   * Builds the panel
+   */
   private void jbInit() throws Exception {
     this.setLayout(new GridBagLayout());
 
@@ -51,7 +62,7 @@ public class CpoEditConnPanel extends JPanel {
     JButton editButton = new JButton("Edit");
     editButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        editConnection(e);
+        editConnection();
       }
     });
     this.add(editButton, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
@@ -59,13 +70,16 @@ public class CpoEditConnPanel extends JPanel {
     JButton deleteButton = new JButton("Delete");
     deleteButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        deleteConnection(e);
+        deleteConnection();
       }
     });
     this.add(deleteButton, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
   }
 
-  private void editConnection(ActionEvent e) {
+  /**
+   * Used to edit a connection
+   */
+  private void editConnection() {
     String connectionName = (String)connectionComboBox.getSelectedItem();
     if (connectionName == null) {
       return;
@@ -75,7 +89,10 @@ public class CpoEditConnPanel extends JPanel {
     refreshConnectionList();
   }
 
-  private void deleteConnection(ActionEvent e) {
+  /**
+   * Used to delete a connection
+   */
+  private void deleteConnection() {
     String connectionName = (String)connectionComboBox.getSelectedItem();
     if (connectionName == null) {
       return;
@@ -89,6 +106,9 @@ public class CpoEditConnPanel extends JPanel {
     }
   }
 
+  /**
+   * Refreshes the list of connections
+   */
   protected void refreshConnectionList() {
     connectionComboBox.setModel(new DefaultComboBoxModel(CpoUtil.getInstance().getConnectionList()));
   }

@@ -25,7 +25,6 @@ import javax.swing.event.CellEditorListener;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.util.*;
-import java.util.List;
 
 public class CpoAttributeTableEditor implements TableCellEditor {
 
@@ -35,8 +34,8 @@ public class CpoAttributeTableEditor implements TableCellEditor {
   TableCellEditor editorCombo;
   TableCellEditor editor;
 
-  public CpoAttributeTableEditor(List<String> dataTypes) {
-    jCombo = new JComboBox(new Vector<String>(dataTypes));
+  public CpoAttributeTableEditor(Vector<String> dataTypes) {
+    jCombo = new JComboBox(dataTypes);
     editorCombo = new DefaultCellEditor(jCombo);
     editorText = new DefaultCellEditor(jText);
     editor = editorText;

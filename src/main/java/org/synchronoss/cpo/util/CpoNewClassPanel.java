@@ -27,7 +27,7 @@ import java.awt.*;
 
 public class CpoNewClassPanel extends JPanel {
 
-  private static Logger OUT = LoggerFactory.getLogger(CpoNewClassPanel.class);
+  private static Logger logger = LoggerFactory.getLogger(CpoNewClassPanel.class);
 
   // Version Id for this class
   private static final long serialVersionUID = 1L;
@@ -44,7 +44,7 @@ public class CpoNewClassPanel extends JPanel {
       connectionComboBox.setModel(new DefaultComboBoxModel(proxy.getConnectionList()));
       jbInit();
     } catch (Exception e) {
-      OUT.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
     }
 
     if (className != null) {

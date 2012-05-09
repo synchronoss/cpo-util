@@ -35,7 +35,7 @@ import java.io.File;
  */
 public class ProxyFactory {
 
-  protected static Logger OUT = LoggerFactory.getLogger(ProxyFactory.class);
+  protected static Logger logger = LoggerFactory.getLogger(ProxyFactory.class);
 
   private static ProxyFactory proxyFactory = new ProxyFactory();
 
@@ -67,7 +67,7 @@ public class ProxyFactory {
       proxy.setMetaDescriptor(metaDescriptor);
       return proxy;
     } catch (Exception ex) {
-      OUT.error(ex.getMessage(), ex);
+      logger.error(ex.getMessage(), ex);
       throw new CpoException(ex);
     }
   }
@@ -84,7 +84,7 @@ public class ProxyFactory {
 
       return getProxy(cpoMetaXml);
     } catch (Exception ex) {
-      OUT.error(ex.getMessage(), ex);
+      logger.error(ex.getMessage(), ex);
       throw new CpoException(ex);
     }
   }

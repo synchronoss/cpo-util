@@ -26,7 +26,6 @@ import org.synchronoss.cpo.util.CpoNewAttributePanel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
 public class JdbcNewAttributePanel extends CpoNewAttributePanel {
 
@@ -42,7 +41,7 @@ public class JdbcNewAttributePanel extends CpoNewAttributePanel {
     try {
       jbInit();
     } catch (Exception e) {
-      OUT.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
     }
   }
 

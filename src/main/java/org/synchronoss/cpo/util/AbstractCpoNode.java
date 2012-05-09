@@ -37,46 +37,82 @@ public abstract class AbstractCpoNode extends DefaultMutableTreeNode {
   protected Set<AbstractCpoNode> newChildren = new HashSet<AbstractCpoNode>();
   protected Set<AbstractCpoNode> removeChildren = new HashSet<AbstractCpoNode>();
 
+  /**
+   * @see DefaultMutableTreeNode#DefaultMutableTreeNode()
+   */
   public AbstractCpoNode() {
     super();
   }
 
+  /**
+   * @see DefaultMutableTreeNode#DefaultMutableTreeNode(Object userObject);
+   */
   public AbstractCpoNode(Object userObject) {
     super(userObject);
   }
 
+  /**
+   * @see DefaultMutableTreeNode#DefaultMutableTreeNode(Object userObject, boolean allowsChildren)
+   */
   public AbstractCpoNode(Object userObject, boolean allowsChildren) {
     super(userObject, allowsChildren);
   }
 
+  /**
+   * @see DefaultMutableTreeNode#getParent()
+   */
   @Override
   public AbstractCpoNode getParent() {
     return (AbstractCpoNode)super.getParent();
   }
 
+  /**
+   * @see DefaultMutableTreeNode#getRoot()
+   */
   @Override
   public CpoRootNode getRoot() {
     return (CpoRootNode)super.getRoot();
   }
 
+  /**
+   * @return The Proxy for this node
+   */
   public Proxy getProxy() {
     return getRoot().getUserObject();
   }
 
+  /**
+   * @return The JPanel to display for this node
+   */
   public abstract JPanel getPanelForSelected();
 
+  /**
+   * @return Text to display for a tooltip for this node
+   */
   public String getToolTipText() {
     return this.toString();
   }
 
+  /**
+   * @return True if this node is protected, false otherwise
+   */
   public boolean isProtected() {
     return isProtected;
   }
 
+  /**
+   * Sets if this node is protected.
+   *
+   * @param b true if protected, false otherwise
+   */
   public void setProtected(boolean b) {
     isProtected = b;
   }
 
+  /**
+   * Sets if this node is dirty
+   * @param dirty True if this node is being changed
+   */
   public void setDirty(boolean dirty) {
     if (this.dirty == dirty) {
       return;
@@ -85,10 +121,16 @@ public abstract class AbstractCpoNode extends DefaultMutableTreeNode {
     getProxy().nodeChanged(this, this);
   }
 
+  /**
+   * @return True if this node is dirty, false otherwise
+   */
   public boolean isDirty() {
     return this.dirty;
   }
 
+  /**
+   * Called to inform the node that the supplied child is dirty
+   */
   public void setChildDirty(AbstractCpoNode childNode) {
     boolean notify = false;
     if (this.isChildDirty() != childNode.isDirty()) {
@@ -105,10 +147,17 @@ public abstract class AbstractCpoNode extends DefaultMutableTreeNode {
     }
   }
 
+  /**
+   * @return True if this node has any dirty children, false otherwise
+   */
   public boolean isChildDirty() {
     return (!dirtyChildren.isEmpty());
   }
 
+  /**
+   * Sets if this node is removed
+   * @param remove True if this node is being removed
+   */
   public void setRemove(boolean remove) {
     if (this.remove == remove) {
       return;
@@ -121,10 +170,16 @@ public abstract class AbstractCpoNode extends DefaultMutableTreeNode {
     // do nothing
   }
 
+  /**
+   * @return True if this node is removed, false otherwise
+   */
   public boolean isRemove() {
     return this.remove;
   }
 
+  /**
+   * Called to inform the node that the supplied child is removed
+   */
   public void setChildRemove(AbstractCpoNode childNode) {
     boolean notify = false;
     if (this.isChildRemove() != childNode.isRemove()) {
@@ -144,10 +199,17 @@ public abstract class AbstractCpoNode extends DefaultMutableTreeNode {
     }
   }
 
+  /**
+   * @return True if this node has any removed children, false otherwise
+   */
   public boolean isChildRemove() {
     return (!removeChildren.isEmpty());
   }
 
+  /**
+   * Sets If this node is new
+   * @param isnew True if this node is new, false otherwise
+   */
   public void setNew(boolean isnew) {
     if (this.isnew == isnew) {
       return;
@@ -156,10 +218,16 @@ public abstract class AbstractCpoNode extends DefaultMutableTreeNode {
     getProxy().nodeChanged(this, this);
   }
 
+  /**
+   * @return True if this node is new, false otherwise
+   */
   public boolean isNew() {
     return this.isnew;
   }
 
+  /**
+   * Called to inform the node that the supplied child is new
+   */
   public void setChildNew(AbstractCpoNode childNode) {
     boolean notify = false;
     if (this.isChildNew() != childNode.isNew()) {
@@ -175,6 +243,9 @@ public abstract class AbstractCpoNode extends DefaultMutableTreeNode {
     }
   }
 
+  /**
+   * @return True if this node has any new children, false otherwise
+   */
   public boolean isChildNew() {
     return (!newChildren.isEmpty());
   }

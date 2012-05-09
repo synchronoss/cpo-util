@@ -52,7 +52,7 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
 
   private CpoClassNode cpoClassNode;
 
-  private Logger OUT = LoggerFactory.getLogger(this.getClass());
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   public TesterPanel(CpoClassNode cpoClassNode) {
     this.cpoClassNode = cpoClassNode;
@@ -61,7 +61,7 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
       connectionComboBox.setModel(new DefaultComboBoxModel(cpoClassNode.getProxy().getConnectionList()));
       jbInit();
     } catch (Exception e) {
-      OUT.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
     }
 
     // populate the list
@@ -73,6 +73,9 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
     setTableCellSize();
   }
 
+  /**
+   * Creates the panel
+   */
   private void jbInit() throws Exception {
     this.setLayout(new GridBagLayout());
 
@@ -94,7 +97,7 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
 
     jComFunctionGroup.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        functionGroupActionPerformed(e);
+        functionGroupActionPerformed();
       }
     });
     this.add(jComFunctionGroup, new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
@@ -103,7 +106,7 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
     jCheckPersist.setEnabled(false);
     jCheckPersist.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        checkPersistActionPerformed(e);
+        checkPersistActionPerformed();
       }
     });
     this.add(jCheckPersist, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
@@ -147,6 +150,9 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
     this.add(jScrollResults, new GridBagConstraints(0, 4, 4, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
   }
 
+  /**
+   * Executes the selected function group
+   */
   private void executeFunctionGroup() {
     if (jTableParam.isEditing()) {
       int row = jTableParam.getEditingRow();
@@ -172,7 +178,9 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
       cpoClassNameReturnType = returnClassNode.getUserObject().getName();
     }
 
-    OUT.debug("Class name tester will use: " + cpoClassName + " and " + cpoClassNameReturnType + " as the return type class");
+    if (logger.isDebugEnabled()) {
+      logger.debug("Class name tester will use: " + cpoClassName + " and " + cpoClassNameReturnType + " as the return type class");
+    }
     try {
       Class<?> cpoClass = CpoUtilClassLoader.getInstance(this.getClass().getClassLoader()).loadClass(cpoClassName);
       Object cpoObject = cpoClass.newInstance();
@@ -184,7 +192,9 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
       for (Object obj : parameterMap.keySet()) {
         String key = (String)obj;
         String methodName = "set" + key.substring(0, 1).toUpperCase() + key.substring(1);
-        OUT.debug("Method name looking for: " + methodName);
+        if (logger.isDebugEnabled()) {
+          logger.debug("Method name looking for: " + methodName);
+        }
         boolean found = false;
         for (Method method : methods) {
           if (method.getName().equals(methodName)) {
@@ -212,7 +222,7 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
     } catch (Exception ex) {
       Throwable t = ex;
       while (t != null) {
-        OUT.error(ex.getMessage(), ex);
+        logger.error(ex.getMessage(), ex);
         t = t.getCause();
       }
       CpoUtil.showException(ex);
@@ -248,7 +258,7 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
       } else if (cls == BigInteger.class) {
         return new BigInteger(param);
       } else if (cls == Date.class) {
-        OUT.debug("Found type Date");
+        logger.debug("Found type Date");
         if (param.equalsIgnoreCase("sysdate")) {
           return new Date();
         }
@@ -257,7 +267,7 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
         }
         return sdf.parse(param);
       } else if (cls == java.sql.Date.class) {
-        OUT.debug("Found type sql Date");
+        logger.debug("Found type sql Date");
         if (param.equalsIgnoreCase("sysdate")) {
           return new java.sql.Date(new Date().getTime());
         }
@@ -266,7 +276,7 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
         }
         return new java.sql.Date(sdf.parse(param).getTime());
       } else if (cls == Timestamp.class) {
-        OUT.debug("Found type Timestamp");
+        logger.debug("Found type Timestamp");
         if (param.equalsIgnoreCase("sysdate")) {
           return new Timestamp(new Date().getTime());
         }
@@ -278,7 +288,7 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
         return param.getBytes();
       }
     } catch (ParseException e) {
-      OUT.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       throw e;
     }
     CpoUtil.showErrorMessage("Could not locate the type for param: " + param + " which is class: " + cls);
@@ -307,7 +317,7 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
 
   @Override
   public void lostOwnership(Clipboard clip, Transferable trans) {
-    OUT.debug("Boohoo ...  clipboard lost ownership ...");
+    logger.debug("Boohoo ...  clipboard lost ownership ...");
   }
 
   private void insertValueAt(String value) {
@@ -394,7 +404,7 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
     }
   }
 
-  private void functionGroupActionPerformed(ActionEvent e) {
+  private void functionGroupActionPerformed() {
     if (((CpoFunctionGroupNode)jComFunctionGroup.getSelectedItem()).getType().equals(StFunctionGroupType.EXIST.toString())) {
       jCheckPersist.setEnabled(true);
     } else {
@@ -405,7 +415,9 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
       CpoFunctionGroupNode cqgn = (CpoFunctionGroupNode)jComFunctionGroup.getSelectedItem();
       try {
         CpoRootNode cpoRootNode = cqgn.getParent().getParent().getParent();
-        OUT.debug("about to get classes for: " + cpoRootNode);
+        if (logger.isDebugEnabled()) {
+          logger.debug("about to get classes for: " + cpoRootNode);
+        }
         jComClassOut.removeAllItems();
         Enumeration children = cpoRootNode.children();
         while (children.hasMoreElements()) {
@@ -423,7 +435,7 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
     setTableCellSize();
   }
 
-  private void checkPersistActionPerformed(ActionEvent e) {
+  private void checkPersistActionPerformed() {
     if (jCheckPersist.isSelected()) {
       try {
         CpoFunctionGroupNode selectedNode = (CpoFunctionGroupNode)jComFunctionGroup.getSelectedItem();

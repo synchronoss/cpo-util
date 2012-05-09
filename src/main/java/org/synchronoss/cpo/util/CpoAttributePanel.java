@@ -48,7 +48,7 @@ public class CpoAttributePanel extends JPanel  {
   private CoreAttributeTableModel model;
   private TableSorter ts;
   private JPopupMenu menu = new JPopupMenu();
-  private Logger OUT = LoggerFactory.getLogger(this.getClass());
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   /**
    * Constructs the panel
@@ -116,7 +116,7 @@ public class CpoAttributePanel extends JPanel  {
         }
       }
     });
-    jTableAttMap.setDefaultEditor(String.class,new CpoAttributeTableEditor(cpoAttLabNode.getProxy().getAllowableDataTypes()));
+    jTableAttMap.setDefaultEditor(String.class, new CpoAttributeTableEditor(cpoAttLabNode.getProxy().getAllowableDataTypes()));
     jScrollTable.getViewport().add(jTableAttMap);
     this.add(jScrollTable,BorderLayout.CENTER);
   }
@@ -160,7 +160,7 @@ public class CpoAttributePanel extends JPanel  {
     CpoNewAttributePanel cnap = cpoAttLabNode.getNewAttributePanel();
 
     int result = JOptionPane.showConfirmDialog(this.getTopLevelAncestor(), cnap, "Add New Attribute", JOptionPane.OK_CANCEL_OPTION);
-    OUT.debug("Result: " + result);
+    logger.debug("Result: " + result);
     if (result == JOptionPane.OK_OPTION) {
       try {
         CpoAttribute newAttribute = cnap.createCpoAttribute();
@@ -213,7 +213,7 @@ public class CpoAttributePanel extends JPanel  {
       CpoAttributeNode cpoAttributeNode = (CpoAttributeNode)cpoAttLabNode.getChildAt(i);
 
       // don't let them delete attributes that are used by functions
-      List<CpoFunctionGroup> functionGroups = cpoAttributeNode.getProxy().getFunctionGroupsUsingAttribute(cpoAttributeNode);
+      Set<CpoFunctionGroup> functionGroups = cpoAttributeNode.getProxy().getFunctionGroupsUsingAttribute(cpoAttributeNode);
       if (!functionGroups.isEmpty()) {
         StringBuilder msg = new StringBuilder();
         msg.append(cpoAttributeNode.getUserObject().getJavaName());

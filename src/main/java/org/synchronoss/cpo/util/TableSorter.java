@@ -47,7 +47,7 @@ import java.util.*;
  */
 public class TableSorter extends TableMap {
 
-  private static Logger OUT = LoggerFactory.getLogger(TableSorter.class);
+  private static Logger logger = LoggerFactory.getLogger(TableSorter.class);
 
   // Version Id for this class
   private static final long serialVersionUID = 1L;
@@ -189,7 +189,7 @@ public class TableSorter extends TableMap {
 
   public void checkModel() {
     if (indexes.length != model.getRowCount()) {
-      OUT.error("Sorter not informed of a change in model.");
+      logger.error("Sorter not informed of a change in model.");
       tableChanged(null);
     }
   }
@@ -326,7 +326,7 @@ public class TableSorter extends TableMap {
               sorter.sortByColumn(column, ascending);
             }
           } catch (Exception ex) {
-            OUT.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
           }
         }
       }

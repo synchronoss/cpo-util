@@ -39,7 +39,7 @@ import java.util.List;
 
 public class CpoUtil extends JFrame {
 
-  private static Logger OUT = LoggerFactory.getLogger(CpoUtil.class);
+  private static Logger logger = LoggerFactory.getLogger(CpoUtil.class);
 
   private static URL mainIcon = CpoBrowserTree.class.getResource("/images/sync-logo-sm.gif");
   private static ImageIcon closeIcon = new ImageIcon(CpoBrowserTree.class.getResource("/images/close.png"));
@@ -92,7 +92,7 @@ public class CpoUtil extends JFrame {
     try {
       jbInit();
     } catch (Exception e) {
-      OUT.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
     }
 
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -146,7 +146,7 @@ public class CpoUtil extends JFrame {
     JMenuItem menuOpen = new JMenuItem("Open");
     menuOpen.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent ae) {
-        openActionPerformed(ae);
+        openActionPerformed();
       }
     });
     menuFile.add(menuOpen);
@@ -154,11 +154,7 @@ public class CpoUtil extends JFrame {
     JMenuItem menuSave = new JMenuItem("Save");
     menuSave.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent ae) {
-        try {
-          saveActionPerformed(ae);
-        } catch (Exception e) {
-          CpoUtil.showException(e);
-        }
+        saveActionPerformed();
       }
     });
     menuFile.add(menuSave);
@@ -166,11 +162,7 @@ public class CpoUtil extends JFrame {
     JMenuItem menuSaveAs = new JMenuItem("Save As");
     menuSaveAs.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent ae) {
-        try {
-          saveAsActionPerformed(ae);
-        } catch (Exception e) {
-          CpoUtil.showException(e);
-        }
+        saveAsActionPerformed();
       }
     });
     menuFile.add(menuSaveAs);
@@ -204,7 +196,7 @@ public class CpoUtil extends JFrame {
     menuEditCon.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent ae) {
         try {
-          editConActionPerformed(ae);
+          editConActionPerformed();
         } catch (Exception e) {
           CpoUtil.showException(e);
         }
@@ -239,7 +231,7 @@ public class CpoUtil extends JFrame {
     JMenuItem menuHelpAbout = new JMenuItem("About");
     menuHelpAbout.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent ae) {
-        aboutActionPerformed(ae);
+        aboutActionPerformed();
       }
     });
     menuHelp.add(menuHelpAbout);
@@ -277,7 +269,7 @@ public class CpoUtil extends JFrame {
     }
   }
 
-  private void openActionPerformed(ActionEvent e) {
+  private void openActionPerformed() {
 
     JFileChooser jFileChooser = new JFileChooser();
     jFileChooser.setMultiSelectionEnabled(false);
@@ -366,14 +358,14 @@ public class CpoUtil extends JFrame {
     }
   }
 
-  private void saveActionPerformed(ActionEvent e) {
+  private void saveActionPerformed() {
     int index = jTabbedPane.getSelectedIndex();
     if (index != -1) {
       save(null);
     }
   }
 
-  private void saveAsActionPerformed(ActionEvent e) {
+  private void saveAsActionPerformed() {
     int index = jTabbedPane.getSelectedIndex();
     if (index != -1) {
       JFileChooser jFileChooser = new JFileChooser();
@@ -407,7 +399,7 @@ public class CpoUtil extends JFrame {
     }
   }
 
-  private void aboutActionPerformed(ActionEvent e) {
+  private void aboutActionPerformed() {
     JOptionPane.showMessageDialog(this, new AboutBoxPanel(), "About", JOptionPane.PLAIN_MESSAGE);
   }
 
@@ -485,7 +477,7 @@ public class CpoUtil extends JFrame {
     }
   }
 
-  private void editConActionPerformed(ActionEvent e) {
+  private void editConActionPerformed() {
     CpoEditConnPanel cecp = new CpoEditConnPanel();
     JOptionPane.showConfirmDialog(this, cecp, "Edit Connections", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
   }
@@ -527,8 +519,8 @@ public class CpoUtil extends JFrame {
       // bootstrapping
       String bootstrapUrl = props.getProperty(BOOTSTRAP_URL_PROP);
       if (bootstrapUrl != null && !bootstrapUrl.isEmpty()) {
-        if (OUT.isDebugEnabled()) {
-          OUT.debug("Bootstrap Url: " + bootstrapUrl);
+        if (logger.isDebugEnabled()) {
+          logger.debug("Bootstrap Url: " + bootstrapUrl);
         }
         try {
           UrlLoader loader = new UrlLoader(bootstrapUrl);
@@ -542,7 +534,7 @@ public class CpoUtil extends JFrame {
             in.close();
           }
         } catch (Exception ex) {
-          OUT.error("Exception caught reading bootstrap properties: " + ex);
+          logger.error("Exception caught reading bootstrap properties: " + ex);
         }
       }
     } catch (MalformedURLException mue) {
@@ -578,8 +570,8 @@ public class CpoUtil extends JFrame {
 
   protected void checkKillSwitch() {
     String minimumVersion = props.getProperty(MINIMUM_VERSION);
-    if (OUT.isDebugEnabled()) {
-      OUT.debug("Minimum version: " + minimumVersion);
+    if (logger.isDebugEnabled()) {
+      logger.debug("Minimum version: " + minimumVersion);
     }
     if (minimumVersion != null) {
       // if it's a snapshot, strip the -SNAPSHOT
@@ -597,22 +589,22 @@ public class CpoUtil extends JFrame {
         }
       }
 
-      if (OUT.isDebugEnabled()) {
-        OUT.debug("Version: " + version);
+      if (logger.isDebugEnabled()) {
+        logger.debug("Version: " + version);
       }
 
       double min = 0;
       try {
         min = Double.parseDouble(minimumVersion);
       } catch (NumberFormatException ex) {
-        OUT.error(ex.getMessage());
+        logger.error(ex.getMessage());
       }
 
       double actual = 0;
       try {
         actual = Double.parseDouble(version);
       } catch (NumberFormatException ex) {
-        OUT.error(ex.getMessage());
+        logger.error(ex.getMessage());
       }
 
       if (actual < min) {
@@ -629,19 +621,19 @@ public class CpoUtil extends JFrame {
     }
 
     String url = props.getProperty(PROTECTED_CLASS_PROP);
-    if (OUT.isDebugEnabled()) {
-      OUT.debug("Protected Classes Url: " + url);
+    if (logger.isDebugEnabled()) {
+      logger.debug("Protected Classes Url: " + url);
     }
 
     Set<String> protClasses = loadProtectedClassesFromUrl(url);
     if (protClasses != null) {
       // updated from url, use them and save them locally
-      OUT.debug("Connected to url, loading classes");
+      logger.debug("Connected to url, loading classes");
       protectedClasses.addAll(protClasses);
       saveProtectedClasses();
     } else {
       // if the set was null, it couldn't be read, so use the local copy
-      OUT.debug("Couldn't connect to url, so loading local copy");
+      logger.debug("Couldn't connect to url, so loading local copy");
       if (cpoUtilConfig.isSetProtectedClasses()) {
         protectedClasses.addAll(Arrays.asList(cpoUtilConfig.getProtectedClasses().getProtectedClassArray()));
       }
@@ -665,8 +657,8 @@ public class CpoUtil extends JFrame {
 
     Set<String> result = new HashSet<String>();
     try {
-      if (OUT.isDebugEnabled()) {
-        OUT.debug("Url: " + url);
+      if (logger.isDebugEnabled()) {
+        logger.debug("Url: " + url);
       }
       UrlLoader loader = new UrlLoader(url);
       Thread thread = new Thread(loader);
@@ -686,8 +678,8 @@ public class CpoUtil extends JFrame {
       }
       return result;
     } catch (Exception ex) {
-      if (OUT.isDebugEnabled()) {
-        OUT.debug("Exception caught reading from url: " + ex);
+      if (logger.isDebugEnabled()) {
+        logger.debug("Exception caught reading from url: " + ex);
       }
     }
 
@@ -872,8 +864,8 @@ public class CpoUtil extends JFrame {
 
   // Some static helper methods for displaying messages
   public static void showException(Throwable e) {
-    if (OUT.isDebugEnabled()) {
-      OUT.debug("Exception caught", e);
+    if (logger.isDebugEnabled()) {
+      logger.debug("Exception caught", e);
     }
     JOptionPane.showMessageDialog(CpoUtil.getInstance(), new ExceptionPanel(e), "Exception Caught!", JOptionPane.PLAIN_MESSAGE);
   }
@@ -893,7 +885,7 @@ public class CpoUtil extends JFrame {
     try {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     } catch (Exception e) {
-      OUT.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
     }
     Policy.setPolicy(new Policy() {
       @Override

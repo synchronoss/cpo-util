@@ -45,7 +45,7 @@ import java.util.StringTokenizer;
   private static final String PARAM_DELIM = ";";
   private static final String PARAM_ASSIGNMENT = "=";
 
-  private Logger OUT = LoggerFactory.getLogger(this.getClass());
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private JTextField jTextName = new JTextField();
   private JTextField jTextUserName = new JTextField();
@@ -58,7 +58,7 @@ import java.util.StringTokenizer;
     try {
       jbInit();
     } catch (Exception e) {
-      OUT.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
     }
   }
 
@@ -148,8 +148,8 @@ import java.util.StringTokenizer;
     int option = chooser.showOpenDialog(this);
     if (option == JFileChooser.APPROVE_OPTION) {
       File file = chooser.getSelectedFile();
-      if (OUT.isDebugEnabled()) {
-        OUT.debug("File: " + file.getPath());
+      if (logger.isDebugEnabled()) {
+        logger.debug("File: " + file.getPath());
       }
 
       try {

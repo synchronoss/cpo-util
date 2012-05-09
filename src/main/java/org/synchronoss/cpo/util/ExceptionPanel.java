@@ -34,13 +34,13 @@ public class ExceptionPanel extends JPanel {
   private JScrollPane jScrollExc = new JScrollPane();
   private JTextArea jTextExc = new JTextArea();
 
-  private Logger OUT = LoggerFactory.getLogger(this.getClass());
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   public ExceptionPanel(Throwable ex) {
     try {
       jbInit(ex);
     } catch (Exception e) {
-      OUT.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
     }
   }
 

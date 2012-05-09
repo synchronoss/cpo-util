@@ -39,7 +39,7 @@ public class CpoFunctionPanel extends JPanel {
                                                         "This might cause some tools such as sql plus not to be able to execute it.\n\n" +
                                                         "To solve this issue, add line breaks to the query.";
 
-  private Logger OUT = LoggerFactory.getLogger(this.getClass());
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   // location of the divider
   private static int divLocation = -1;
@@ -293,10 +293,10 @@ public class CpoFunctionPanel extends JPanel {
       }
 
       // at this point, the colList will only have columns that correspond to a ?
-      if (OUT.isDebugEnabled()) {
+      if (logger.isDebugEnabled()) {
         int count = 1;
         for (String col : colList) {
-          OUT.debug("Column[" + count + "] = " + col);
+          logger.debug("Column[" + count + "] = " + col);
           count++;
         }
       }

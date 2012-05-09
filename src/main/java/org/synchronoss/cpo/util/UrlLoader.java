@@ -32,7 +32,7 @@ import java.net.*;
  */
 public class UrlLoader implements Runnable {
 
-  private Logger OUT = LoggerFactory.getLogger(this.getClass());
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private URL url;
   private InputStream connInputStream = null;
@@ -57,7 +57,7 @@ public class UrlLoader implements Runnable {
 
       connInputStream = conn.getInputStream();
     } catch (Exception ex) {
-      OUT.error(ex.getMessage());
+      logger.error(ex.getMessage());
     }
   }
 }

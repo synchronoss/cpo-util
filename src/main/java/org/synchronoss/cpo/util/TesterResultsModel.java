@@ -34,7 +34,7 @@ public class TesterResultsModel extends AbstractTableModel {
   private Collection<?> results;
   private String[] columnNames;
   private CpoClassNode cpoClassNode;
-  private Logger OUT = LoggerFactory.getLogger(this.getClass());
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   public TesterResultsModel(Collection<?> results, CpoClassNode cpoClassNode) {
     this.results = results;
@@ -98,7 +98,7 @@ public class TesterResultsModel extends AbstractTableModel {
               Object returnObj = method.invoke(rowObj);
               return returnObj == null ? "" : returnObj.toString();
             } catch (Exception e) {
-              OUT.error(e.getMessage(), e);
+              logger.error(e.getMessage(), e);
               return e.getMessage();
             }
           }
@@ -106,7 +106,7 @@ public class TesterResultsModel extends AbstractTableModel {
       }
       row++;
     }
-    OUT.debug("Did not find column/row you are looking for - trying to return toString!");
+    logger.debug("Did not find column/row you are looking for - trying to return toString!");
     return rowObj == null ? "" : rowObj.toString();
   }
 

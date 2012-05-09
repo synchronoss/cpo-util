@@ -20,77 +20,58 @@
  */
 package org.synchronoss.cpo.util;
 
-import org.slf4j.*;
-
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * About Box
+ */
 public class AboutBoxPanel extends JPanel {
 
-  private Logger OUT = LoggerFactory.getLogger(this.getClass());
-
-  // Version Id for this class
-  private static final long serialVersionUID = 1L;
-
-  private JLabel titleLabel = new JLabel();
-  private JLabel titleValue = new JLabel();
-  private JLabel versionLabel = new JLabel();
-  private JLabel versionValue = new JLabel();
-  private JLabel authorLabel = new JLabel();
-  private JLabel authorValue = new JLabel();
-  private JLabel copyrightLabel = new JLabel();
-  private JLabel copyrightValue = new JLabel();
-  private JLabel companyLabel = new JLabel();
-  private JLabel companyValue = new JLabel();
-
-  private JLabel jvmLabel = new JLabel();
-  private JLabel jvmValue = new JLabel();
-
+  /**
+   * Creates the about box
+   */
   public AboutBoxPanel() {
-    try {
-      jbInit();
-    } catch (Exception e) {
-      OUT.error(e.getMessage(), e);
-    }
+    jbInit();
   }
 
-  private void jbInit() throws Exception {
+  private void jbInit() {
     this.setLayout(new GridBagLayout());
 
-    titleLabel.setText("Title:");
+    JLabel titleLabel = new JLabel("Title:");
     this.add(titleLabel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
-    titleValue.setText(CpoUtil.getInstance().getProperty(CpoUtil.TITLE));
+    JLabel titleValue = new JLabel(CpoUtil.getInstance().getProperty(CpoUtil.TITLE));
     this.add(titleValue, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
-    versionLabel.setText("Version:");
+    JLabel versionLabel = new JLabel("Version:");
     this.add(versionLabel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
-    versionValue.setText(CpoUtil.getInstance().getProperty(CpoUtil.VERSION));
+    JLabel versionValue = new JLabel(CpoUtil.getInstance().getProperty(CpoUtil.VERSION));
     this.add(versionValue, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
-    authorLabel.setText("Authors:");
+    JLabel authorLabel = new JLabel("Authors:");
     this.add(authorLabel, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
-    authorValue.setText(CpoUtil.getInstance().getProperty(CpoUtil.AUTHOR));
+    JLabel authorValue = new JLabel(CpoUtil.getInstance().getProperty(CpoUtil.AUTHOR));
     this.add(authorValue, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
-    copyrightLabel.setText("Copyright:");
+    JLabel copyrightLabel = new JLabel("Copyright:");
     this.add(copyrightLabel, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
-    copyrightValue.setText(CpoUtil.getInstance().getProperty(CpoUtil.COPYRIGHT));
+    JLabel copyrightValue = new JLabel(CpoUtil.getInstance().getProperty(CpoUtil.COPYRIGHT));
     this.add(copyrightValue, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
-    companyLabel.setText("Company:");
+    JLabel companyLabel = new JLabel("Company:");
     this.add(companyLabel, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
-    companyValue.setText(CpoUtil.getInstance().getProperty(CpoUtil.COMPANY));
+    JLabel companyValue = new JLabel(CpoUtil.getInstance().getProperty(CpoUtil.COMPANY));
     this.add(companyValue, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
-    jvmLabel.setText("Java Version:");
+    JLabel jvmLabel = new JLabel("Java Version:");
     this.add(jvmLabel, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
-    jvmValue.setText(System.getProperty("java.version"));
+    JLabel jvmValue = new JLabel(System.getProperty("java.version"));
     this.add(jvmValue, new GridBagConstraints(1, 5, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
   }
 }

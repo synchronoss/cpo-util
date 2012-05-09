@@ -75,10 +75,8 @@ public class CpoBrowserPanel extends JPanel {
       public void treeWillExpand(TreeExpansionEvent tee) {
         Object pathComp = tee.getPath().getLastPathComponent();
         // if the node is a protected class node, warn them
-        if (pathComp instanceof CpoClassNode) {
-          if (((CpoClassNode)pathComp).isProtected()) {
-            CpoUtil.showMessage("This is a protected class.  Be careful what you do.");
-          }
+        if (pathComp instanceof CpoClassNode && ((CpoClassNode)pathComp).isProtected()) {
+          CpoUtil.showMessage("This is a protected class.  Be careful what you do.");
         }
       }
 

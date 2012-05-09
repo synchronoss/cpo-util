@@ -37,7 +37,7 @@ public enum SupportedType {
   // Cassandra(CpoMetaDescriptor.class, CassandraProxy.class, CtCassandraConfig.class, CassandraConnectionPanel.class),
   ;
 
-  protected static Logger OUT = LoggerFactory.getLogger(SupportedType.class);
+  protected static Logger logger = LoggerFactory.getLogger(SupportedType.class);
 
   private Class<? extends CpoMetaDescriptor> metaDescriptorClass = null;
   private Class<? extends Proxy> proxyClass = null;

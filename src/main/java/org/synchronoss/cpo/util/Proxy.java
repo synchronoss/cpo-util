@@ -40,7 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class Proxy {
 
-  protected Logger OUT = LoggerFactory.getLogger(this.getClass());
+  protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
   // the cpo meta file for this proxy
   protected File cpoMetaXml;
@@ -166,13 +166,13 @@ public abstract class Proxy {
   }
 
   /**
-   * Returns the data types that this instance of cpo supports
+   * @return The data types that this instance of cpo supports
    */
-  public List<String> getAllowableDataTypes() {
-    List<String> dataTypes = new ArrayList<String>();
+  public Vector<String> getAllowableDataTypes() {
+    Vector<String> dataTypes = new Vector<String>();
 
     try {
-      dataTypes = metaDescriptor.getAllowableDataTypes();
+      dataTypes.addAll(metaDescriptor.getAllowableDataTypes());
     } catch (CpoException ex) {
       CpoUtil.showException(ex);
     }
@@ -493,10 +493,10 @@ public abstract class Proxy {
   // remove methods
 
   /**
-   * Returns a list of all function groups that have funtions having arguments using the supplied attribute
+   * Returns a set of all function groups that have functions having arguments using the supplied attribute
    */
-  public List<CpoFunctionGroup> getFunctionGroupsUsingAttribute(CpoAttributeNode cpoAttributeNode) {
-    List<CpoFunctionGroup> functionGroups = new ArrayList<CpoFunctionGroup>();
+  public Set<CpoFunctionGroup> getFunctionGroupsUsingAttribute(CpoAttributeNode cpoAttributeNode) {
+    SortedSet<CpoFunctionGroup> functionGroups = new TreeSet<CpoFunctionGroup>();
 
     Enumeration functionGroupNodes = cpoAttributeNode.getParent().getParent().getFunctionGroupLabelNode().children();
     while (functionGroupNodes.hasMoreElements()) {
@@ -509,9 +509,7 @@ public abstract class Proxy {
         while (argumentNodes.hasMoreElements()) {
           CpoArgumentNode argumentNode = (CpoArgumentNode)argumentNodes.nextElement();
           if (argumentNode.getUserObject().getAttributeName().equals(cpoAttributeNode.getUserObject().getJavaName())) {
-            if (!functionGroups.contains(functionGroup)) {
-              functionGroups.add(functionGroup);
-            }
+            functionGroups.add(functionGroup);
           }
         }
       }
@@ -581,7 +579,7 @@ public abstract class Proxy {
         CpoAdapter cpoAdapter = getCpoAdapter(connectionName);
         attributes =  cpoAdapter.getCpoAttributes(expression);
       } catch (Exception ex) {
-        OUT.error(ex.getMessage(), ex);
+        logger.error(ex.getMessage(), ex);
         throw new CpoException(ex);
       }
     }
@@ -658,8 +656,8 @@ public abstract class Proxy {
    * Invoked when nodes are changed.
    */
   protected void nodeChanged(AbstractCpoNode notifier, AbstractCpoNode changedNode) {
-    if (OUT.isDebugEnabled()) {
-      OUT.debug("Proxy got notification of changed object (new) " + changedNode.isNew() + " (remove) " + changedNode.isRemove());
+    if (logger.isDebugEnabled()) {
+      logger.debug("Proxy got notification of changed object (new) " + changedNode.isNew() + " (remove) " + changedNode.isRemove());
     }
     AbstractCpoNode parent = notifier.getParent();
     if (parent != null) {
@@ -669,55 +667,55 @@ public abstract class Proxy {
       parent.setChildRemove(changedNode);
 
       int index = parent.getIndex(notifier);
-      if (OUT.isDebugEnabled()) {
-        OUT.debug("Set parent flags - index is: " + index);
+      if (logger.isDebugEnabled()) {
+        logger.debug("Set parent flags - index is: " + index);
       }
       if (index >= 0 && notifier.equals(changedNode)) {
-        if (OUT.isDebugEnabled()) {
-          OUT.debug("Index: " + index + " size: " + notifier.getParent().getChildCount());
+        if (logger.isDebugEnabled()) {
+          logger.debug("Index: " + index + " size: " + notifier.getParent().getChildCount());
         }
         if (notifier.isRemove()) {
           if (notifier.isNew() && !parent.isLeaf()) {
-            if (OUT.isDebugEnabled()) {
-              OUT.debug("Notifying non-leaf parent of node removal");
+            if (logger.isDebugEnabled()) {
+              logger.debug("Notifying non-leaf parent of node removal");
             }
             treeModel.nodesWereRemoved(parent, new int[]{index}, new Object[]{notifier});
           } else if (!parent.isLeaf()) {
-            if (OUT.isDebugEnabled()) {
-              OUT.debug("Notifying non-leaf parent of node (marked deleted) change");
+            if (logger.isDebugEnabled()) {
+              logger.debug("Notifying non-leaf parent of node (marked deleted) change");
             }
             treeModel.nodeChanged(changedNode);
           } else {
-            if (OUT.isDebugEnabled()) {
-              OUT.debug("Notifying a leaf parent of node (marked deleted) change");
+            if (logger.isDebugEnabled()) {
+              logger.debug("Notifying a leaf parent of node (marked deleted) change");
             }
             treeModel.nodeChanged(parent);
           }
         } else if (notifier.isDirty()) {
-          if (OUT.isDebugEnabled()) {
-            OUT.debug("Notifying parent of node change (dirty and all else)");
+          if (logger.isDebugEnabled()) {
+            logger.debug("Notifying parent of node change (dirty and all else)");
           }
           treeModel.nodeChanged(parent);
         } else if (notifier.isNew()) {
-          if (OUT.isDebugEnabled()) {
-            OUT.debug("Notifying parent (" + parent + ") of node insertion (" + changedNode + ")");
+          if (logger.isDebugEnabled()) {
+            logger.debug("Notifying parent (" + parent + ") of node insertion (" + changedNode + ")");
           }
           treeModel.nodesWereInserted(parent, new int[]{index});
         }
       } else if (notifier.equals(changedNode)) {
-        if (OUT.isDebugEnabled()) {
-          OUT.debug("Object equal to notifier: " + notifier + " : parent: " + parent);
+        if (logger.isDebugEnabled()) {
+          logger.debug("Object equal to notifier: " + notifier + " : parent: " + parent);
         }
         treeModel.nodeStructureChanged(parent);
       } else {
-        if (OUT.isDebugEnabled()) {
-          OUT.debug("object not equal to notifier: " + notifier + " : object: " + changedNode);
+        if (logger.isDebugEnabled()) {
+          logger.debug("object not equal to notifier: " + notifier + " : object: " + changedNode);
         }
         treeModel.nodeChanged(parent);
       }
     } else {
-      if (OUT.isDebugEnabled()) {
-        OUT.debug("Parent of " + notifier.getClass() + " was null");
+      if (logger.isDebugEnabled()) {
+        logger.debug("Parent of " + notifier.getClass() + " was null");
       }
     }
   }

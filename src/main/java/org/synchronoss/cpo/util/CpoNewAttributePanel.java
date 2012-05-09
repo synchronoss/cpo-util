@@ -26,12 +26,10 @@ import org.synchronoss.cpo.meta.domain.CpoAttribute;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
-import java.util.*;
 
 public class CpoNewAttributePanel extends JPanel {
 
-  protected Logger OUT = LoggerFactory.getLogger(this.getClass());
+  protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
   // Version Id for this class
   private static final long serialVersionUID = 1L;
@@ -45,12 +43,11 @@ public class CpoNewAttributePanel extends JPanel {
 
   public CpoNewAttributePanel(CpoAttributeLabelNode cpoAttributeLabelNode) {
     this.cpoAttributeLabelNode = cpoAttributeLabelNode;
-    List<String> dataTypes = cpoAttributeLabelNode.getProxy().getAllowableDataTypes();
-    this.jComDataType = new JComboBox(new Vector<String>(dataTypes));
+    this.jComDataType = new JComboBox(cpoAttributeLabelNode.getProxy().getAllowableDataTypes());
     try {
       jbInit();
     } catch (Exception e) {
-      OUT.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
     }
   }
 

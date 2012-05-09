@@ -172,9 +172,10 @@ public class CoreArgumentTableModel extends AbstractTableModel {
         }
 
         CpoArgumentNode cpoArgumentNode = cpoFunctionNode.getProxy().addArgument(cpoFunctionNode, firstAttribute);
-
-        // tell the table it's changed
-        this.fireTableDataChanged();
+        if (cpoArgumentNode != null) {
+          // tell the table it's changed
+          this.fireTableDataChanged();
+        }
       } catch (Exception pe) {
         CpoUtil.showException(pe);
       }

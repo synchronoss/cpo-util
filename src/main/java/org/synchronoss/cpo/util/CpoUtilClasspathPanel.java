@@ -31,7 +31,7 @@ import java.util.List;
 
 public class CpoUtilClasspathPanel extends JPanel  {
 
-  private Logger OUT = LoggerFactory.getLogger(this.getClass());
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   // Version Id for this class
   private static final long serialVersionUID=1L;
@@ -44,7 +44,7 @@ public class CpoUtilClasspathPanel extends JPanel  {
     try {
       jbInit();
     } catch(Exception e) {
-      OUT.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
     }
   }
 

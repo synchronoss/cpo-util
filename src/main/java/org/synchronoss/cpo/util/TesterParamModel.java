@@ -36,7 +36,7 @@ public class TesterParamModel extends AbstractTableModel {
   private Object[] columnClasses = {Integer.class, String.class, String.class, String.class, String.class};
   private CpoFunctionGroupNode cpoFGnode;
   private Hashtable<Object, Object> parameterMap = new Hashtable<Object, Object>();
-  private Logger OUT = LoggerFactory.getLogger(this.getClass());
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   public TesterParamModel(CpoFunctionGroupNode cpoQGnode) {
     this.cpoFGnode = cpoQGnode;
@@ -105,7 +105,7 @@ public class TesterParamModel extends AbstractTableModel {
   @Override
   public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
     if (columnIndex == 4) {
-      OUT.debug(getValueAt(rowIndex, 3) + " : " + aValue);
+      logger.debug(getValueAt(rowIndex, 3) + " : " + aValue);
       if (aValue == null) {
         this.parameterMap.remove(getValueAt(rowIndex, 3));
       }
