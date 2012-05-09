@@ -22,6 +22,7 @@ package org.synchronoss.cpo.util;
 
 import org.synchronoss.cpo.meta.domain.*;
 
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.util.*;
 
@@ -33,6 +34,10 @@ public class CoreArgumentTableModel extends AbstractTableModel {
 
   public CoreArgumentTableModel(CpoFunctionNode cpoFunctionNode) {
     this.cpoFunctionNode = cpoFunctionNode;
+  }
+
+  public void initTableEditors(JTable table) {
+    table.setDefaultEditor(CpoAttribute.class, new CpoArgumentAttributeEditor(this));
   }
 
   public CpoFunctionNode getCpoFunctionNode() {
@@ -107,11 +112,9 @@ public class CoreArgumentTableModel extends AbstractTableModel {
 
   @Override
   public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-    CpoArgumentNode cpoArgumentNode = (CpoArgumentNode)cpoFunctionNode.getChildAt(rowIndex);
-    CpoArgument argument = cpoArgumentNode.getUserObject();
-
     if (columnIndex == 1) {
-      argument.setAttribute((CpoAttribute)aValue);
+      CpoArgumentNode cpoArgumentNode = (CpoArgumentNode)cpoFunctionNode.getChildAt(rowIndex);
+      cpoArgumentNode.setCpoAttribute((CpoAttribute)aValue);
     }
     this.fireTableDataChanged();
   }

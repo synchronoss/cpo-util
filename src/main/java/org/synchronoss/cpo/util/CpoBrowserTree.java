@@ -40,7 +40,6 @@ public class CpoBrowserTree extends JTree {
   private static final long serialVersionUID = 1L;
 
   private JPopupMenu menu;
-  private AbstractCpoNode menuNode;
   private static ImageIcon iconRed = new ImageIcon(CpoBrowserTree.class.getResource("/images/red.gif"));
   private static ImageIcon iconYellow = new ImageIcon(CpoBrowserTree.class.getResource("/images/yellow.gif"));
   private static ImageIcon iconGreen = new ImageIcon(CpoBrowserTree.class.getResource("/images/green.gif"));
@@ -126,7 +125,7 @@ public class CpoBrowserTree extends JTree {
     menu.removeAll();
     menu.setLabel("");
     if (node instanceof AbstractCpoNode) {
-      menuNode = (AbstractCpoNode)node;
+      final AbstractCpoNode menuNode = (AbstractCpoNode)node;
       menu.setLabel(menuNode.toString());
       if (menuNode instanceof CpoRootNode) {
         if (menuNode.isChildDirty() || menuNode.isChildNew() || menuNode.isChildRemove()) {
@@ -171,10 +170,11 @@ public class CpoBrowserTree extends JTree {
         });
         menu.add(jMenuRefresh);
       } else if (menuNode instanceof CpoClassNode) {
+        final CpoClassNode cpoClassNode = (CpoClassNode)menuNode;
         JMenuItem jMenuRename = new JMenuItem("Rename Class");
         jMenuRename.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae) {
-            renameCpoClassNode();
+            renameCpoClassNode(cpoClassNode);
           }
         });
         menu.add(jMenuRename);
@@ -182,7 +182,7 @@ public class CpoBrowserTree extends JTree {
         JMenuItem jMenuGenerateClass = new JMenuItem("Generate Class Source");
         jMenuGenerateClass.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae) {
-            generateClassSource();
+            generateClassSource(cpoClassNode);
           }
         });
         menu.add(jMenuGenerateClass);
@@ -190,15 +190,16 @@ public class CpoBrowserTree extends JTree {
         JMenuItem jMenuAddGroup = new JMenuItem("Add Function Group to Class");
         jMenuAddGroup.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae) {
-            addFunctionGroup();
+            addFunctionGroup((CpoFunctionGroupLabelNode)menuNode);
           }
         });
         menu.add(jMenuAddGroup);
       } else if (menuNode instanceof CpoFunctionGroupNode) {
+        final CpoFunctionGroupNode cpoFunctionGroupNode = (CpoFunctionGroupNode)menuNode;
         JMenuItem jMenuAddQuery = new JMenuItem("Add Function to Group");
         jMenuAddQuery.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae) {
-            addFunctionToGroup((CpoFunctionGroupNode)menuNode);
+            addFunctionToGroup(cpoFunctionGroupNode);
           }
         });
         menu.add(jMenuAddQuery);
@@ -206,7 +207,7 @@ public class CpoBrowserTree extends JTree {
         JMenuItem jMenuRenameQG = new JMenuItem("Rename Query Group");
         jMenuRenameQG.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae) {
-            renameFunctionGroup();
+            renameFunctionGroup(cpoFunctionGroupNode);
           }
         });
         menu.add(jMenuRenameQG);
@@ -246,7 +247,7 @@ public class CpoBrowserTree extends JTree {
     }
   }
 
-  private void addFunctionGroup() {
+  private void addFunctionGroup(CpoFunctionGroupLabelNode functionGroupLabelNode) {
     FunctionGroupPanel fgp = new FunctionGroupPanel();
     int result = JOptionPane.showConfirmDialog(this.getTopLevelAncestor(), fgp, "Create new Function Group", JOptionPane.OK_CANCEL_OPTION);
     if (result == JOptionPane.OK_OPTION) {
@@ -255,7 +256,7 @@ public class CpoBrowserTree extends JTree {
 
         String groupName = fgp.getGroupName().equals("") ? null : fgp.getGroupName();
 
-        CpoFunctionGroupNode cpoFunctionGroupNode = proxy.addFunctionGroup((CpoClassNode)menuNode, groupName, fgp.getGroupType());
+        CpoFunctionGroupNode cpoFunctionGroupNode = proxy.addFunctionGroup(functionGroupLabelNode.getParent(), groupName, fgp.getGroupType());
 
         // create a function to the group
         addFunctionToGroup(cpoFunctionGroupNode);
@@ -457,15 +458,15 @@ public class CpoBrowserTree extends JTree {
     CpoUtil.getInstance().setStatusBarText("Class (" + className + ") successfully saved");
   }
 
-  private void renameFunctionGroup() {
-    String result = (String)JOptionPane.showInputDialog(this.getTopLevelAncestor(), "Enter new group name", "Edit Group Name", JOptionPane.INFORMATION_MESSAGE, null, null, ((CpoFunctionGroupNode)menuNode).getGroupName());
+  private void renameFunctionGroup(CpoFunctionGroupNode cpoFunctionGroupNode) {
+    String result = (String)JOptionPane.showInputDialog(this.getTopLevelAncestor(), "Enter new group name", "Edit Group Name", JOptionPane.INFORMATION_MESSAGE, null, null, cpoFunctionGroupNode.getGroupName());
     if (result == null) {
       return;
     }
     if (result.equals("")) {
       result = null;
     }
-    ((CpoFunctionGroupNode)menuNode).setGroupName(result);
+    cpoFunctionGroupNode.setGroupName(result);
     CpoUtil.getInstance().setStatusBarText("Changed Group Name to: " + result);
   }
 
@@ -497,21 +498,21 @@ public class CpoBrowserTree extends JTree {
     this.getModel().nodeStructureChanged(rootNode);
   }
 
-  private void renameCpoClassNode() {
-    String result = (String)JOptionPane.showInputDialog(this.getTopLevelAncestor(), "Enter new class name", "Edit Class Name", JOptionPane.INFORMATION_MESSAGE, null, null, ((CpoClassNode)menuNode).getUserObject().getName());
+  private void renameCpoClassNode(CpoClassNode cpoClassNode) {
+    String result = (String)JOptionPane.showInputDialog(this.getTopLevelAncestor(), "Enter new class name", "Edit Class Name", JOptionPane.INFORMATION_MESSAGE, null, null, cpoClassNode.getUserObject().getName());
     if (result == null) {
       return;
     }
     if (result.equals("")) {
       result = null;
     }
-    ((CpoClassNode)menuNode).setClassName(result);
+    cpoClassNode.setClassName(result);
     CpoUtil.getInstance().setStatusBarText("Changed Class Name to: " + result);
   }
 
-  private void generateClassSource() {
+  private void generateClassSource(CpoClassNode cpoClassNode) {
     try {
-      this.saveClassSource((CpoClassNode)menuNode);
+      this.saveClassSource(cpoClassNode);
     } catch (Exception e) {
       CpoUtil.showException(e);
     }

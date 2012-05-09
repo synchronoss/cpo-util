@@ -60,6 +60,14 @@ public class CpoArgumentNode extends AbstractCpoNode {
     return getUserObject().getAttribute();
   }
 
+  public void setCpoAttribute(CpoAttribute cpoAttribute) {
+    if (cpoAttribute.equals(this.getCpoAttribute())) {
+      return;
+    }
+    getUserObject().setAttribute(cpoAttribute);
+    this.setDirty(true);
+  }
+
   /**
    * Returns the index of this node in relation
    */

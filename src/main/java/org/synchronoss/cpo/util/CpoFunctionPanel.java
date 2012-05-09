@@ -26,7 +26,6 @@ import org.synchronoss.cpo.meta.domain.CpoAttribute;
 import org.synchronoss.cpo.parser.ExpressionParser;
 
 import javax.swing.*;
-import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
@@ -57,8 +56,6 @@ public class CpoFunctionPanel extends JPanel {
 
   private JScrollPane jScrollExpression = new JScrollPane();
   private JTable jTableArgument;
-  private TableCellEditor editor;
-  private JComboBox jIOTypeBox;
   private JSplitPane jSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
   public CpoFunctionPanel(CpoFunctionNode cpoFunctionNode, CoreArgumentTableModel coreArgumentTableModel) {
@@ -149,22 +146,13 @@ public class CpoFunctionPanel extends JPanel {
 
     // the bottom panel
     jTableArgument = new JTable(coreArgumentTM);
-
-    jIOTypeBox = new JComboBox();
-    jIOTypeBox.addItem("IN");
-    jIOTypeBox.addItem("OUT");
-    jIOTypeBox.addItem("BOTH");
-    editor = new DefaultCellEditor(jIOTypeBox);
+    coreArgumentTM.initTableEditors(jTableArgument);
 
     JScrollPane jScrollTable = new JScrollPane();
     jScrollTable.getViewport().add(jTableArgument);
 
-    jTableArgument.setDefaultEditor(CpoAttribute.class, new CpoArgumentAttributeEditor(coreArgumentTM));
-    jTableArgument.setDefaultEditor(JComboBox.class, editor);
-
     jSplitPane.setBottomComponent(jScrollTable);
     // the bottom panel
-
   }
 
   private void checkExpressionLength() {

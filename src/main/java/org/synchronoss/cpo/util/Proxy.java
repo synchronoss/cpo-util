@@ -288,7 +288,7 @@ public abstract class Proxy {
     cpoClassNode.getUserObject().addFunctionGroup(cpoFunctionGroup);
 
     // add to the tree
-    cpoClassNode.add(cpoFunctionGroupNode);
+    cpoClassNode.getFunctionGroupLabelNode().add(cpoFunctionGroupNode);
     cpoFunctionGroupNode.setNew(true);
 
     return cpoFunctionGroupNode;
@@ -542,7 +542,7 @@ public abstract class Proxy {
           if (OUT.isDebugEnabled()) {
             OUT.debug("Notifying parent of node change (dirty and all else)");
           }
-          treeModel.nodeChanged(changedNode);
+          treeModel.nodeChanged(parent);
         } else if (notifier.isNew()) {
           if (OUT.isDebugEnabled()) {
             OUT.debug("Notifying parent (" + parent + ") of node insertion (" + changedNode + ")");

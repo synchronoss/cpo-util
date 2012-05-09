@@ -109,6 +109,7 @@ public class CoreAttributeTableModel extends AbstractTableModel  {
     } else if (columnIndex == 3) {
       cpoAttributeNode.setTransformClass(val);
     }
+    this.fireTableDataChanged();
   }
 
   public void removeRows(int[] rowIndex) {

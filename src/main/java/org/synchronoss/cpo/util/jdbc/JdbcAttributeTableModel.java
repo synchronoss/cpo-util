@@ -107,5 +107,7 @@ public class JdbcAttributeTableModel extends CoreAttributeTableModel {
     } else if (columnIndex == 5) {
       jdbcAttributeNode.setTransformClass(val);
     }
+
+    this.fireTableDataChanged();
   }
 }

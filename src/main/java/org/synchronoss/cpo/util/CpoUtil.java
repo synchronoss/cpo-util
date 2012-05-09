@@ -485,24 +485,6 @@ public class CpoUtil extends JFrame {
     }
   }
 
-  protected boolean editConnection(AbstractConnectionPanel panel, String title) {
-    int result = 0;
-    boolean complete = false;
-    while (result == JOptionPane.OK_OPTION && !complete) {
-      result = JOptionPane.showConfirmDialog(this, panel, title, JOptionPane.OK_CANCEL_OPTION);
-      if (result == JOptionPane.OK_OPTION) {
-        try {
-          CtDataSourceConfig dataSourceConfig = panel.createDataSourceConfig();
-          complete = true;
-          saveConfig();
-        } catch (CpoException ex) {
-          showErrorMessage(ex.getMessage());
-        }
-      }
-    }
-    return complete;
-  }
-
   private void editConActionPerformed(ActionEvent e) {
     CpoEditConnPanel cecp = new CpoEditConnPanel();
     JOptionPane.showConfirmDialog(this, cecp, "Edit Connections", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -704,7 +686,9 @@ public class CpoUtil extends JFrame {
       }
       return result;
     } catch (Exception ex) {
-      OUT.debug("Exception caught reading from url: " + ex);
+      if (OUT.isDebugEnabled()) {
+        OUT.debug("Exception caught reading from url: " + ex);
+      }
     }
 
     return null;

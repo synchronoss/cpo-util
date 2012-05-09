@@ -30,7 +30,7 @@
     </layout>
   </appender>
   <logger name="org.synchronoss">
-    <level value="DEBUG"/>
+    <level value="ERROR"/>
   </logger>
   <root>
     <priority value="ERROR"/>

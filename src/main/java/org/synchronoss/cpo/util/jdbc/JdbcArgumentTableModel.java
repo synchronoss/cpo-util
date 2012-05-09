@@ -21,16 +21,30 @@
 package org.synchronoss.cpo.util.jdbc;
 
 import org.synchronoss.cpo.jdbc.*;
-import org.synchronoss.cpo.meta.domain.CpoAttribute;
+import org.synchronoss.cpo.jdbc.cpoJdbcMeta.CtJdbcArgument;
 import org.synchronoss.cpo.util.*;
 
 import javax.swing.*;
+import javax.swing.table.TableCellEditor;
 import java.util.*;
 
 public class JdbcArgumentTableModel extends CoreArgumentTableModel {
 
   public JdbcArgumentTableModel(CpoFunctionNode cpoFunctionNode) {
     super(cpoFunctionNode);
+  }
+
+  @Override
+  public void initTableEditors(JTable table) {
+    super.initTableEditors(table);
+
+    JComboBox jIOTypeBox = new JComboBox();
+    jIOTypeBox.addItem(CtJdbcArgument.Scope.IN.toString());
+    jIOTypeBox.addItem(CtJdbcArgument.Scope.OUT.toString());
+    jIOTypeBox.addItem(CtJdbcArgument.Scope.BOTH.toString());
+
+    TableCellEditor editor = new DefaultCellEditor(jIOTypeBox);
+    table.setDefaultEditor(JComboBox.class, editor);
   }
 
   public List<String> getColumnNames() {
@@ -96,13 +110,11 @@ public class JdbcArgumentTableModel extends CoreArgumentTableModel {
     }
 
     JdbcArgumentNode jdbcArgumentNode = (JdbcArgumentNode)cpoArgumentNode;
-    JdbcCpoArgument jdbcArgument = jdbcArgumentNode.getUserObject();
 
     if (columnIndex == 1) {
-      jdbcArgument.setAttribute((CpoAttribute)aValue);
-    }
-    if (columnIndex == 4) {
-      jdbcArgument.setScope((String)aValue);
+      jdbcArgumentNode.setCpoAttribute((JdbcCpoAttribute)aValue);
+    } else if (columnIndex == 4) {
+      jdbcArgumentNode.setScope((String)aValue);
     }
     this.fireTableDataChanged();
   }
