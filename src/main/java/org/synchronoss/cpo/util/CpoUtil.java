@@ -564,6 +564,7 @@ public class CpoUtil extends JFrame {
       if (!configFile.exists()) {
         // file doesn't exist, let's make one
         cpoUtilConfigDocument = CpoUtilConfigDocument.Factory.newInstance();
+        cpoUtilConfigDocument.addNewCpoUtilConfig();
         saveConfig();
       } else {
         cpoUtilConfigDocument = CpoUtilConfigDocument.Factory.parse(configFile);
