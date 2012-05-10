@@ -26,13 +26,14 @@ import java.io.InputStream;
 import java.net.*;
 
 /**
- * User: Michael Bellomo
- * Date: Nov 7, 2009
- * Time: 9:14:41 PM
+ * @author  Michael Bellomo
+ * @since 11/7/2009
  */
 public class UrlLoader implements Runnable {
 
   private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+  public static final int TIMEOUT = 3000;
 
   private URL url;
   private InputStream connInputStream = null;
@@ -52,7 +53,7 @@ public class UrlLoader implements Runnable {
   public void run() {
     try {
       URLConnection conn = url.openConnection();
-      conn.setConnectTimeout(3000);
+      conn.setConnectTimeout(TIMEOUT);
       conn.connect();
 
       connInputStream = conn.getInputStream();

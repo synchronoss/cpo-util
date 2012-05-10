@@ -49,7 +49,6 @@ public class CpoUtilClasspathPanel extends JPanel  {
   }
 
   private void jbInit() throws Exception {
-    this.setSize(new Dimension(515, 387));
     this.setLayout(new GridBagLayout());
 
     JLabel jLabClasspath = new JLabel("Currently in Classpath");
@@ -90,7 +89,7 @@ public class CpoUtilClasspathPanel extends JPanel  {
   private void removeFile() {
     Object[] selectedFiles = this.jListClasspath.getSelectedValues();
     for (Object selectedFile : selectedFiles) {
-      classpathEntries.remove(selectedFile);
+      classpathEntries.remove((File)selectedFile);
     }
     this.jListClasspath.setListData(classpathEntries);
   }

@@ -35,6 +35,8 @@ import java.util.List;
 
 public class CpoFunctionPanel extends JPanel {
 
+  private final static int EXPRESSION_LINE_MAX_SIZE = 2000;
+
   private final static String expressionLineTooBigMsg = "The expression entered has lines containing more than 2000 characters.\n" +
                                                         "This might cause some tools such as sql plus not to be able to execute it.\n\n" +
                                                         "To solve this issue, add line breaks to the query.";
@@ -161,7 +163,7 @@ public class CpoFunctionPanel extends JPanel {
     // check for length, over 2499 characters and sql plus won't handle the query
     boolean hasBigChunk = false;
     for (String chunk : expression.split("\n")) {
-      if (chunk.length() > 2000) {
+      if (chunk.length() > EXPRESSION_LINE_MAX_SIZE) {
         hasBigChunk = true;
       }
     }

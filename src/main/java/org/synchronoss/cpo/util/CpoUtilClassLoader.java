@@ -74,7 +74,7 @@ public class CpoUtilClassLoader extends ClassLoader {
   }
 
   private byte[] loadClassData(String name) throws IOException {
-    for (File file : CpoUtil.getCustomClasspathEntries()) {
+    for (File file : CpoUtil.getInstance().getCustomClasspathEntries()) {
       if (file.isFile()) {
         if (file.getName().toLowerCase().endsWith(".jar")) {
           String filename = name.replace('.', '/') + ".class";

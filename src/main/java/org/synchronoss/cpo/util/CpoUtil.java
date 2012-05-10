@@ -37,6 +37,9 @@ import java.security.*;
 import java.util.*;
 import java.util.List;
 
+/**
+ * Main frame for CpoUtil.
+ */
 public class CpoUtil extends JFrame {
 
   private static Logger logger = LoggerFactory.getLogger(CpoUtil.class);
@@ -59,9 +62,10 @@ public class CpoUtil extends JFrame {
   public static final String COMPANY = "cpoutil.company";
   public static final String MINIMUM_VERSION = "cpoutil.minimumVersion";
 
+  private static final String SNAPSHOT = "-SNAPSHOT";
 
   // config
-  private static CtCpoUtilConfig cpoUtilConfig = null;
+  private CtCpoUtilConfig cpoUtilConfig = null;
 
   private File configFile = new File(CPOUTIL_CONFIG_DIR, CPOUTIL_CONFIG_FILE);
   private Properties props = new Properties();
@@ -70,21 +74,24 @@ public class CpoUtil extends JFrame {
   private static CpoUtil cpoUtil;
 
   // protected classes
-  private HashSet<String> protectedClasses = new HashSet<String>();
+  private Set<String> protectedClasses = new HashSet<String>();
 
   private JLabel statusBar = new JLabel();
 
-  private JPanel panelCenter = new JPanel();
   protected JTabbedPane jTabbedPane = new JTabbedPane();
   private int tabCounter = 0;
 
+  /**
+   * @return The static singleton instance
+   */
   public static CpoUtil getInstance() {
     return cpoUtil;
   }
 
-  public CpoUtil() {
-    cpoUtil = this;
-
+  /**
+   * Creates the CpoUtil
+   */
+  protected CpoUtil() {
     loadConfig();
     checkKillSwitch();
     loadProtectedClasses();
@@ -96,7 +103,7 @@ public class CpoUtil extends JFrame {
     }
 
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    Dimension frameSize = cpoUtil.getSize();
+    Dimension frameSize = this.getSize();
     if (frameSize.height > screenSize.height) {
       frameSize.height = screenSize.height;
     }
@@ -114,12 +121,16 @@ public class CpoUtil extends JFrame {
     this.setVisible(true);
   }
 
+  /**
+   * Constructs GUI
+   */
   private void jbInit() throws Exception {
     setIconImage(Toolkit.getDefaultToolkit().createImage(mainIcon));
-
     this.getContentPane().setLayout(new BorderLayout());
     this.setSize(new Dimension(1000, 800));
     this.setTitle("CPO Utility");
+
+    JPanel panelCenter = new JPanel();
     panelCenter.setLayout(new BorderLayout());
 
     // menu bar
@@ -243,6 +254,11 @@ public class CpoUtil extends JFrame {
     this.getContentPane().add(panelCenter, BorderLayout.CENTER);
   }
 
+  /**
+   * New action
+   *
+   * Creates a new meta xml file for the type supplied
+   */
   private void newMetaFile(SupportedType type) {
     JFileChooser jFileChooser = new JFileChooser();
     jFileChooser.setMultiSelectionEnabled(false);
@@ -269,6 +285,9 @@ public class CpoUtil extends JFrame {
     }
   }
 
+  /**
+   * Open action
+   */
   private void openActionPerformed() {
 
     JFileChooser jFileChooser = new JFileChooser();
@@ -313,6 +332,9 @@ public class CpoUtil extends JFrame {
     }
   }
 
+  /**
+   * Creates a new browser tab for the supplied proxy
+   */
   private void createNewBrowser(Proxy proxy) {
     try {
       CpoBrowserPanel browserPanel = new CpoBrowserPanel(proxy);
@@ -358,6 +380,9 @@ public class CpoUtil extends JFrame {
     }
   }
 
+  /**
+   * Save action
+   */
   private void saveActionPerformed() {
     int index = jTabbedPane.getSelectedIndex();
     if (index != -1) {
@@ -365,6 +390,9 @@ public class CpoUtil extends JFrame {
     }
   }
 
+  /**
+   * Save as action
+   */
   private void saveAsActionPerformed() {
     int index = jTabbedPane.getSelectedIndex();
     if (index != -1) {
@@ -389,6 +417,11 @@ public class CpoUtil extends JFrame {
     }
   }
 
+  /**
+   * Saves the meta xml data to the file specified.
+   *
+   * @param file The file to save to
+   */
   private void save(File file) {
     int index = jTabbedPane.getSelectedIndex();
     if (index != -1) {
@@ -399,10 +432,16 @@ public class CpoUtil extends JFrame {
     }
   }
 
+  /**
+   * Displays the about box
+   */
   private void aboutActionPerformed() {
     JOptionPane.showMessageDialog(this, new AboutBoxPanel(), "About", JOptionPane.PLAIN_MESSAGE);
   }
 
+  /**
+   * Creates a new connection
+   */
   private void newConnection(SupportedType type) {
     try {
       AbstractConnectionPanel panel = type.getConnectionPanelClass().newInstance();
@@ -433,6 +472,9 @@ public class CpoUtil extends JFrame {
     }
   }
 
+  /**
+   * Edits an existing connection
+   */
   protected void editConnection(String connectionName) {
 
     CtDataSourceConfig dataSourceConfig = getDataSourceConfig(connectionName);
@@ -477,24 +519,44 @@ public class CpoUtil extends JFrame {
     }
   }
 
+  /**
+   * Displays edit connection dialog
+   */
   private void editConActionPerformed() {
     CpoEditConnPanel cecp = new CpoEditConnPanel();
     JOptionPane.showConfirmDialog(this, cecp, "Edit Connections", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
   }
 
+  /**
+   * Unloads the custom classloader
+   */
   private void unloadCustomClassLoader() {
     CpoUtilClassLoader.unloadLoader();
     setStatusBarText("Classloader Unloaded - Meta Cache Refreshed On All Connected Servers");
   }
 
+  /**
+   * Sets the status bar text
+   * @param txt The text to display
+   */
   public void setStatusBarText(String txt) {
     statusBar.setText(txt);
   }
 
+  /**
+   * Returns the value of the property
+   *
+   * @param propertyName The name of the property
+   * @return The value of the property, null if it does not exist
+   */
   public String getProperty(String propertyName) {
     return props.getProperty(propertyName);
   }
 
+  /**
+   * Loads the configuration data from the CpoUtilConfig.xml file, along with the necessary properties,
+   * and bootstraping url if supplied.
+   */
   protected void loadConfig() {
     try {
       // user config
@@ -526,7 +588,7 @@ public class CpoUtil extends JFrame {
           UrlLoader loader = new UrlLoader(bootstrapUrl);
           Thread thread = new Thread(loader);
           thread.start();
-          thread.join(3000);
+          thread.join(UrlLoader.TIMEOUT);
 
           InputStream in = loader.getInputStream();
           if (in != null) {
@@ -549,7 +611,10 @@ public class CpoUtil extends JFrame {
     }
   }
 
-  public void saveConfig() {
+  /**
+   * Saves the config data
+   */
+  private void saveConfig() {
     CpoUtilConfigDocument doc = CpoUtilConfigDocument.Factory.newInstance();
     CtCpoUtilConfig config = doc.addNewCpoUtilConfig();
     config.set(cpoUtilConfig);
@@ -568,7 +633,11 @@ public class CpoUtil extends JFrame {
     }
   }
 
-  protected void checkKillSwitch() {
+  /**
+   * Performs a version check against the minimum version.  This is used to force the user to
+   * upgrade before using the application.
+   */
+  private void checkKillSwitch() {
     String minimumVersion = props.getProperty(MINIMUM_VERSION);
     if (logger.isDebugEnabled()) {
       logger.debug("Minimum version: " + minimumVersion);
@@ -576,8 +645,8 @@ public class CpoUtil extends JFrame {
     if (minimumVersion != null) {
       // if it's a snapshot, strip the -SNAPSHOT
       String version = props.getProperty(VERSION);
-      if (version.endsWith("-SNAPSHOT")) {
-        version = version.substring(0, version.length() - 9);
+      if (version.endsWith(SNAPSHOT)) {
+        version = version.substring(0, version.length() - SNAPSHOT.length());
       }
 
       // if the version is something like 2.9.1, use 2.9 as the version, the .1 is a minor rev
@@ -615,6 +684,9 @@ public class CpoUtil extends JFrame {
     }
   }
 
+  /**
+   * Loads the protected classes
+   */
   private void loadProtectedClasses() {
     if (props == null) {
       return;
@@ -663,7 +735,7 @@ public class CpoUtil extends JFrame {
       UrlLoader loader = new UrlLoader(url);
       Thread thread = new Thread(loader);
       thread.start();
-      thread.join(3000);
+      thread.join(UrlLoader.TIMEOUT);
 
       InputStream in = loader.getInputStream();
       if (in != null) {
@@ -686,7 +758,10 @@ public class CpoUtil extends JFrame {
     return null;
   }
 
-  protected void saveProtectedClasses() {
+  /**
+   * Saves the protected classes
+   */
+  private void saveProtectedClasses() {
     if (protectedClasses == null) {
       return;
     }
@@ -704,7 +779,10 @@ public class CpoUtil extends JFrame {
     saveConfig();
   }
 
-  public static List<File> getCustomClasspathEntries() {
+  /**
+   * @return List of custom classpath entries
+   */
+  protected List<File> getCustomClasspathEntries() {
     // Custom classpath
     List<File> files = new ArrayList<File>();
     if (cpoUtilConfig.isSetCustomClasspath()) {
@@ -716,6 +794,11 @@ public class CpoUtil extends JFrame {
     return files;
   }
 
+  /**
+   * Displays the custom classpath dialog
+   *
+   * @param message Message to use in the custom classpath dialog
+   */
   public void setCustomClasspath(String message) {
     CpoUtilClasspathPanel cpp = new CpoUtilClasspathPanel(getCustomClasspathEntries());
     int result = JOptionPane.showConfirmDialog(this, cpp, message, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -742,6 +825,9 @@ public class CpoUtil extends JFrame {
     }
   }
 
+  /**
+   * @return List of CtDataSourceConfig objects that are configured
+   */
   public List<CtDataSourceConfig> getDataSourceConfigs() {
     List<CtDataSourceConfig> result = new ArrayList<CtDataSourceConfig>();
     if (cpoUtilConfig.isSetDataConfigs()) {
@@ -750,6 +836,9 @@ public class CpoUtil extends JFrame {
     return result;
   }
 
+  /**
+   * @return CtDataSourceConfig object with the given name, null if none exists
+   */
   public CtDataSourceConfig getDataSourceConfig(String name) {
     if (cpoUtilConfig.isSetDataConfigs()) {
       for (CtDataSourceConfig dataSourceConfig : cpoUtilConfig.getDataConfigs().getDataConfigArray()) {
@@ -761,6 +850,9 @@ public class CpoUtil extends JFrame {
     return null;
   }
 
+  /**
+   * @return Vector of connection names
+   */
   protected Vector<String> getConnectionList() {
     Vector<String> result = new Vector<String>();
     for (CtDataSourceConfig dataSourceConfig : getDataSourceConfigs()) {
@@ -770,6 +862,11 @@ public class CpoUtil extends JFrame {
     return result;
   }
 
+  /**
+   * Adds a new connection to the configuration
+   *
+   * @param dataSourceConfig The connection to add
+   */
   protected void addConnection(CtDataSourceConfig dataSourceConfig) {
     if (!cpoUtilConfig.isSetDataConfigs()) {
       cpoUtilConfig.addNewDataConfigs();
@@ -779,6 +876,11 @@ public class CpoUtil extends JFrame {
     saveConfig();
   }
 
+  /**
+   * Deletes a connection from the configuration
+   *
+   * @param connectionName The connection to delete
+   */
   protected void removeConnection(String connectionName) {
     int index = 0;
     int connectionNameIndex = -1;
@@ -863,6 +965,11 @@ public class CpoUtil extends JFrame {
   }
 
   // Some static helper methods for displaying messages
+
+  /**
+   * Displays an exception dialog box
+   * @param e The exception to display
+   */
   public static void showException(Throwable e) {
     if (logger.isDebugEnabled()) {
       logger.debug("Exception caught", e);
@@ -870,10 +977,18 @@ public class CpoUtil extends JFrame {
     JOptionPane.showMessageDialog(CpoUtil.getInstance(), new ExceptionPanel(e), "Exception Caught!", JOptionPane.PLAIN_MESSAGE);
   }
 
+  /**
+   * Displays a message
+   * @param message The message to display
+   */
   public static void showMessage(String message) {
     JOptionPane.showMessageDialog(CpoUtil.getInstance(), message);
   }
 
+  /**
+   * Displays an error message
+   * @param message The error message to display
+   */
   public static void showErrorMessage(String message) {
     JOptionPane.showMessageDialog(CpoUtil.getInstance(), message, "Error", JOptionPane.ERROR_MESSAGE);
   }
@@ -899,6 +1014,8 @@ public class CpoUtil extends JFrame {
       public void refresh() {
       }
     });
-    new CpoUtil();
+
+    // save the reference
+    cpoUtil = new CpoUtil();
   }
 }

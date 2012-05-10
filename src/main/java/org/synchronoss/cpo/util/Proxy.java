@@ -597,12 +597,14 @@ public abstract class Proxy {
    */
   public List<CpoAttribute> createAttributesFromClass(String className) throws CpoException, ClassNotFoundException {
 
+    String getMethodPrefix = "get";
+
     List<CpoAttribute> attributes = new ArrayList<CpoAttribute>();
 
     Method[] methods = CpoUtilClassLoader.getInstance(this.getClass().getClassLoader()).loadClass(className).getMethods();
     for (Method method : methods) {
-      if (method.getName().startsWith("get")) {
-        String attributeName = method.getName().substring(3);
+      if (method.getName().startsWith(getMethodPrefix)) {
+        String attributeName = method.getName().substring(getMethodPrefix.length());
 
         CpoAttribute attribute = createCpoAttribute();
         attribute.setJavaName(attributeName);
