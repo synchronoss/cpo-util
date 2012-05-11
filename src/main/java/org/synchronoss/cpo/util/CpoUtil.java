@@ -24,6 +24,7 @@ import org.apache.xmlbeans.*;
 import org.slf4j.*;
 import org.synchronoss.cpo.CpoException;
 import org.synchronoss.cpo.core.cpoCoreConfig.CtDataSourceConfig;
+import org.synchronoss.cpo.helper.XmlBeansHelper;
 import org.synchronoss.cpo.meta.domain.CpoClass;
 import org.synchronoss.cpo.util.cpoUtilConfig.*;
 
@@ -619,15 +620,8 @@ public class CpoUtil extends JFrame {
     CtCpoUtilConfig config = doc.addNewCpoUtilConfig();
     config.set(cpoUtilConfig);
 
-    XmlOptions xo = new XmlOptions();
-    xo.setCharacterEncoding("utf-8");
-    xo.setSaveAggressiveNamespaces();
-    xo.setSaveNamespacesFirst();
-    xo.setSavePrettyPrint();
-    xo.setUseDefaultNamespace();
-
     try {
-      doc.save(configFile, xo);
+      doc.save(configFile, XmlBeansHelper.getXmlOptions());
     } catch (Exception ex) {
       showException(ex);
     }
