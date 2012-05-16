@@ -26,6 +26,7 @@ import org.synchronoss.cpo.CpoException;
 import org.synchronoss.cpo.core.cpoCoreConfig.CtDataSourceConfig;
 import org.synchronoss.cpo.helper.XmlBeansHelper;
 import org.synchronoss.cpo.meta.domain.CpoClass;
+import org.synchronoss.cpo.util.conversion.ConvertCpoUtilLocalProperties;
 import org.synchronoss.cpo.util.cpoUtilConfig.*;
 
 import javax.swing.*;
@@ -565,7 +566,18 @@ public class CpoUtil extends JFrame {
       if (!configFile.exists()) {
         // file doesn't exist, let's make one
         cpoUtilConfigDocument = CpoUtilConfigDocument.Factory.newInstance();
-        cpoUtilConfig = cpoUtilConfigDocument.addNewCpoUtilConfig();
+
+        // first, try to convert if they have the old style file
+        try {
+          cpoUtilConfig = ConvertCpoUtilLocalProperties.convert();
+        } catch (CpoException ex) {
+          showException(ex);
+        }
+
+        // if null here, then it couldn't be converted for some reason, so just make a fresh one
+        if (cpoUtilConfig == null)  {
+          cpoUtilConfig = cpoUtilConfigDocument.addNewCpoUtilConfig();
+        }
         saveConfig();
       } else {
         cpoUtilConfigDocument = CpoUtilConfigDocument.Factory.parse(configFile);
