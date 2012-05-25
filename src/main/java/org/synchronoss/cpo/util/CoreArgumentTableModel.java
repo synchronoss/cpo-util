@@ -75,7 +75,7 @@ public class CoreArgumentTableModel extends AbstractTableModel {
 
   @Override
   public boolean isCellEditable(int rowIndex, int columnIndex) {
-    return (columnIndex == 1 || columnIndex==4);
+    return (columnIndex == 1);
   }
 
   @Override

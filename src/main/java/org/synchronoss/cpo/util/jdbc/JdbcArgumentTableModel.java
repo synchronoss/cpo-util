@@ -48,12 +48,17 @@ public class JdbcArgumentTableModel extends CoreArgumentTableModel {
   }
 
   public List<String> getColumnNames() {
-    return Arrays.asList("Seq Num", "Attribute", "Data Name", "Data Type", "In/Out/Both", "DB Table", "DB Column", "Transform Class", "Changed?");
+    return Arrays.asList("Seq Num", "Attribute", "Data Name", "Data Type", "Scope", "Type Info", "DB Table", "DB Column", "Transform Class", "Changed?");
   }
 
   public List<Class<?>> getColumnClasses() {
-    Class<?>[] columnClasses = {String.class, JdbcCpoAttribute.class, String.class, String.class, JComboBox.class, String.class, String.class, String.class, String.class};
+    Class<?>[] columnClasses = {String.class, JdbcCpoAttribute.class, String.class, String.class, JComboBox.class, String.class, String.class, String.class, String.class, String.class};
     return Arrays.asList(columnClasses);
+  }
+
+  @Override
+  public boolean isCellEditable(int rowIndex, int columnIndex) {
+    return (columnIndex == 1 || columnIndex == 4 || columnIndex == 5);
   }
 
   @Override
@@ -66,7 +71,6 @@ public class JdbcArgumentTableModel extends CoreArgumentTableModel {
     }
 
     JdbcArgumentNode jdbcArgumentNode = (JdbcArgumentNode)cpoArgumentNode;
-    JdbcCpoArgument jdbcArgument = jdbcArgumentNode.getUserObject();
     JdbcCpoAttribute jdbcAttribute = jdbcArgumentNode.getCpoAttribute();
 
     if (columnIndex == 0) {
@@ -78,14 +82,16 @@ public class JdbcArgumentTableModel extends CoreArgumentTableModel {
     } else if (columnIndex == 3) {
       return jdbcAttribute != null ? jdbcAttribute.getDataType() : null;
     } else if (columnIndex == 4) {
-      return jdbcArgument.getScope();
+      return jdbcArgumentNode.getScope();
     } else if (columnIndex == 5) {
-      return jdbcAttribute != null ? jdbcAttribute.getDbTable() : null;
+      return jdbcArgumentNode.getTypeInfo();
     } else if (columnIndex == 6) {
-      return jdbcAttribute != null ? jdbcAttribute.getDbColumn() : null;
+      return jdbcAttribute != null ? jdbcAttribute.getDbTable() : null;
     } else if (columnIndex == 7) {
-      return jdbcAttribute != null ? jdbcAttribute.getTransformClassName() : null;
+      return jdbcAttribute != null ? jdbcAttribute.getDbColumn() : null;
     } else if (columnIndex == 8) {
+      return jdbcAttribute != null ? jdbcAttribute.getTransformClassName() : null;
+    } else if (columnIndex == 9) {
       if (cpoArgumentNode.isNew()) {
         return "New";
       } else if (cpoArgumentNode.isRemove()) {
@@ -115,6 +121,8 @@ public class JdbcArgumentTableModel extends CoreArgumentTableModel {
       jdbcArgumentNode.setCpoAttribute((JdbcCpoAttribute)aValue);
     } else if (columnIndex == 4) {
       jdbcArgumentNode.setScope((String)aValue);
+    } else if (columnIndex == 5) {
+      jdbcArgumentNode.setTypeInfo((String)aValue);
     }
     this.fireTableDataChanged();
   }

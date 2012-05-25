@@ -48,6 +48,20 @@ public class JdbcArgumentNode extends CpoArgumentNode {
     }
   }
 
+  public String getTypeInfo() {
+    return getUserObject().getTypeInfo();
+  }
+
+  public void setTypeInfo(String value) {
+    if (this.getTypeInfo() == null && value == null)
+      return;
+
+    if (this.getTypeInfo() == null || value == null || !value.equals(this.getTypeInfo())) {
+      getUserObject().setTypeInfo(value);
+      this.setDirty(true);
+    }
+  }
+
   public JdbcCpoAttribute getCpoAttribute() {
     return getUserObject().getAttribute();
   }
