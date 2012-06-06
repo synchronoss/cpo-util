@@ -120,9 +120,7 @@ public class CpoFunctionPanel extends JPanel {
     });
     jTextAExpression.addKeyListener(new KeyAdapter() {
       public void keyReleased(KeyEvent ke) {
-        if (cpoFunctionNode.getExpression() != null) {
-          checkExpression();
-        }
+        checkExpression();
       }
     });
     jTextAExpression.addMouseListener(new MouseAdapter() {
@@ -174,10 +172,6 @@ public class CpoFunctionPanel extends JPanel {
   }
 
   private void checkExpression() {
-    if (jTextAExpression.getText().length() < 1) {
-      return;
-    }
-
     try {
       ExpressionParser expressionParser = cpoFunctionNode.getProxy().getExpressionParser(jTextAExpression.getText());
       int tokenCount = expressionParser.countArguments();

@@ -47,11 +47,11 @@ public class CpoRootNode extends AbstractCpoNode {
   }
 
   public List<AbstractCpoNode> getChangedNodes() {
-    List<AbstractCpoNode> changedNodes = new ArrayList<AbstractCpoNode>();
+    Set<AbstractCpoNode> changedNodes = new HashSet<AbstractCpoNode>();
     changedNodes.addAll(newChildren);
     changedNodes.addAll(dirtyChildren);
     changedNodes.addAll(removeChildren);
-    return changedNodes;
+    return new ArrayList<AbstractCpoNode>(changedNodes);
   }
 
   public boolean isUnsaved() {

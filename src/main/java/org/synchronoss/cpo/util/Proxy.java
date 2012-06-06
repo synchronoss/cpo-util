@@ -242,7 +242,10 @@ public abstract class Proxy {
    * Creates a new cpo function
    */
   protected CpoFunction createCpoFunction() throws CpoException {
-    return metaDescriptor.createCpoFunction();
+    CpoFunction function = metaDescriptor.createCpoFunction();
+    // make sure we set an expression
+    function.setExpression("");
+    return function;
   }
 
   /**

@@ -61,7 +61,7 @@ public class SaveNodesTableModel extends AbstractTableModel {
   public Object getValueAt(int rowIndex, int columnIndex) {
     if (columnIndex == 0) {
       String className = changedObjects.get(rowIndex).getClass().getName();
-      return className.substring(className.lastIndexOf("."));
+      return className.substring(className.lastIndexOf(".") + 1);
     } else if (columnIndex == 1) {
       return changedObjects.get(rowIndex).toString();
     } else if (columnIndex == 2) {
