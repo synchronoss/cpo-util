@@ -25,6 +25,8 @@ import java.util.*;
 
 public class CpoRootNode extends AbstractCpoNode {
 
+  private boolean displayShortClassName = false;
+
   public CpoRootNode(Proxy proxy) {
     super(proxy);
   }
@@ -63,5 +65,13 @@ public class CpoRootNode extends AbstractCpoNode {
       return true;
 
     return false;
+  }
+
+  public void toggleClassNames() {
+    this.displayShortClassName = !displayShortClassName;
+  }
+
+  public boolean isDisplayShortClassName() {
+    return this.displayShortClassName;
   }
 }

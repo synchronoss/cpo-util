@@ -28,8 +28,6 @@ import java.util.Enumeration;
 
 public class CpoClassNode extends AbstractCpoNode implements Comparable<CpoClassNode> {
 
-  private boolean displayShortClassName = false;
-
   public CpoClassNode(CpoClass cpoClass) {
     super(cpoClass);
     createLabelNodes();
@@ -91,14 +89,9 @@ public class CpoClassNode extends AbstractCpoNode implements Comparable<CpoClass
   public void performRemove() throws CpoException {
     getProxy().removeClass(this);
   }
-
-  public void toggleClassNames() {
-    this.displayShortClassName = !displayShortClassName;
-  }
-
   public String getDisplayClassName() {
     String className = getUserObject().getName();
-    if (displayShortClassName && className.lastIndexOf(".") != -1 && className.length() > className.lastIndexOf(".") + 1) {
+    if (getParent().isDisplayShortClassName() && className.lastIndexOf(".") != -1 && className.length() > className.lastIndexOf(".") + 1) {
       return className.substring(className.lastIndexOf(".") + 1);
     }
     return className;

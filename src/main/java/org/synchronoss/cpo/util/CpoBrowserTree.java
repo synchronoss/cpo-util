@@ -371,16 +371,7 @@ public class CpoBrowserTree extends JTree {
       }
     }
 
-    try {
-      CpoClassNode cpoClassNode = proxy.addClass(className);
-      proxy.addAttributes(cpoClassNode, attributes);
-
-      saveClassSource(cpoClassNode);
-
-      CpoUtil.getInstance().setStatusBarText("Class (" + cpoClassNode.getUserObject().getClass().getName() + ") successfully created");
-    } catch (Exception pe) {
-      CpoUtil.showException(pe);
-    }
+    createNewClass(className, attributes);
   }
 
   private void createNewCpoClass() {
@@ -412,11 +403,21 @@ public class CpoBrowserTree extends JTree {
       }
     }
 
+    createNewClass(className, attributes);
+  }
+
+  private void createNewClass(String className, List<CpoAttribute> attributes) {
     try {
+      Proxy proxy = getRoot().getProxy();
       CpoClassNode cpoClassNode = proxy.addClass(className);
       proxy.addAttributes(cpoClassNode, attributes);
 
       saveClassSource(cpoClassNode);
+
+      // try to expand and select the node
+      DefaultTreeModel model = getModel();
+      this.expandPath(new TreePath(model.getPathToRoot(cpoClassNode)));
+      this.setSelectionPath(new TreePath(cpoClassNode));
 
       CpoUtil.getInstance().setStatusBarText("Class (" + cpoClassNode.getUserObject().getClass().getName() + ") successfully created");
     } catch (Exception pe) {
@@ -472,13 +473,13 @@ public class CpoBrowserTree extends JTree {
 
   public void toggleClassnames() {
     CpoRootNode rootNode = getRoot();
-    List<CpoClassNode> nodes = new ArrayList<CpoClassNode>();
 
+    // toggle the class name display
+    rootNode.toggleClassNames();
+
+    List<CpoClassNode> nodes = new ArrayList<CpoClassNode>();
     while (rootNode.getChildCount() > 0) {
       CpoClassNode node = (CpoClassNode)rootNode.getChildAt(0);
-
-      // toggle the class name display
-      node.toggleClassNames();
 
       // add to the list
       nodes.add(node);
