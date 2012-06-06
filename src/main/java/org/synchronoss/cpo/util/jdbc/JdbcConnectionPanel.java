@@ -253,7 +253,7 @@ import java.util.StringTokenizer;
     jdbcConfig.setName(connectionName);
 
     CtMetaDescriptor metaDescriptor = jdbcConfig.addNewMetaDescriptor();
-    if (myConfig.getMetaDescriptor() != null) {
+    if (myConfig != null && myConfig.getMetaDescriptor() != null) {
       metaDescriptor.set(myConfig.getMetaDescriptor());
     } else {
       metaDescriptor.setName(DEFAULT_META_DESCRIPTOR);
