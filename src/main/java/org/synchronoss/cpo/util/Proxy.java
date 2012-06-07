@@ -515,15 +515,19 @@ public abstract class Proxy {
     Enumeration functionGroupNodes = cpoAttributeNode.getParent().getParent().getFunctionGroupLabelNode().children();
     while (functionGroupNodes.hasMoreElements()) {
       CpoFunctionGroupNode functionGroupNode = (CpoFunctionGroupNode)functionGroupNodes.nextElement();
-      CpoFunctionGroup functionGroup = functionGroupNode.getUserObject();
-      Enumeration functionNodes = functionGroupNode.children();
-      while (functionNodes.hasMoreElements()) {
-        CpoFunctionNode functionNode = (CpoFunctionNode)functionNodes.nextElement();
-        Enumeration argumentNodes = functionNode.children();
-        while (argumentNodes.hasMoreElements()) {
-          CpoArgumentNode argumentNode = (CpoArgumentNode)argumentNodes.nextElement();
-          if (argumentNode.getUserObject().getAttributeName().equals(cpoAttributeNode.getUserObject().getJavaName())) {
-            functionGroups.add(functionGroup);
+
+      // if we're deleting the function group, then we don't care
+      if (!functionGroupNode.isRemove()) {
+        CpoFunctionGroup functionGroup = functionGroupNode.getUserObject();
+        Enumeration functionNodes = functionGroupNode.children();
+        while (functionNodes.hasMoreElements()) {
+          CpoFunctionNode functionNode = (CpoFunctionNode)functionNodes.nextElement();
+          Enumeration argumentNodes = functionNode.children();
+          while (argumentNodes.hasMoreElements()) {
+            CpoArgumentNode argumentNode = (CpoArgumentNode)argumentNodes.nextElement();
+            if (argumentNode.getUserObject().getAttributeName().equals(cpoAttributeNode.getUserObject().getJavaName())) {
+              functionGroups.add(functionGroup);
+            }
           }
         }
       }
