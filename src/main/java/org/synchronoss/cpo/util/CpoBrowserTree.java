@@ -329,8 +329,8 @@ public class CpoBrowserTree extends JTree {
 
       this.setModel(proxy.createTreeModel());
 
-      // force a toggle - this will sort the names
-      toggleClassnames();
+      // force a sort
+      sortClasses();
 
       // force a selection on the root node
       TreePath tp = new TreePath(getModel().getRoot());
@@ -476,6 +476,12 @@ public class CpoBrowserTree extends JTree {
 
     // toggle the class name display
     rootNode.getProxy().toggleClassNames();
+
+    sortClasses();
+  }
+
+  private void sortClasses() {
+    CpoRootNode rootNode = getRoot();
 
     List<CpoClassNode> nodes = new ArrayList<CpoClassNode>();
     for (int i = 0; i < rootNode.getChildCount(); i++) {
