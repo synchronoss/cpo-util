@@ -89,9 +89,10 @@ public class CpoClassNode extends AbstractCpoNode implements Comparable<CpoClass
   public void performRemove() throws CpoException {
     getProxy().removeClass(this);
   }
+
   public String getDisplayClassName() {
     String className = getUserObject().getName();
-    if (getParent().isDisplayShortClassName() && className.lastIndexOf(".") != -1 && className.length() > className.lastIndexOf(".") + 1) {
+    if (getProxy().isDisplayShortClassName() && className.lastIndexOf(".") != -1 && className.length() > className.lastIndexOf(".") + 1) {
       return className.substring(className.lastIndexOf(".") + 1);
     }
     return className;

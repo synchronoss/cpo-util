@@ -475,24 +475,25 @@ public class CpoBrowserTree extends JTree {
     CpoRootNode rootNode = getRoot();
 
     // toggle the class name display
-    rootNode.toggleClassNames();
+    rootNode.getProxy().toggleClassNames();
 
     List<CpoClassNode> nodes = new ArrayList<CpoClassNode>();
-    while (rootNode.getChildCount() > 0) {
-      CpoClassNode node = (CpoClassNode)rootNode.getChildAt(0);
+    for (int i = 0; i < rootNode.getChildCount(); i++) {
+      CpoClassNode node = (CpoClassNode)rootNode.getChildAt(i);
 
       // add to the list
       nodes.add(node);
-
-      // unlink from the root
-      rootNode.remove(node);
     }
 
     // sort them - note that this sorts by display name so it will work both for long and short names
     Collections.sort(nodes);
 
+    // unlink from the root
+    rootNode.removeAllChildren();
+
     // link them back into the tree
     for (CpoClassNode node : nodes) {
+      // relink
       rootNode.add(node);
     }
 

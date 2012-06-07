@@ -57,6 +57,9 @@ public abstract class Proxy {
   // the tree model
   protected DefaultTreeModel treeModel = null;
 
+  // short or long class names
+  private boolean displayShortClassName = false;
+
   protected Proxy() {
     super();
   }
@@ -204,6 +207,14 @@ public abstract class Proxy {
     } catch (CpoException ex) {
       CpoUtil.showException(ex);
     }
+  }
+
+  public void toggleClassNames() {
+    this.displayShortClassName = !displayShortClassName;
+  }
+
+  public boolean isDisplayShortClassName() {
+    return this.displayShortClassName;
   }
 
   /**
