@@ -52,6 +52,7 @@ public class CpoUtil extends JFrame {
   private static final String CPOUTIL_CONFIG_DIRNAME = ".cpoutil";
   private static final File CPOUTIL_CONFIG_DIR = new File(System.getProperties().getProperty("user.home"), CPOUTIL_CONFIG_DIRNAME);
   private static final String CPOUTIL_CONFIG_FILE = "CpoUtilConfig.xml";
+  private static final File configFile = new File(CPOUTIL_CONFIG_DIR, CPOUTIL_CONFIG_FILE);
   private static final String CPOUTIL_PROPERTIES_FILE = "cpoutil.properties";
 
   private static final String BOOTSTRAP_URL_PROP = "cpoutil.bootstrapUrl";
@@ -69,7 +70,6 @@ public class CpoUtil extends JFrame {
   // config
   private CtCpoUtilConfig cpoUtilConfig = null;
 
-  private File configFile = new File(CPOUTIL_CONFIG_DIR, CPOUTIL_CONFIG_FILE);
   private Properties props = new Properties();
 
   // reference to the CpoUtil frame
@@ -628,6 +628,12 @@ public class CpoUtil extends JFrame {
    * Saves the config data
    */
   private void saveConfig() {
+
+    // if the .cpoutil folder isn't there, make it
+    if (!CPOUTIL_CONFIG_DIR.exists()) {
+      CPOUTIL_CONFIG_DIR.mkdir();
+    }
+
     CpoUtilConfigDocument doc = CpoUtilConfigDocument.Factory.newInstance();
     CtCpoUtilConfig config = doc.addNewCpoUtilConfig();
     config.set(cpoUtilConfig);
