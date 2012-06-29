@@ -371,7 +371,7 @@ public class CpoBrowserTree extends JTree {
       }
     }
 
-    createNewClass(className, attributes);
+    createNewClass(className, attributes, false);
   }
 
   private void createNewCpoClass() {
@@ -381,6 +381,7 @@ public class CpoBrowserTree extends JTree {
 
     String className = null;
     List<CpoAttribute> attributes = new ArrayList<CpoAttribute>();
+    boolean generateClassSource = false;
 
     boolean happy = false;
     while (!happy) {
@@ -390,6 +391,7 @@ public class CpoBrowserTree extends JTree {
         try {
           className = cncp.getClassName();
           attributes = proxy.createAttributesFromExpression(cncp.getConnection(), cncp.getExpression());
+          generateClassSource = cncp.isGenerateSource();
           happy = true;
         } catch (Exception pe) {
           CpoUtil.showException(pe);
@@ -403,16 +405,18 @@ public class CpoBrowserTree extends JTree {
       }
     }
 
-    createNewClass(className, attributes);
+    createNewClass(className, attributes, generateClassSource);
   }
 
-  private void createNewClass(String className, List<CpoAttribute> attributes) {
+  private void createNewClass(String className, List<CpoAttribute> attributes, boolean generateClassSource) {
     try {
       Proxy proxy = getRoot().getProxy();
       CpoClassNode cpoClassNode = proxy.addClass(className);
       proxy.addAttributes(cpoClassNode, attributes);
 
-      saveClassSource(cpoClassNode);
+      if (generateClassSource) {
+        saveClassSource(cpoClassNode);
+      }
 
       // try to expand and select the node
       DefaultTreeModel model = getModel();

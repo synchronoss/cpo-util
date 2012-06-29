@@ -126,7 +126,6 @@ public class CoreArgumentTableModel extends AbstractTableModel {
       CpoArgumentNode cpoArgumentNode = (CpoArgumentNode)cpoFunctionNode.getChildAt(i);
       if (cpoArgumentNode.isNew()) {
         cpoArgumentNode.setRemove(true);
-        cpoFunctionNode.remove(cpoArgumentNode);
         this.fireTableDataChanged();
         return;
       }

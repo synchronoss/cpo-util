@@ -695,6 +695,10 @@ public abstract class Proxy {
           logger.debug("Index: " + index + " size: " + notifier.getParent().getChildCount());
         }
         if (notifier.isRemove()) {
+          if (notifier.isNew() && notifier.isRemove()) {
+            // if it was new and is being removed, remove it from the parent
+            parent.remove(notifier);
+          }
           if (notifier.isNew() && !parent.isLeaf()) {
             if (logger.isDebugEnabled()) {
               logger.debug("Notifying non-leaf parent of node removal");

@@ -229,14 +229,8 @@ public class CpoAttributePanel extends JPanel  {
       nodesToRemove.add(cpoAttributeNode);
     }
 
-
     for (CpoAttributeNode node : nodesToRemove) {
       node.setRemove(true);
-
-      if (node.isNew() && node.isRemove()) {
-        // if it was new and is being removed, remove it from the table
-        cpoAttLabNode.remove(node);
-      }
     }
 
     model.fireTableDataChanged();
