@@ -252,11 +252,10 @@ import java.util.StringTokenizer;
     CtJdbcConfig jdbcConfig = newDataSourceConfig();
     jdbcConfig.setName(connectionName);
 
-    CtMetaDescriptor metaDescriptor = jdbcConfig.addNewMetaDescriptor();
-    if (myConfig != null && myConfig.getMetaDescriptor() != null) {
-      metaDescriptor.set(myConfig.getMetaDescriptor());
+    if (myConfig != null && myConfig.getMetaDescriptorName() != null) {
+      jdbcConfig.setMetaDescriptorName(myConfig.getMetaDescriptorName());
     } else {
-      metaDescriptor.setName(DEFAULT_META_DESCRIPTOR);
+      jdbcConfig.setMetaDescriptorName(DEFAULT_META_DESCRIPTOR);
     }
 
     jdbcConfig.setCpoConfigProcessor(this.getConfigProcessor());

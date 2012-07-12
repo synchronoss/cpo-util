@@ -139,8 +139,7 @@ public class ConvertCpoUtilLocalProperties {
           CtJdbcConfig jdbcConfig = CtJdbcConfig.Factory.newInstance();
           jdbcConfig.setName(server);
           jdbcConfig.setCpoConfigProcessor(JDBC_CONFIG_PROCESSOR);
-          CtMetaDescriptor metaDescriptor = jdbcConfig.addNewMetaDescriptor();
-          metaDescriptor.setName(DEFAULT_META_DESCRIPTOR);
+          jdbcConfig.setMetaDescriptorName(DEFAULT_META_DESCRIPTOR);
 
           CtJdbcReadWriteConfig rwc = jdbcConfig.addNewReadWriteConfig();
           rwc.setUser(userName);
