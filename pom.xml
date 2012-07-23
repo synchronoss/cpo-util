@@ -4,7 +4,7 @@
   <groupId>org.synchronoss.cpo</groupId>
   <artifactId>cpoUtil</artifactId>
   <name>cpoUtil</name>
-  <version>5.0.0-SNAPSHOT</version>
+  <version>5.0.0</version>
   <description>cpoUtil is the utility that configures the metadata for cpo</description>
   <packaging>jar</packaging>
   <url>http://cpo.sourceforge.net/cpo-util-sourceforge/</url>
@@ -23,7 +23,7 @@
   <properties>
     <currentVersion>${project.version}</currentVersion>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <cpoutil.bootstrapUrl/>
+    <cpoutil.bootstrapUrl />
     <cpo.assembly.id>dist</cpo.assembly.id>
     <cpo.onejar.filename>${project.build.finalName}.one-jar.jar</cpo.onejar.filename>
     <cpo.osx.filename>${project.build.finalName}.dmg</cpo.osx.filename>
@@ -172,9 +172,9 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/trunk</connection>
-    <developerConnection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/trunk</developerConnection>
-    <url>https://cpo.svn.sourceforge.net/svnroot/cpo/util/trunk</url>
+    <connection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/tags/cpoUtil-5.0.0</connection>
+    <developerConnection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/tags/cpoUtil-5.0.0</developerConnection>
+    <url>https://cpo.svn.sourceforge.net/svnroot/cpo/util/tags/cpoUtil-5.0.0</url>
   </scm>
   <build>
     <resources>
