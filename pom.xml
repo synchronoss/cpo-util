@@ -4,7 +4,7 @@
   <groupId>org.synchronoss.cpo</groupId>
   <artifactId>cpoUtil</artifactId>
   <name>cpoUtil</name>
-  <version>5.0.0-SNAPSHOT</version>
+  <version>5.0.0</version>
   <description>cpoUtil is the utility that configures the metadata for cpo</description>
   <packaging>jar</packaging>
   <url>http://cpo.sourceforge.net/cpo-util-sourceforge/</url>
@@ -172,9 +172,9 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/trunk</connection>
-    <developerConnection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/trunk</developerConnection>
-    <url>https://cpo.svn.sourceforge.net/svnroot/cpo/util/trunk</url>
+    <connection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/tags/cpoUtil-5.0.0</connection>
+    <developerConnection>scm:svn:https://cpo.svn.sourceforge.net/svnroot/cpo/util/tags/cpoUtil-5.0.0</developerConnection>
+    <url>https://cpo.svn.sourceforge.net/svnroot/cpo/util/tags/cpoUtil-5.0.0</url>
   </scm>
   <build>
     <resources>
@@ -217,7 +217,7 @@
             <dependency>
               <groupId>com.oracle</groupId>
               <artifactId>ojdbc6</artifactId>
-							<version>11.2.0.2.0</version>
+              <version>11.2.0.2.0</version>
             </dependency>
           </dependencies>
           <configuration>
@@ -436,17 +436,17 @@
     <dependency>
       <groupId>org.synchronoss.cpo</groupId>
       <artifactId>cpo-core</artifactId>
-      <version>5.0.0-SNAPSHOT</version>
+      <version>5.0.0</version>
     </dependency>
     <dependency>
       <groupId>org.synchronoss.cpo</groupId>
       <artifactId>cpo-jdbc</artifactId>
-      <version>5.0.0-SNAPSHOT</version>
+      <version>5.0.0</version>
     </dependency>
     <dependency>
       <groupId>org.synchronoss.cpo</groupId>
       <artifactId>cpo-cassandra</artifactId>
-      <version>5.0.0-SNAPSHOT</version>
+      <version>5.0.0</version>
     </dependency>
   </dependencies>
   <reporting>
