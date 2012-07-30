@@ -214,7 +214,7 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
       TableSorter ts = new TableSorter(new TesterResultsModel(result, returnClassNode));
       this.jTableResults.setModel(ts);
       ts.addMouseListenerToHeaderInTable(this.jTableResults);
-      CpoUtil.getInstance().setStatusBarText("Query Executed! Rows Returned: " + result.size());
+      CpoUtil.getInstance().setStatusBarText("Function Executed! Rows Returned: " + result.size());
       setColumnSizes(200);
     } catch (NoClassDefFoundError cdfe) {
       CpoUtil.showException(cdfe);
@@ -382,7 +382,7 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
     JPopupMenu menu = new JPopupMenu();
     menu.setLabel("Results Menu");
 
-    JMenuItem jMenuPopulateNorth = new JMenuItem("Populate Query");
+    JMenuItem jMenuPopulateNorth = new JMenuItem("Populate Function");
     jMenuPopulateNorth.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent ae) {
         insertValuesFromResults();
