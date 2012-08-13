@@ -196,21 +196,21 @@ public class CpoBrowserTree extends JTree {
         menu.add(jMenuAddGroup);
       } else if (menuNode instanceof CpoFunctionGroupNode) {
         final CpoFunctionGroupNode cpoFunctionGroupNode = (CpoFunctionGroupNode)menuNode;
-        JMenuItem jMenuAddQuery = new JMenuItem("Add Function to Group");
-        jMenuAddQuery.addActionListener(new ActionListener() {
+        JMenuItem jMenuAddFunction = new JMenuItem("Add Function to Group");
+        jMenuAddFunction.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae) {
             addFunctionToGroup(cpoFunctionGroupNode);
           }
         });
-        menu.add(jMenuAddQuery);
+        menu.add(jMenuAddFunction);
 
-        JMenuItem jMenuRenameQG = new JMenuItem("Rename Query Group");
-        jMenuRenameQG.addActionListener(new ActionListener() {
+        JMenuItem jMenuRenameFG = new JMenuItem("Rename Function Group");
+        jMenuRenameFG.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae) {
             renameFunctionGroup(cpoFunctionGroupNode);
           }
         });
-        menu.add(jMenuRenameQG);
+        menu.add(jMenuRenameFG);
       } else if (menuNode instanceof CpoFunctionNode) {
         final CpoFunctionNode functionNode = (CpoFunctionNode)menuNode;
 
