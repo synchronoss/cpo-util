@@ -132,8 +132,13 @@ public class ConvertCpoUtilLocalProperties {
             password = userPass.substring(userPass.indexOf("/") + 1);
           } else if (url.startsWith(hsqlPrefix)) {
             String userPass = url.substring(url.indexOf("user="));
-            userName = userPass.substring("user=".length(), userPass.indexOf(";"));
-            password = userPass.substring(userPass.indexOf(";")).substring("password=".length() + 1);
+            if (userPass.contains(";")) {
+              userName = userPass.substring("user=".length(), userPass.indexOf(";"));
+              password = userPass.substring(userPass.indexOf(";")).substring("password=".length() + 1);
+            } else {
+              userName = userPass.substring("user=".length());
+              password = "";
+            }
           }
 
           CtJdbcConfig jdbcConfig = CtJdbcConfig.Factory.newInstance();
