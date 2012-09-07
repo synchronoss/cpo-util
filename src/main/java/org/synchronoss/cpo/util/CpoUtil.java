@@ -295,18 +295,15 @@ public class CpoUtil extends JFrame {
     JFileChooser jFileChooser = new JFileChooser();
     jFileChooser.setMultiSelectionEnabled(false);
     jFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    /**
-     * causes windows to be broken...will fix at some point, removing for now
     jFileChooser.setFileFilter(new FileFilter() {
       public String getDescription() {
         return "XML files";
       }
 
       public boolean accept(File f) {
-        return (f.getName().toLowerCase().endsWith(".xml"));
+        return (f.isDirectory() || f.getName().toLowerCase().endsWith(".xml"));
       }
     });
-    **/
     int result = jFileChooser.showOpenDialog(this);
     if (result == JFileChooser.CANCEL_OPTION) {
       return;
