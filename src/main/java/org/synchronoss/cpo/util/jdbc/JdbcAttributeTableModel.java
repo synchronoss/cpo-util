@@ -31,7 +31,7 @@ public class JdbcAttributeTableModel extends CoreAttributeTableModel {
   }
 
   public List<String> getColumnNames() {
-    return Arrays.asList("Attribute", "Column Name", "Column Type", "DB Table", "DB Column", "Transform Class", "Modified?");
+    return Arrays.asList("Attribute", "Data Name", "Data Type", "DB Table", "DB Column", "Transform Class", "Modified?");
   }
 
   public List<Class<?>> getColumnClasses() {
