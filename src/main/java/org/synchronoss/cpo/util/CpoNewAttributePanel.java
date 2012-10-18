@@ -95,11 +95,15 @@ public class CpoNewAttributePanel extends JPanel {
       return null;
     }
 
-    CpoAttribute attribute = cpoAttributeLabelNode.getProxy().createCpoAttribute();
+    Proxy proxy = cpoAttributeLabelNode.getProxy();
+    CpoAttribute attribute = proxy.createCpoAttribute();
     attribute.setJavaName(javaName);
     attribute.setDataName(jTextDataName.getText());
     attribute.setDataType((String)jComDataType.getSelectedItem());
     attribute.setTransformClassName(jTextTransform.getText());
+
+    // figure out the java type
+    attribute.setJavaType(proxy.getJavaTypeName(attribute));
 
     return attribute;
   }

@@ -582,6 +582,14 @@ public abstract class Proxy {
   // reorder methods
 
   /**
+   * Attempt to figure out the java type name for the supplied attribute.
+   */
+  public String getJavaTypeName(CpoAttribute cpoAttribute) throws CpoException {
+    // figure out the java type
+    return metaDescriptor.getJavaTypeName(cpoAttribute);
+  }
+
+  /**
    * The specified connection and expression are used to create attributes
    *
    * @param connectionName The name of the connection to use
