@@ -21,16 +21,12 @@
 package org.synchronoss.cpo.util.jdbc;
 
 import org.synchronoss.cpo.jdbc.*;
-import org.synchronoss.cpo.jdbc.cpoJdbcMeta.CtJdbcArgument;
 import org.synchronoss.cpo.util.CpoArgumentNode;
 
 public class JdbcArgumentNode extends CpoArgumentNode {
 
   public JdbcArgumentNode(JdbcCpoArgument cpoArgument) {
     super(cpoArgument);
-
-    // default the scope to in
-    getUserObject().setScope(CtJdbcArgument.Scope.IN.toString());
   }
 
   @Override

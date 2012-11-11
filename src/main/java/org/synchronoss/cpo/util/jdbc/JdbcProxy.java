@@ -22,6 +22,7 @@ package org.synchronoss.cpo.util.jdbc;
 
 import org.synchronoss.cpo.CpoException;
 import org.synchronoss.cpo.jdbc.*;
+import org.synchronoss.cpo.jdbc.cpoJdbcMeta.CtJdbcArgument;
 import org.synchronoss.cpo.meta.CpoMetaDescriptor;
 import org.synchronoss.cpo.meta.domain.*;
 import org.synchronoss.cpo.util.*;
@@ -44,6 +45,16 @@ public class JdbcProxy extends Proxy {
     super();
     this.setCpoMetaXml(cpoMetaXml);
     this.setMetaDescriptor(metaDescriptor);
+  }
+
+  @Override
+  protected CpoArgument createCpoArgument() throws CpoException {
+    JdbcCpoArgument cpoArgument = (JdbcCpoArgument)metaDescriptor.createCpoArgument();
+
+    // default the scope to in
+    cpoArgument.setScope(CtJdbcArgument.Scope.IN.toString());
+
+    return cpoArgument;
   }
 
   // node creation functions
