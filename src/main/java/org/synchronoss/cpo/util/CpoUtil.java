@@ -64,6 +64,7 @@ public class CpoUtil extends JFrame {
   public static final String COPYRIGHT = "cpoutil.copyright";
   public static final String COMPANY = "cpoutil.company";
   public static final String MINIMUM_VERSION = "cpoutil.minimumVersion";
+  public static final String RECENT_FILE_SIZE = "cpoutil.recentFileSize";
 
   private static final String SNAPSHOT = "-SNAPSHOT";
 
@@ -79,7 +80,7 @@ public class CpoUtil extends JFrame {
   private Set<String> protectedClasses = new HashSet<String>();
 
   private JLabel statusBar = new JLabel();
-
+  private JMenu openRecentMenu;
   protected JTabbedPane jTabbedPane = new JTabbedPane();
   private int tabCounter = 0;
 
@@ -163,6 +164,10 @@ public class CpoUtil extends JFrame {
       }
     });
     menuFile.add(menuOpen);
+
+    openRecentMenu = new JMenu("Open Recent");
+    menuFile.add(openRecentMenu);
+    generateRecentFileMenu();
 
     JMenuItem menuSave = new JMenuItem("Save");
     menuSave.addActionListener(new ActionListener() {
@@ -256,6 +261,21 @@ public class CpoUtil extends JFrame {
     this.getContentPane().add(panelCenter, BorderLayout.CENTER);
   }
 
+  private void generateRecentFileMenu() {
+    openRecentMenu.removeAll();
+    for (final File file : getRecentFiles()) {
+      String fileName = file.getAbsolutePath();
+      JMenuItem recentFileMenu = new JMenuItem(fileName);
+      recentFileMenu.setToolTipText(fileName);
+      openRecentMenu.add(recentFileMenu);
+      recentFileMenu.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent ae) {
+          openFile(file);
+        }
+      });
+    }
+  }
+
   /**
    * New action
    *
@@ -309,8 +329,12 @@ public class CpoUtil extends JFrame {
       return;
     }
 
-    // make sure the file is readable
     File cpoMetaXml = jFileChooser.getSelectedFile();
+    openFile(cpoMetaXml);
+  }
+
+  private void openFile(File cpoMetaXml) {
+    // make sure the file is readable
     if (cpoMetaXml == null || !cpoMetaXml.canRead()) {
       CpoUtil.showErrorMessage("Invalid file selected.");
       return;
@@ -326,6 +350,8 @@ public class CpoUtil extends JFrame {
       }
     }
 
+    addRecentFile(cpoMetaXml);
+
     try {
       Proxy proxy = ProxyFactory.getInstance().getProxy(cpoMetaXml);
       createNewBrowser(proxy);
@@ -340,8 +366,8 @@ public class CpoUtil extends JFrame {
   private void createNewBrowser(Proxy proxy) {
     try {
       CpoBrowserPanel browserPanel = new CpoBrowserPanel(proxy);
-      this.jTabbedPane.addTab(browserPanel.getProxy().toString(), null, browserPanel, browserPanel.getProxy().toString());
-      this.jTabbedPane.setSelectedComponent(browserPanel);
+      jTabbedPane.addTab(browserPanel.getProxy().toString(), null, browserPanel, browserPanel.getProxy().toString());
+      jTabbedPane.setSelectedComponent(browserPanel);
 
       JButton tabCloseButton = new JButton(closeIcon);
       tabCloseButton.setContentAreaFilled(false);
@@ -377,6 +403,7 @@ public class CpoUtil extends JFrame {
       pnl.add(tabCloseButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHEAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
       jTabbedPane.setTabComponentAt(jTabbedPane.getTabCount() - 1, pnl);
       jTabbedPane.setSelectedIndex(jTabbedPane.getTabCount() - 1);
+      jTabbedPane.setToolTipTextAt(jTabbedPane.getTabCount() - 1, proxy.getCpoMetaXml().getAbsolutePath());
     } catch (CpoException ex) {
       CpoUtil.showException(ex);
     }
@@ -860,6 +887,60 @@ public class CpoUtil extends JFrame {
       }
     }
     return null;
+  }
+
+  private int getRecentFileSize() {
+    int result = 10;
+    try {
+      result = Integer.parseInt(getProperty(CpoUtil.RECENT_FILE_SIZE));
+    } catch (NumberFormatException ex) {
+      // ignore
+    }
+    return result;
+  }
+
+  protected List<File> getRecentFiles() {
+    List<File> recentFiles = new ArrayList<File>();
+    if (cpoUtilConfig.isSetRecentFiles()) {
+      CtRecentFiles ctRecentFiles = cpoUtilConfig.getRecentFiles();
+      for (String fileName : ctRecentFiles.getFileArray()) {
+        File file = new File(fileName);
+        if (file.exists() && file.canRead()) {
+          recentFiles.add(file);
+        }
+      }
+    }
+    return recentFiles;
+  }
+
+  protected void addRecentFile(File file) {
+
+    // remove the file if it's already in the list
+    List<File> recentFiles = getRecentFiles();
+    recentFiles.remove(file);
+
+    // place first in the list
+    recentFiles.add(0, file);
+
+    // if the list is more than it should be, trim it
+    int maxSize = getRecentFileSize();
+    while (recentFiles.size() > maxSize) {
+      recentFiles.remove(recentFiles.size() - 1);
+    }
+
+    if (cpoUtilConfig.isSetRecentFiles()) {
+      cpoUtilConfig.unsetRecentFiles();
+    }
+    CtRecentFiles ctRecentFiles = cpoUtilConfig.addNewRecentFiles();
+    for (File recentFile : recentFiles) {
+      ctRecentFiles.addFile(recentFile.getAbsolutePath());
+    }
+
+    // save the config
+    saveConfig();
+
+    // update the menu
+    generateRecentFileMenu();
   }
 
   /**

@@ -35,7 +35,8 @@
     <xs:sequence>
       <xs:element name="customClasspath" type="ctCustomClasspath" minOccurs="0" maxOccurs="1" />
       <xs:element name="protectedClasses" type="ctProtectedClasses" minOccurs="0" maxOccurs="1" />
-      <xs:element name="dataConfigs" type="ctDataConfig" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="dataConfigs" type="ctDataConfig" minOccurs="0" maxOccurs="1" />
+      <xs:element name="recentFiles" type="ctRecentFiles" minOccurs="0" maxOccurs="1" />
     </xs:sequence>
   </xs:complexType>
 
@@ -54,6 +55,12 @@
   <xs:complexType name="ctDataConfig">
     <xs:sequence>
       <xs:element name="dataConfig" type="core:ctDataSourceConfig" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ctRecentFiles">
+    <xs:sequence>
+      <xs:element name="file" type="xs:string" minOccurs="1" maxOccurs="unbounded" />
     </xs:sequence>
   </xs:complexType>
 

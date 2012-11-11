@@ -76,6 +76,9 @@ public abstract class Proxy {
    */
   protected final void setCpoMetaXml(File cpoMetaXml) {
     this.cpoMetaXml = cpoMetaXml;
+
+    // set the last dir
+    lastDir = cpoMetaXml.getParentFile();
   }
 
   /**
