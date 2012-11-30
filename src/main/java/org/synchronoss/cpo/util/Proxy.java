@@ -207,6 +207,7 @@ public abstract class Proxy {
 
     try {
       metaDescriptor.export(dest);
+      getRoot().clearChangedNodes();
     } catch (CpoException ex) {
       CpoUtil.showException(ex);
     }

@@ -52,6 +52,12 @@ public class CpoRootNode extends AbstractCpoNode {
     return new ArrayList<AbstractCpoNode>(changedNodes);
   }
 
+  public void clearChangedNodes() {
+    newChildren.clear();
+    dirtyChildren.clear();
+    removeChildren.clear();
+  }
+
   public boolean isUnsaved() {
     if (this.isChildDirty())
       return true;
