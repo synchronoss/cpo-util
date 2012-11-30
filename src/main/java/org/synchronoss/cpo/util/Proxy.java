@@ -503,7 +503,7 @@ public abstract class Proxy {
     CpoFunctionNode cpoFunctionNode = cpoArgumentNode.getParent();
 
     // remove from meta
-    cpoFunctionNode.getUserObject().removeArgument(cpoArgumentNode.getUserObject());
+    cpoFunctionNode.getUserObject().removeArgument(cpoArgumentNode.getSeqNo());
 
     // remove from tree
     cpoArgumentNode.removeFromParent();
@@ -707,26 +707,8 @@ public abstract class Proxy {
           logger.debug("Index: " + index + " size: " + notifier.getParent().getChildCount());
         }
         if (notifier.isRemove()) {
-          if (notifier.isNew() && notifier.isRemove()) {
-            // if it was new and is being removed, remove it from the parent
-            parent.remove(notifier);
-          }
-          if (notifier.isNew() && !parent.isLeaf()) {
-            if (logger.isDebugEnabled()) {
-              logger.debug("Notifying non-leaf parent of node removal");
-            }
-            treeModel.nodesWereRemoved(parent, new int[]{index}, new Object[]{notifier});
-          } else if (!parent.isLeaf()) {
-            if (logger.isDebugEnabled()) {
-              logger.debug("Notifying non-leaf parent of node (marked deleted) change");
-            }
-            treeModel.nodeChanged(changedNode);
-          } else {
-            if (logger.isDebugEnabled()) {
-              logger.debug("Notifying a leaf parent of node (marked deleted) change");
-            }
-            treeModel.nodeChanged(parent);
-          }
+          logger.debug("Notifying a parent of node (marked deleted) change");
+          treeModel.nodeChanged(parent);
         } else if (notifier.isDirty()) {
           if (logger.isDebugEnabled()) {
             logger.debug("Notifying parent of node change (dirty and all else)");

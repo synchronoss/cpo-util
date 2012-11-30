@@ -65,10 +65,10 @@ public class SaveNodesTableModel extends AbstractTableModel {
     } else if (columnIndex == 1) {
       return changedObjects.get(rowIndex).toString();
     } else if (columnIndex == 2) {
-      if ((changedObjects.get(rowIndex)).isNew()) {
-        return "New";
-      } else if ((changedObjects.get(rowIndex)).isRemove()) {
+      if ((changedObjects.get(rowIndex)).isRemove()) {
         return "Delete";
+      } else if ((changedObjects.get(rowIndex)).isNew()) {
+        return "New";
       } else if ((changedObjects.get(rowIndex)).isDirty()) {
         return "Update";
       } else {

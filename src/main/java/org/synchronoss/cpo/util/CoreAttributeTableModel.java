@@ -82,10 +82,10 @@ public class CoreAttributeTableModel extends AbstractTableModel  {
     } else if (columnIndex == 3) {
       return att.getTransformClassName();
     } else if (columnIndex == 4) {
-      if (cpoAttributeNode.isNew()) {
-        return "New";
-      } else if (cpoAttributeNode.isRemove()) {
+      if (cpoAttributeNode.isRemove()) {
         return "Removed";
+      } else if (cpoAttributeNode.isNew()) {
+        return "New";
       } else if (cpoAttributeNode.isDirty()) {
         return "Changed";
       } else {

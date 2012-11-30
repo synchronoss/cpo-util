@@ -96,10 +96,10 @@ public class CoreArgumentTableModel extends AbstractTableModel {
     } else if (columnIndex == 4) {
       return att != null ? att.getTransformClassName() : null;
     } else if (columnIndex == 5) {
-      if (cpoArgumentNode.isNew()) {
-        return "New";
-      } else if (cpoArgumentNode.isRemove()) {
+      if (cpoArgumentNode.isRemove()) {
         return "Removed";
+      } else if (cpoArgumentNode.isNew()) {
+        return "New";
       } else if (cpoArgumentNode.isDirty()) {
         return "Changed";
       } else {
@@ -124,28 +124,12 @@ public class CoreArgumentTableModel extends AbstractTableModel {
 
     for (int i = cpoFunctionNode.getChildCount() - 1; i >= 0; i--) {
       CpoArgumentNode cpoArgumentNode = (CpoArgumentNode)cpoFunctionNode.getChildAt(i);
-      if (cpoArgumentNode.isNew()) {
+      if (!cpoArgumentNode.isRemove()) {
         cpoArgumentNode.setRemove(true);
         this.fireTableDataChanged();
         return;
       }
     }
-
-    if (this.getNonRemovedRows() == originalLength) {
-      for (int i = cpoFunctionNode.getChildCount() - 1; i >= 0; i--) {
-        CpoArgumentNode cpoArgumentNode = (CpoArgumentNode)cpoFunctionNode.getChildAt(i);
-        if (!cpoArgumentNode.isRemove()) {
-          this.removeRow(i);
-          return;
-        }
-      }
-    }
-  }
-
-  public void removeRow(int rowIndex) {
-    CpoArgumentNode cpoArgumentNode = (CpoArgumentNode)cpoFunctionNode.getChildAt(rowIndex);
-    cpoArgumentNode.setRemove(true);
-    this.fireTableDataChanged();
   }
 
   public void addNewRow() {

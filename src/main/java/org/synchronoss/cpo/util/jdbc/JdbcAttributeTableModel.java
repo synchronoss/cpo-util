@@ -67,10 +67,10 @@ public class JdbcAttributeTableModel extends CoreAttributeTableModel {
     } else if (columnIndex == 5) {
       return jdbcAttributeNode.getTransformClassName();
     } else if (columnIndex == 6) {
-      if (cpoAttributeNode.isNew()) {
-        return "New";
-      } else if (cpoAttributeNode.isRemove()) {
+      if (cpoAttributeNode.isRemove()) {
         return "Removed";
+      } else if (cpoAttributeNode.isNew()) {
+        return "New";
       } else if (cpoAttributeNode.isDirty()) {
         return "Changed";
       } else {

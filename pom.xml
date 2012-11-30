@@ -24,11 +24,11 @@
     <currentVersion>${project.version}</currentVersion>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <cpoutil.bootstrapUrl />
-    <cpo.version>5.0.3</cpo.version>
+    <cpo.version>5.0.3.3-SNAPSHOT</cpo.version>
     <cpo.assembly.id>dist</cpo.assembly.id>
     <cpo.onejar.filename>${project.build.finalName}.one-jar.jar</cpo.onejar.filename>
-    <!--<cpo.osx.filename>${project.build.finalName}.dmg</cpo.osx.filename>-->
-    <!--<cpo.osx.bundleName>CpoUtil-${project.version}</cpo.osx.bundleName>-->
+    <cpo.osx.filename>${project.build.finalName}.dmg</cpo.osx.filename>
+    <cpo.osx.bundleName>CpoUtil-${project.version}</cpo.osx.bundleName>
   </properties>
   <ciManagement>
     <system>teamcity</system>
@@ -41,15 +41,14 @@
         <activeByDefault>false</activeByDefault>
       </activation>
       <properties>
-        <cpoutil.bootstrapUrl>http://wiki.synchronoss.net/~components/sncrcpo/bootstrap.properties</cpoutil.bootstrapUrl>
+        <cpoutil.bootstrapUrl>http://wiki.synchronoss.net/~components/sncrcpo/cpo5-bootstrap.properties</cpoutil.bootstrapUrl>
         <cpo.classifier>sncr</cpo.classifier>
         <cpo.assembly.id>dist-${cpo.classifier}</cpo.assembly.id>
         <cpo.onejar.filename>${project.build.finalName}-${cpo.classifier}.one-jar.jar</cpo.onejar.filename>
-        <!--<cpo.osx.filename>${project.build.finalName}-${cpo.classifier}.dmg</cpo.osx.filename>-->
-        <!--<cpo.osx.bundleName>CpoUtil-${project.version}-${cpo.classifier}</cpo.osx.bundleName>-->
+        <cpo.osx.filename>${project.build.finalName}-${cpo.classifier}.dmg</cpo.osx.filename>
+        <cpo.osx.bundleName>CpoUtil-${project.version}-${cpo.classifier}</cpo.osx.bundleName>
       </properties>
     </profile>
-    <!--
     <profile>
       <id>mac</id>
       <activation>
@@ -59,9 +58,7 @@
       </activation>
       <build>
         <plugins>
-          -->
           <!-- the dmg only gets generated if you build on a mac, and the build-helper plugin fails if the file doesn't exist -->
-          <!--
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>build-helper-maven-plugin</artifactId>
@@ -87,7 +84,6 @@
         </plugins>
       </build>
     </profile>
-      -->
     <profile>
       <id>DEPLOY</id>
       <build>
@@ -311,7 +307,6 @@
           </execution>
         </executions>
       </plugin>
-      <!--
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>osxappbundle-maven-plugin</artifactId>
@@ -333,7 +328,6 @@
           </execution>
         </executions>
       </plugin>
-      -->
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>

@@ -92,10 +92,10 @@ public class JdbcArgumentTableModel extends CoreArgumentTableModel {
     } else if (columnIndex == 8) {
       return jdbcAttribute != null ? jdbcAttribute.getTransformClassName() : null;
     } else if (columnIndex == 9) {
-      if (cpoArgumentNode.isNew()) {
-        return "New";
-      } else if (cpoArgumentNode.isRemove()) {
+      if (cpoArgumentNode.isRemove()) {
         return "Removed";
+      } else if (cpoArgumentNode.isNew()) {
+        return "New";
       } else if (cpoArgumentNode.isDirty()) {
         return "Changed";
       } else {

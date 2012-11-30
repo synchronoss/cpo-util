@@ -181,12 +181,12 @@ public abstract class AbstractCpoNode extends DefaultMutableTreeNode {
    * Called to inform the node that the supplied child is removed
    */
   public void setChildRemove(AbstractCpoNode childNode) {
-    if (childNode.isRemove() && childNode.isNew()) {
-      removeChildren.remove(childNode);
-      newChildren.remove(childNode);
-      dirtyChildren.remove(childNode);
-    } else if (childNode.isRemove()) {
+    if (childNode.isRemove()) {
       removeChildren.add(childNode);
+      if (childNode.isNew()) {
+        newChildren.remove(childNode);
+        dirtyChildren.remove(childNode);
+      }
     } else if (!childNode.isRemove()) {
       removeChildren.remove(childNode);
     }
