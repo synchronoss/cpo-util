@@ -22,7 +22,7 @@ package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
 import org.synchronoss.cpo.CpoException;
-import org.synchronoss.cpo.meta.domain.CpoAttribute;
+import org.synchronoss.cpo.meta.domain.*;
 
 import javax.swing.*;
 import javax.swing.tree.*;
@@ -255,6 +255,12 @@ public class CpoBrowserTree extends JTree {
         Proxy proxy = getRoot().getProxy();
 
         String groupName = fgp.getGroupName().equals("") ? null : fgp.getGroupName();
+
+        // don't allow dupes
+        if (functionGroupLabelNode.getParent().getUserObject().existsFunctionGroup(fgp.getGroupType(), groupName)) {
+          CpoUtil.showErrorMessage("A function group with that type and name already exists for this class: " + fgp.getGroupType() + " - " + groupName);
+          return;
+        }
 
         CpoFunctionGroupNode cpoFunctionGroupNode = proxy.addFunctionGroup(functionGroupLabelNode.getParent(), groupName, fgp.getGroupType());
 
