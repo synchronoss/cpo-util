@@ -29,12 +29,12 @@ import java.io.File;
 import java.util.*;
 import java.util.List;
 
-public class CpoUtilClasspathPanel extends JPanel  {
+public class CpoUtilClasspathPanel extends JPanel {
 
   private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   // Version Id for this class
-  private static final long serialVersionUID=1L;
+  private static final long serialVersionUID = 1L;
 
   private JList jListClasspath = new JList();
   private Vector<File> classpathEntries = new Vector<File>();
@@ -43,7 +43,7 @@ public class CpoUtilClasspathPanel extends JPanel  {
     this.classpathEntries.addAll(classpathEntries);
     try {
       jbInit();
-    } catch(Exception e) {
+    } catch (Exception e) {
       logger.error(e.getMessage(), e);
     }
   }
@@ -81,7 +81,9 @@ public class CpoUtilClasspathPanel extends JPanel  {
     jFile.setMultiSelectionEnabled(true);
     jFile.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
     int result = jFile.showOpenDialog(this);
-    if (result == 1) return;
+    if (result == 1) {
+      return;
+    }
     classpathEntries.addAll(Arrays.asList(jFile.getSelectedFiles()));
     this.jListClasspath.setListData(classpathEntries);
   }

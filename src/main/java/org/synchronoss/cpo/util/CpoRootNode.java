@@ -59,14 +59,17 @@ public class CpoRootNode extends AbstractCpoNode {
   }
 
   public boolean isUnsaved() {
-    if (this.isChildDirty())
+    if (this.isChildDirty()) {
       return true;
+    }
 
-    if (this.isChildNew())
+    if (this.isChildNew()) {
       return true;
+    }
 
-    if (this.isChildRemove())
+    if (this.isChildRemove()) {
       return true;
+    }
 
     return false;
   }

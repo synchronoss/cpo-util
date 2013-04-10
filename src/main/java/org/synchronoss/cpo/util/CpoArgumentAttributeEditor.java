@@ -30,8 +30,8 @@ import java.util.*;
 
 public class CpoArgumentAttributeEditor implements TableCellEditor {
 
-  TableCellEditor editor;
-  CoreArgumentTableModel cpoFTM;
+  private TableCellEditor editor;
+  private CoreArgumentTableModel cpoFTM;
 
   public CpoArgumentAttributeEditor(CoreArgumentTableModel cpoFTM) {
     editor = new DefaultCellEditor(new JComboBox());

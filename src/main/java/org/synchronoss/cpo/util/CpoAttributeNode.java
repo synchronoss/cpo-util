@@ -73,29 +73,33 @@ public class CpoAttributeNode extends AbstractCpoNode {
   }
 
   public void setDataName(String dataName) {
-    if (dataName.equals(this.getDataName()))
+    if (dataName.equals(this.getDataName())) {
       return;
+    }
     this.getUserObject().setDataName(dataName);
     this.setDirty(true);
   }
 
   public void setAttribute(String attribute) {
-    if (attribute.equals(this.getJavaName()))
+    if (attribute.equals(this.getJavaName())) {
       return;
+    }
     this.getUserObject().setJavaName(attribute);
     this.setDirty(true);
   }
 
   public void setDataType(String dataType) {
-    if (dataType.equals(this.getDataType()))
+    if (dataType.equals(this.getDataType())) {
       return;
+    }
     this.getUserObject().setDataType(dataType);
     this.setDirty(true);
   }
 
   public void setTransformClass(String transform) {
-    if (transform.equals(this.getTransformClassName()))
+    if (transform.equals(this.getTransformClassName())) {
       return;
+    }
     this.getUserObject().setTransformClassName(transform);
     this.setDirty(true);
   }

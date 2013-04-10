@@ -51,7 +51,7 @@ public class TableSorter extends TableMap {
 
   // Version Id for this class
   private static final long serialVersionUID = 1L;
-  private int indexes[] = new int[0];
+  private int[] indexes = new int[0];
   private Vector<Integer> sortingColumns = new Vector<Integer>();
   private boolean ascending = true;
 
@@ -218,7 +218,7 @@ public class TableSorter extends TableMap {
    * NlogN depending on the initial order but the main reason for
    * using it here is that, unlike qsort, it is stable.
    */
-  public void shuttlesort(int from[], int to[], int low, int high) {
+  public void shuttlesort(int[] from, int[] to, int low, int high) {
     if (high - low < 2) {
       return;
     }

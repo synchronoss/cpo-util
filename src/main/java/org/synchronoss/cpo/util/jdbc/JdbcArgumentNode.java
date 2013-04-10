@@ -39,8 +39,9 @@ public class JdbcArgumentNode extends CpoArgumentNode {
   }
 
   public void setScope(String value) {
-    if (this.getScope() == null && value == null)
+    if (this.getScope() == null && value == null) {
       return;
+    }
 
     if (this.getScope() == null || value == null || !value.equals(this.getScope())) {
       getUserObject().setScope(value);
@@ -53,8 +54,9 @@ public class JdbcArgumentNode extends CpoArgumentNode {
   }
 
   public void setTypeInfo(String value) {
-    if (this.getTypeInfo() == null && value == null)
+    if (this.getTypeInfo() == null && value == null) {
       return;
+    }
 
     if (this.getTypeInfo() == null || value == null || !value.equals(this.getTypeInfo())) {
       getUserObject().setTypeInfo(value);

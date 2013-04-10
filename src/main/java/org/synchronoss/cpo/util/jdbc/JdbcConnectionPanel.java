@@ -37,7 +37,7 @@ import java.util.StringTokenizer;
  * @author Michael Bellomo
  * @since 5/5/12
  */
- public class JdbcConnectionPanel extends AbstractConnectionPanel {
+public class JdbcConnectionPanel extends AbstractConnectionPanel {
 
   // Version Id for this class
   private static final long serialVersionUID = 1L;
@@ -119,7 +119,6 @@ import java.util.StringTokenizer;
 
     jTextDriver.setText("oracle.jdbc.OracleDriver");
     this.add(jTextDriver, new GridBagConstraints(1, 4, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
-
 
     JButton testConnectionButton = new JButton("Test");
     testConnectionButton.addActionListener(new ActionListener() {
@@ -272,10 +271,12 @@ import java.util.StringTokenizer;
         String token = st.nextToken();
         StringTokenizer stNameValue = new StringTokenizer(token, PARAM_ASSIGNMENT);
         String name = null, value = null;
-        if (stNameValue.hasMoreTokens())
+        if (stNameValue.hasMoreTokens()) {
           name = stNameValue.nextToken();
-        if (stNameValue.hasMoreTokens())
+        }
+        if (stNameValue.hasMoreTokens()) {
           value = stNameValue.nextToken();
+        }
 
         CtProperty prop = rwc.addNewProperty();
         prop.setName(name);
@@ -284,6 +285,5 @@ import java.util.StringTokenizer;
     }
 
     return jdbcConfig;
-
   }
 }

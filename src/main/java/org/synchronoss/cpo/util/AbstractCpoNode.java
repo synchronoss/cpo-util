@@ -28,10 +28,10 @@ import java.util.*;
 
 public abstract class AbstractCpoNode extends DefaultMutableTreeNode {
 
-  private boolean dirty = false;
-  private boolean remove = false;
-  private boolean isnew = false;
-  private boolean isProtected = false;
+  private boolean _dirty = false;
+  private boolean _remove = false;
+  private boolean _new = false;
+  private boolean _protected = false;
 
   protected Set<AbstractCpoNode> dirtyChildren = new HashSet<AbstractCpoNode>();
   protected Set<AbstractCpoNode> newChildren = new HashSet<AbstractCpoNode>();
@@ -97,7 +97,7 @@ public abstract class AbstractCpoNode extends DefaultMutableTreeNode {
    * @return True if this node is protected, false otherwise
    */
   public boolean isProtected() {
-    return isProtected;
+    return _protected;
   }
 
   /**
@@ -106,7 +106,7 @@ public abstract class AbstractCpoNode extends DefaultMutableTreeNode {
    * @param b true if protected, false otherwise
    */
   public void setProtected(boolean b) {
-    isProtected = b;
+    _protected = b;
   }
 
   /**
@@ -114,10 +114,10 @@ public abstract class AbstractCpoNode extends DefaultMutableTreeNode {
    * @param dirty True if this node is being changed
    */
   public void setDirty(boolean dirty) {
-    if (this.dirty == dirty) {
+    if (this._dirty == dirty) {
       return;
     }
-    this.dirty = dirty;
+    this._dirty = dirty;
     getProxy().nodeChanged(this, this);
   }
 
@@ -125,7 +125,7 @@ public abstract class AbstractCpoNode extends DefaultMutableTreeNode {
    * @return True if this node is dirty, false otherwise
    */
   public boolean isDirty() {
-    return this.dirty;
+    return this._dirty;
   }
 
   /**
@@ -139,7 +139,7 @@ public abstract class AbstractCpoNode extends DefaultMutableTreeNode {
 
     if (childNode.isDirty()) {
       dirtyChildren.add(childNode);
-    } else if (!childNode.isDirty()) {
+    } else {
       dirtyChildren.remove(childNode);
     }
     if (notify) {
@@ -159,10 +159,10 @@ public abstract class AbstractCpoNode extends DefaultMutableTreeNode {
    * @param remove True if this node is being removed
    */
   public void setRemove(boolean remove) {
-    if (this.remove == remove) {
+    if (this._remove == remove) {
       return;
     }
-    this.remove = remove;
+    this._remove = remove;
     getProxy().nodeChanged(this, this);
   }
 
@@ -174,7 +174,7 @@ public abstract class AbstractCpoNode extends DefaultMutableTreeNode {
    * @return True if this node is removed, false otherwise
    */
   public boolean isRemove() {
-    return this.remove;
+    return this._remove;
   }
 
   /**
@@ -187,7 +187,7 @@ public abstract class AbstractCpoNode extends DefaultMutableTreeNode {
         newChildren.remove(childNode);
         dirtyChildren.remove(childNode);
       }
-    } else if (!childNode.isRemove()) {
+    } else {
       removeChildren.remove(childNode);
     }
     getProxy().nodeChanged(this, childNode);
@@ -205,10 +205,10 @@ public abstract class AbstractCpoNode extends DefaultMutableTreeNode {
    * @param isnew True if this node is new, false otherwise
    */
   public void setNew(boolean isnew) {
-    if (this.isnew == isnew) {
+    if (this._new == isnew) {
       return;
     }
-    this.isnew = isnew;
+    this._new = isnew;
     getProxy().nodeChanged(this, this);
   }
 
@@ -216,7 +216,7 @@ public abstract class AbstractCpoNode extends DefaultMutableTreeNode {
    * @return True if this node is new, false otherwise
    */
   public boolean isNew() {
-    return this.isnew;
+    return this._new;
   }
 
   /**
@@ -229,7 +229,7 @@ public abstract class AbstractCpoNode extends DefaultMutableTreeNode {
     }
     if (childNode.isNew()) {
       newChildren.add(childNode);
-    } else if (!childNode.isNew()) {
+    } else {
       newChildren.remove(childNode);
     }
     if (notify) {

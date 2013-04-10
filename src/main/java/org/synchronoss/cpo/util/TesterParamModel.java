@@ -30,8 +30,6 @@ public class TesterParamModel extends AbstractTableModel {
 
   // Version Id for this class
   private static final long serialVersionUID = 1L;
-  public static int COLUMN_PARAMETER = 4;
-  public static int COLUMN_ATTRIBUTE_NAME = 3;
   private String[] columnNames = {"Function Seq Num", "Argument Seq Num", "Data Name", "Attribute Name", "Parameter"};
   private Object[] columnClasses = {Integer.class, String.class, String.class, String.class, String.class};
   private CpoFunctionGroupNode cpoFGnode;
@@ -115,7 +113,7 @@ public class TesterParamModel extends AbstractTableModel {
     }
   }
 
-  boolean isTableFilledOut() {
+  protected boolean isTableFilledOut() {
     int rows = getRowCount();
     for (int i = 0; i < rows; i++) {
       if (getValueAt(i, 4) == null || getValueAt(i, 4).equals("")) {

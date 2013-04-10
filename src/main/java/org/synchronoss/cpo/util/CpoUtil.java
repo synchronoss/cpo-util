@@ -535,7 +535,7 @@ public class CpoUtil extends JFrame {
             }
 
             if (!complete) {
-              throw new CpoException("Saving connection failed, could not update connection: " + connectionName);
+              showErrorMessage("Saving connection failed, could not update connection: " + connectionName);
             }
 
           } catch (CpoException ex) {
@@ -895,6 +895,9 @@ public class CpoUtil extends JFrame {
       result = Integer.parseInt(getProperty(CpoUtil.RECENT_FILE_SIZE));
     } catch (NumberFormatException ex) {
       // ignore
+      if (logger.isTraceEnabled()) {
+        logger.trace(ex.getLocalizedMessage());
+      }
     }
     return result;
   }

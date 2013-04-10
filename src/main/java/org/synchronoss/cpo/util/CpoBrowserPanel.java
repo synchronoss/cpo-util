@@ -110,7 +110,7 @@ public class CpoBrowserPanel extends JPanel {
     ToolTipManager.sharedInstance().registerComponent(jTreeBrowser);
   }
 
-  Proxy getProxy() {
+  protected Proxy getProxy() {
     return this.proxy;
   }
 

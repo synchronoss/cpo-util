@@ -28,16 +28,15 @@ import java.util.*;
 
 public class CpoAttributeTableEditor implements TableCellEditor {
 
-  JTextField jText = new JTextField();
-  JComboBox jCombo;
-  TableCellEditor editorText;
-  TableCellEditor editorCombo;
-  TableCellEditor editor;
+  private JComboBox jCombo;
+  private TableCellEditor editorText;
+  private TableCellEditor editorCombo;
+  private TableCellEditor editor;
 
   public CpoAttributeTableEditor(Vector<String> dataTypes) {
     jCombo = new JComboBox(dataTypes);
     editorCombo = new DefaultCellEditor(jCombo);
-    editorText = new DefaultCellEditor(jText);
+    editorText = new DefaultCellEditor(new JTextField());
     editor = editorText;
   }
 
@@ -45,8 +44,9 @@ public class CpoAttributeTableEditor implements TableCellEditor {
     if (column == 2) {
       this.editor = this.editorCombo;
       jCombo.setSelectedItem(value);
-    } else
+    } else {
       this.editor = this.editorText;
+    }
     return editor.getTableCellEditorComponent(table, value, isSelected, row, column);
   }
 

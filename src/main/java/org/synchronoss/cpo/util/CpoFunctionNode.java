@@ -43,7 +43,7 @@ public class CpoFunctionNode extends AbstractCpoNode {
 
   @Override
   public JPanel getPanelForSelected() {
-    return new CpoFunctionPanel(this,  new CoreArgumentTableModel(this));
+    return new CpoFunctionPanel(this, new CoreArgumentTableModel(this));
   }
 
   @Override
@@ -65,12 +65,13 @@ public class CpoFunctionNode extends AbstractCpoNode {
   public String toString() {
     int seqNo = getParent().getIndex(this) + 1;
 
-    if (this.getName() == null || this.getName().equals(""))
+    if (this.getName() == null || this.getName().equals("")) {
       return seqNo + " (NO NAME)";
+    }
 
     return seqNo + " (" + this.getName() + ")";
   }
-  
+
   public String getExpression() {
     return getUserObject().getExpression();
   }

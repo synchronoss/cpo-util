@@ -277,7 +277,7 @@ public class CpoFunctionPanel extends JPanel {
   private void guessAttributes() {
     String query = jTextAExpression.getText().trim();
 
-    Vector<String> errors = new Vector<String>();
+    List<String> errors = new ArrayList<String>();
 
     try {
       ExpressionParser expressionParser = cpoFunctionNode.getProxy().getExpressionParser(query);

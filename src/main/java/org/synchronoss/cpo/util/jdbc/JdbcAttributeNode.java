@@ -43,15 +43,17 @@ public class JdbcAttributeNode extends CpoAttributeNode {
   }
 
   public void setDbTable(String dbTable) {
-    if (dbTable.equals(this.getDbTable()))
+    if (dbTable.equals(this.getDbTable())) {
       return;
+    }
     getUserObject().setDbTable(dbTable);
     this.setDirty(true);
   }
 
   public void setDbColumn(String dbColumn) {
-    if (dbColumn.equals(this.getDbColumn()))
+    if (dbColumn.equals(this.getDbColumn())) {
       return;
+    }
     getUserObject().setDbColumn(dbColumn);
     this.setDirty(true);
   }

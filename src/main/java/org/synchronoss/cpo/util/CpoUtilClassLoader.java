@@ -58,7 +58,7 @@ public class CpoUtilClassLoader extends ClassLoader {
     // Convert class name argument to filename
     // Convert package names into subdirectories
     try {
-      byte data[] = loadClassData(name);
+      byte[] data = loadClassData(name);
       c = defineClass(name, data, 0, data.length);
       if (c == null) {
         throw new ClassNotFoundException(name);
@@ -68,7 +68,7 @@ public class CpoUtilClassLoader extends ClassLoader {
       }
     } catch (IOException e) {
       logger.error(e.getMessage(), e);
-      throw new ClassNotFoundException("Error reading class: " + name);
+      throw new ClassNotFoundException("Error reading class: " + name, e);
     }
     return c;
   }
@@ -79,7 +79,8 @@ public class CpoUtilClassLoader extends ClassLoader {
         if (file.getName().toLowerCase().endsWith(".jar")) {
           String filename = name.replace('.', '/') + ".class";
           JarFile jf = new JarFile(file);
-          for (Enumeration<JarEntry> e = jf.entries(); e.hasMoreElements(); ) {
+          Enumeration<JarEntry> e = jf.entries();
+          while (e.hasMoreElements()) {
             ZipEntry entry = e.nextElement();
             if (filename.equals(entry.getName())) {
               InputStream is = jf.getInputStream(entry);
@@ -102,7 +103,7 @@ public class CpoUtilClassLoader extends ClassLoader {
         int size = (int)f.length();
 
         // Reserve space to read
-        byte buff[] = new byte[size];
+        byte[] buff = new byte[size];
 
         // Get stream to read from
         FileInputStream fis = new FileInputStream(f);

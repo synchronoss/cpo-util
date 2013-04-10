@@ -42,6 +42,9 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
   private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SS");
   private static SimpleDateFormat sdfDateOnly = new SimpleDateFormat("yyyy-MM-dd");
 
+  private static final int COLUMN_PARAMETER = 4;
+  private static final int COLUMN_ATTRIBUTE_NAME = 3;
+
   private JComboBox connectionComboBox = new JComboBox();
   private JComboBox jComFunctionGroup = new JComboBox();
   private JTable jTableParam = new JTable();
@@ -326,7 +329,7 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
       CpoUtil.getInstance().setStatusBarText("Select ONE Row");
       return;
     }
-    jTableParam.setValueAt(value, selectedRows[0], TesterParamModel.COLUMN_PARAMETER);
+    jTableParam.setValueAt(value, selectedRows[0], COLUMN_PARAMETER);
   }
 
   private void insertValuesFromResults() {
@@ -340,7 +343,7 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
       int setColumn = getParamRowForSetter(setterName);
       if (setColumn != -1) {
         String value = this.jTableResults.getValueAt(selectedRows[0], i) == null ? null : this.jTableResults.getValueAt(selectedRows[0], i).toString();
-        jTableParam.setValueAt(value, setColumn, TesterParamModel.COLUMN_PARAMETER);
+        jTableParam.setValueAt(value, setColumn, COLUMN_PARAMETER);
       }
     }
   }
@@ -348,7 +351,7 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
   private int getParamRowForSetter(String setter) {
     int returnVal = -1;
     for (int i = 0; i < jTableParam.getRowCount(); i++) {
-      if (jTableParam.getValueAt(i, TesterParamModel.COLUMN_ATTRIBUTE_NAME).equals(setter)) {
+      if (jTableParam.getValueAt(i, COLUMN_ATTRIBUTE_NAME).equals(setter)) {
         returnVal = i;
       }
     }

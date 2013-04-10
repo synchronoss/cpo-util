@@ -115,6 +115,9 @@ public class ConvertCpoUtilLocalProperties {
         if (oldProps.getProperty(PROP_JDBC_URL + server) == null && oldProps.getProperty(PROP_JDBC_URL + server) == null) {
           // weblogic
           // TODO - do we need this?
+          if (logger.isTraceEnabled()) {
+            logger.trace("Weblogic???");
+          }
         } else {
           // jdbc
           String userName = null;

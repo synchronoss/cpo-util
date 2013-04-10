@@ -120,8 +120,6 @@ public class CoreArgumentTableModel extends AbstractTableModel {
   }
 
   public void removeNewRow() {
-    int originalLength = this.getNonRemovedRows();
-
     for (int i = cpoFunctionNode.getChildCount() - 1; i >= 0; i--) {
       CpoArgumentNode cpoArgumentNode = (CpoArgumentNode)cpoFunctionNode.getChildAt(i);
       if (!cpoArgumentNode.isRemove()) {

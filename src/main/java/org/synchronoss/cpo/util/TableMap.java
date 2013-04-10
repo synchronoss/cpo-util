@@ -19,7 +19,7 @@
  * http://www.gnu.org/licenses/lgpl.txt
  */
 package org.synchronoss.cpo.util;
-/** 
+/**
  * In a chain of data manipulators some behaviour is common. TableMap
  * provides most of this behavour and can be subclassed by filters
  * that only need to override a handful of specific methods. TableMap 
@@ -31,64 +31,65 @@ package org.synchronoss.cpo.util;
  * @version 1.4 12/17/97
  * @author Philip Milne */
 
-import javax.swing.table.*; 
-import javax.swing.event.TableModelListener; 
-import javax.swing.event.TableModelEvent; 
+import javax.swing.table.*;
+import javax.swing.event.TableModelListener;
+import javax.swing.event.TableModelEvent;
 
-public class TableMap extends AbstractTableModel 
-                      implements TableModelListener {
-    // Version Id for this class
-    private static final long serialVersionUID=1L;
-    protected TableModel model; 
+public class TableMap extends AbstractTableModel implements TableModelListener {
 
-    public TableModel getModel() {
-        return model;
-    }
+  // Version Id for this class
+  private static final long serialVersionUID = 1L;
+  protected TableModel model;
 
-    public void setModel(TableModel model) {
-        this.model = model; 
-        model.addTableModelListener(this); 
-    }
+  public TableModel getModel() {
+    return model;
+  }
 
-    // By default, implement TableModel by forwarding all messages 
-    // to the model. 
+  public void setModel(TableModel model) {
+    this.model = model;
+    model.addTableModelListener(this);
+  }
 
-    public Object getValueAt(int aRow, int aColumn) {
-        return model.getValueAt(aRow, aColumn); 
-    }
-        
-    @Override
-    public void setValueAt(Object aValue, int aRow, int aColumn) {
-        model.setValueAt(aValue, aRow, aColumn); 
-    }
+  // By default, implement TableModel by forwarding all messages
+  // to the model.
 
-    public int getRowCount() {
-        return (model == null) ? 0 : model.getRowCount(); 
-    }
+  public Object getValueAt(int aRow, int aColumn) {
+    return model.getValueAt(aRow, aColumn);
+  }
 
-    public int getColumnCount() {
-        return (model == null) ? 0 : model.getColumnCount(); 
-    }
-        
-    @Override
-    public String getColumnName(int aColumn) {
-        return model.getColumnName(aColumn); 
-    }
+  @Override
+  public void setValueAt(Object aValue, int aRow, int aColumn) {
+    model.setValueAt(aValue, aRow, aColumn);
+  }
 
-    @Override
-    public Class<?> getColumnClass(int aColumn) {
-        return model.getColumnClass(aColumn); 
-    }
-        
-    @Override
-    public boolean isCellEditable(int row, int column) { 
-         return model.isCellEditable(row, column); 
-    }
-//
+  public int getRowCount() {
+    return (model == null) ? 0 : model.getRowCount();
+  }
+
+  public int getColumnCount() {
+    return (model == null) ? 0 : model.getColumnCount();
+  }
+
+  @Override
+  public String getColumnName(int aColumn) {
+    return model.getColumnName(aColumn);
+  }
+
+  @Override
+  public Class<?> getColumnClass(int aColumn) {
+    return model.getColumnClass(aColumn);
+  }
+
+  @Override
+  public boolean isCellEditable(int row, int column) {
+    return model.isCellEditable(row, column);
+  }
+
+  //
 // Implementation of the TableModelListener interface, 
 //
-    // By default forward all events to all the listeners. 
-    public void tableChanged(TableModelEvent e) {
-        fireTableChanged(e);
-    }
+  // By default forward all events to all the listeners.
+  public void tableChanged(TableModelEvent e) {
+    fireTableChanged(e);
+  }
 }
