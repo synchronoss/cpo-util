@@ -5,6 +5,11 @@
   <artifactId>cpoUtil</artifactId>
   <name>cpoUtil</name>
   <version>5.0.2-SNAPSHOT</version>
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
   <description>cpoUtil is the utility that configures the metadata for cpo</description>
   <packaging>jar</packaging>
   <url>http://cpo.sourceforge.net/cpo-util-sourceforge/</url>
@@ -106,18 +111,6 @@
     </profile>
   </profiles>
   <distributionManagement>
-    <repository>
-      <id>sf-cpo-releases</id>
-      <name>Sourceforge CPO Repository</name>
-      <url>scp://shell.sourceforge.net/home/project-web/cpo/htdocs/sf-cpo-releases</url>
-      <!--<url>sftp://web.sourceforge.net/home/project-web/cpo/htdocs/sf-cpo-releases</url>-->
-    </repository>
-    <snapshotRepository>
-      <id>sf-cpo-snapshots</id>
-      <name>Sourceforge CPO Snapshot Repository</name>
-      <url>scp://shell.sourceforge.net/home/project-web/cpo/htdocs/sf-cpo-snapshots</url>
-      <!--<url>sftp://web.sourceforge.net/home/project-web/cpo/htdocs/sf-cpo-snapshots</url>-->
-    </snapshotRepository>
     <site>
       <!-- must create a shell for your account at sourceforge by execing: ssh -t <username>,<project name>@shell.sf.net create-->
       <id>sf-cpo-site</id>
