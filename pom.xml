@@ -186,11 +186,11 @@
       </resource>
     </resources>
     <extensions>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-ssh</artifactId>
-				<version>2.4</version>
-			</extension>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ssh</artifactId>
+        <version>2.2</version>
+      </extension>
     </extensions>
     <pluginManagement>
       <plugins>
@@ -222,7 +222,7 @@
               <!-- add support for ssh/scp -->
               <groupId>org.apache.maven.wagon</groupId>
               <artifactId>wagon-ssh</artifactId>
-              <version>2.4</version>
+              <version>2.2</version>
             </dependency>
           </dependencies>
         </plugin>
