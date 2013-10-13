@@ -29,7 +29,7 @@
     <currentVersion>${project.version}</currentVersion>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <cpoutil.bootstrapUrl/>
-    <cpo.version>5.0.3.3</cpo.version>
+    <cpo.version>5.0.5-SNAPSHOT</cpo.version>
     <cpo.assembly.id>dist</cpo.assembly.id>
     <cpo.onejar.filename>${project.build.finalName}.one-jar.jar</cpo.onejar.filename>
     <cpo.osx.filename>${project.build.finalName}.dmg</cpo.osx.filename>
@@ -196,6 +196,41 @@
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>2.4.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>2.3.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.8</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.4</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>2.4</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>2.7</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.6</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
           <version>2.4.1</version>
         </plugin>
@@ -207,6 +242,11 @@
             <source>1.6</source>
             <target>1.6</target>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>1.3.1</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -246,7 +286,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.2</version>
         <configuration>
           <archive>
             <manifest>
@@ -258,6 +297,31 @@
           <!-- breaks one-jar plugin -->
           <!--<classifier>${cpo.classifier}</classifier>-->
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <configuration>
+          <rules>
+            <requireMavenVersion>
+              <version>3.0.5</version>
+            </requireMavenVersion>
+            <requireJavaVersion>
+              <version>1.6</version>
+            </requireJavaVersion>
+            <requirePluginVersions>
+              <message>Best Practice is to always define plugin versions!</message>
+            </requirePluginVersions>
+          </rules>
+        </configuration>
+        <executions>
+          <execution>
+            <id>enforce-versions</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -325,7 +389,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.4</version>
         <configuration>
           <descriptors>
             <descriptor>src/assemble/bin-assembly.xml</descriptor>

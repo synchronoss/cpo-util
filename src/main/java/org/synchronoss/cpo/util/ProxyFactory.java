@@ -109,6 +109,6 @@ public class ProxyFactory {
    */
   private CpoMetaDescriptor createMetaDescriptor(File cpoMetaXml) throws CpoException {
     String metaDescriptorName = "CpoUtil:" + System.currentTimeMillis() + ":" + cpoMetaXml.getAbsolutePath();
-    return CpoMetaDescriptor.getInstance(metaDescriptorName, cpoMetaXml.getAbsolutePath());
+    return CpoMetaDescriptor.getInstance(metaDescriptorName, cpoMetaXml.getAbsolutePath(), false);
   }
 }

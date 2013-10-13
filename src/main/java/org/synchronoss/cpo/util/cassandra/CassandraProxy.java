@@ -43,9 +43,4 @@ public class CassandraProxy extends Proxy {
     this.setCpoMetaXml(cpoMetaXml);
     this.setMetaDescriptor(metaDescriptor);
   }
-  @Override
-  protected CpoAdapter getCpoAdapter(String connectionName) throws CpoException {
-    // TODO - Implement org.synchronoss.cpo.util.cassandra.CassandraProxy.getCpoAdapter
-    throw new UnsupportedOperationException("org.synchronoss.cpo.util.cassandra.CassandraProxy.getCpoAdapter has not been implemented.");
-  }
 }

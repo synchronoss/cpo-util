@@ -588,9 +588,9 @@ public abstract class Proxy {
   /**
    * Attempt to figure out the java type name for the supplied attribute.
    */
-  public String getJavaTypeName(CpoAttribute cpoAttribute) throws CpoException {
+  public String getDataTypeName(CpoAttribute cpoAttribute) throws CpoException {
     // figure out the java type
-    return metaDescriptor.getJavaTypeName(cpoAttribute);
+    return metaDescriptor.getDataTypeName(cpoAttribute);
   }
 
   /**

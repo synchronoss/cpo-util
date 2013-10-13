@@ -103,7 +103,7 @@ public class CpoNewAttributePanel extends JPanel {
     attribute.setTransformClassName(jTextTransform.getText());
 
     // figure out the java type
-    attribute.setJavaType(proxy.getJavaTypeName(attribute));
+    attribute.setJavaType(proxy.getDataTypeName(attribute));
 
     return attribute;
   }

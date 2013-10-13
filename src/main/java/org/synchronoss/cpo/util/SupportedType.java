@@ -22,10 +22,13 @@ package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
 import org.synchronoss.cpo.CpoException;
+import org.synchronoss.cpo.cassandra.cpoCassandraConfig.CtCassandraConfig;
+import org.synchronoss.cpo.cassandra.meta.CassandraCpoMetaDescriptor;
 import org.synchronoss.cpo.core.cpoCoreConfig.CtDataSourceConfig;
 import org.synchronoss.cpo.jdbc.cpoJdbcConfig.CtJdbcConfig;
 import org.synchronoss.cpo.jdbc.meta.JdbcCpoMetaDescriptor;
 import org.synchronoss.cpo.meta.CpoMetaDescriptor;
+import org.synchronoss.cpo.util.cassandra.*;
 import org.synchronoss.cpo.util.jdbc.*;
 
 /**
@@ -34,7 +37,7 @@ import org.synchronoss.cpo.util.jdbc.*;
 public enum SupportedType {
 
   Jdbc(JdbcCpoMetaDescriptor.class, JdbcProxy.class, CtJdbcConfig.class, JdbcConnectionPanel.class),
-  // Cassandra(CpoMetaDescriptor.class, CassandraProxy.class, CtCassandraConfig.class, CassandraConnectionPanel.class),
+  Cassandra(CassandraCpoMetaDescriptor.class, CassandraProxy.class, CtCassandraConfig.class, CassandraConnectionPanel.class),
   ;
 
   protected static Logger logger = LoggerFactory.getLogger(SupportedType.class);
