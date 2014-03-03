@@ -169,7 +169,7 @@
   <scm>
     <connection>scm:git:git@github.com:berryware/cpo-util.git</connection>
     <developerConnection>scm:git:git@github.com:berryware/cpo-util.git</developerConnection>
-    <url>scm:git:git@github.com:berryware/cpo-util.git</url>
+    <url>https://github.com/berryware/cpo-util</url>
   </scm>
   <build>
     <resources>
