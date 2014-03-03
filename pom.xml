@@ -167,9 +167,9 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:svn:svn+ssh://svn.code.sf.net/p/cpo/code/util/trunk</connection>
-    <developerConnection>scm:svn:svn+ssh://svn.code.sf.net/p/cpo/code/util/trunk</developerConnection>
-    <url>https://svn.code.sf.net/p/cpo/code/util/trunk</url>
+    <connection>scm:git:git@github.com:berryware/cpo-util.git</connection>
+    <developerConnection>scm:git:git@github.com:berryware/cpo-util.git</developerConnection>
+    <url>scm:git:git@github.com:berryware/cpo-util.git</url>
   </scm>
   <build>
     <resources>
