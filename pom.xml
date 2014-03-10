@@ -28,8 +28,9 @@
   <properties>
     <currentVersion>${project.version}</currentVersion>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <github.global.server>github</github.global.server>
     <cpoutil.bootstrapUrl/>
-    <cpo.version>5.0.5-SNAPSHOT</cpo.version>
+    <cpo.version>5.0.5</cpo.version>
     <cpo.assembly.id>dist</cpo.assembly.id>
     <cpo.onejar.filename>${project.build.finalName}.one-jar.jar</cpo.onejar.filename>
     <cpo.osx.filename>${project.build.finalName}.dmg</cpo.osx.filename>
@@ -427,6 +428,22 @@
             <goals>
               <goal>format</goal>
             </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.github.github</groupId>
+        <artifactId>site-maven-plugin</artifactId>
+        <version>0.9</version>
+        <configuration>
+          <message>Creating site for ${project.version}</message>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>site</goal>
+            </goals>
+            <phase>site</phase>
           </execution>
         </executions>
       </plugin>
