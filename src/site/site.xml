@@ -25,7 +25,7 @@
   <publishDate position="left" format="MM-dd-yyyy hh:mm:ss a"/>
   <bannerLeft>
     <name>CPO Util</name>
-    <href>/cpo-util-sourceforge/</href>
+    <href>http://github.com/berryware/cpo-util/</href>
   </bannerLeft>
   <bannerRight>
     <src>images/syn_logo.png</src>
@@ -33,7 +33,7 @@
   </bannerRight>
   <body>
     <links>
-      <item name="GitHub Project" href="http://github.com/berryware/cpo-util"/>
+      <item name="GitHub Project" href="http://github.com/berryware/cpo-util/"/>
       <item name="Continuous Builds" href="http://continuous.synchronoss.net:8111/viewType.html?buildTypeId=bt4"/>
     </links>
     <menu ref="parent" />
