@@ -12,7 +12,7 @@
   </parent>
   <description>cpoUtil is the utility that configures the metadata for cpo</description>
   <packaging>jar</packaging>
-  <url>http://cpo.sourceforge.net/cpo-util-sourceforge/</url>
+  <url>http://berryware.github.io/cpo-util/</url>
   <licenses>
     <license>
       <name>GNU Lesser General Public License</name>
@@ -28,7 +28,7 @@
   <properties>
     <currentVersion>${project.version}</currentVersion>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <github.global.server>github</github.global.server>
+    <github.global.server>cpo-github</github.global.server>
     <cpoutil.bootstrapUrl/>
     <cpo.version>5.0.5</cpo.version>
     <cpo.assembly.id>dist</cpo.assembly.id>
@@ -111,31 +111,13 @@
       </build>
     </profile>
   </profiles>
-  <distributionManagement>
-    <site>
-      <!-- must create a shell for your account at sourceforge by execing: ssh -t <username>,<project name>@shell.sf.net create-->
-      <id>sf-cpo-site</id>
-      <url>scp://shell.sourceforge.net/home/project-web/cpo/htdocs/cpo-util-sourceforge</url>
-      <!--<url>sftp://web.sourceforge.net/home/project-web/cpo/htdocs/cpo-util-sourceforge</url>-->
-    </site>
-  </distributionManagement>
   <issueManagement>
-    <system>SourceForge</system>
-    <url>http://sourceforge.net/projects/cpo</url>
+    <system>GitHub</system>
+    <url>https://github.com/berryware/cpo-util/issues</url>
   </issueManagement>
-  <mailingLists>
-    <mailingList>
-      <name>CPO Users List</name>
-      <subscribe>cpo-users-subscribe@lists.sourceforge.net</subscribe>
-      <unsubscribe>cpo-users-unsubscribe@lists.sourceforge.net</unsubscribe>
-      <post>cpo-users@lists.sourceforge.net</post>
-      <archive>http://lists.sourceforge.net/mailman/listinfo/cpo-users</archive>
-    </mailingList>
-  </mailingLists>
   <developers>
     <developer>
       <name>David Berry</name>
-      <email>berryware@N0SP4M.users.sourceforge.net</email>
       <roles>
         <role>architect</role>
         <role>developer</role>
@@ -143,25 +125,9 @@
       <timezone>EST</timezone>
     </developer>
     <developer>
-      <name>Jay Colson</name>
-      <email>jcolson@N0SP4M.users.sourceforge.net</email>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>EST</timezone>
-    </developer>
-    <developer>
-      <name>Eric Fedok</name>
-      <email>efedok@N0SP4M.users.sourceforge.net</email>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>EST</timezone>
-    </developer>
-    <developer>
       <name>Michael Bellomo</name>
-      <email>curly72@N0SP4M.users.sourceforge.net</email>
       <roles>
+        <role>architect</role>
         <role>developer</role>
       </roles>
       <timezone>EST</timezone>
@@ -406,9 +372,9 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>com.mycila.maven-license-plugin</groupId>
-        <artifactId>maven-license-plugin</artifactId>
-        <version>1.10.b1</version>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>2.5</version>
         <configuration>
           <header>src/main/resources/license.txt</header>
           <strictCheck>true</strictCheck>
@@ -416,10 +382,6 @@
             <!-- use /* instead of /** for java files -->
             <java>SLASHSTAR_STYLE</java>
           </mapping>
-          <excludes>
-            <!-- intellij folder -->
-            <exclude>.idea/**</exclude>
-          </excludes>
         </configuration>
         <executions>
           <execution>
