@@ -40,7 +40,7 @@
     <menu ref="modules" />
     <menu ref="reports" />
     <menu name="Related Links">
-	  <item name="CPO" href="../cpo-api/"/>
+	  <item name="CPO" href="http://berryware.github.io/cpo-api/"/>
     </menu>
   </body>
 </project>
