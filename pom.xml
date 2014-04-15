@@ -34,7 +34,7 @@
   </parent>
   <description>cpoUtil is the utility that configures the metadata for cpo</description>
   <packaging>jar</packaging>
-  <url>http://berryware.github.io/cpo-util/</url>
+  <url>http://cpo-org.github.io/cpo-util/</url>
   <licenses>
     <license>
       <name>GNU Lesser General Public License</name>
@@ -142,7 +142,7 @@
   </profiles>
   <issueManagement>
     <system>GitHub</system>
-    <url>https://github.com/berryware/cpo-util/issues</url>
+    <url>https://github.com/cpo-org/cpo-util/issues</url>
   </issueManagement>
   <developers>
     <developer>
@@ -163,9 +163,9 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:git:git@github.com:berryware/cpo-util.git</connection>
-    <developerConnection>scm:git:git@github.com:berryware/cpo-util.git</developerConnection>
-    <url>https://github.com/berryware/cpo-util</url>
+    <connection>scm:git:git@github.com:cpo-org/cpo-util.git</connection>
+    <developerConnection>scm:git:git@github.com:cpo-org/cpo-util.git</developerConnection>
+    <url>https://github.com/cpo-org/cpo-util</url>
   </scm>
   <build>
     <resources>
