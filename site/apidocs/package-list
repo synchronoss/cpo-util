@@ -1,0 +1,6 @@
+org.synchronoss.cpo.util
+org.synchronoss.cpo.util.cassandra
+org.synchronoss.cpo.util.conversion
+org.synchronoss.cpo.util.cpoUtilConfig
+org.synchronoss.cpo.util.cpoUtilConfig.impl
+org.synchronoss.cpo.util.jdbc
