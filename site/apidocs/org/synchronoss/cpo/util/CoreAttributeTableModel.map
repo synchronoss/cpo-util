@@ -1,6 +1,6 @@
 <map id="G" name="G">
-<area shape="rect" id="node1_0" href="./CpoAttributePanel.html" title="&lt;TABLE&gt;" alt="" coords="90,17,206,41"/>
-<area shape="rect" id="node2_1" href="./CpoAttributeLabelNode.html" title="&lt;TABLE&gt;" alt="" coords="15,209,158,233"/>
-<area shape="rect" id="node3_2" href="./CoreAttributeTableModel.html" title="&lt;TABLE&gt;" alt="" coords="135,113,286,137"/>
-<area shape="rect" id="node4_3" href="./jdbc/JdbcAttributeTableModel.html" title="&lt;TABLE&gt;" alt="" coords="204,203,353,239"/>
+<area shape="rect" id="c3160" href="./CpoAttributeLabelNode.html" title="&lt;TABLE&gt;" alt="" coords="15,209,163,233"/>
+<area shape="rect" id="c3163" href="./CpoAttributePanel.html" title="&lt;TABLE&gt;" alt="" coords="93,17,211,41"/>
+<area shape="rect" id="c3190" href="./CoreAttributeTableModel.html" title="&lt;TABLE&gt;" alt="" coords="137,113,293,137"/>
+<area shape="rect" id="c3200" href="./jdbc/JdbcAttributeTableModel.html" title="&lt;TABLE&gt;" alt="" coords="208,203,363,239"/>
 </map>

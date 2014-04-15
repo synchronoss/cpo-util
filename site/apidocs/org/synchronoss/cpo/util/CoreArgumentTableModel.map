@@ -1,7 +1,7 @@
 <map id="G" name="G">
-<area shape="rect" id="node1_0" href="./CpoFunctionPanel.html" title="&lt;TABLE&gt;" alt="" coords="16,17,133,41"/>
-<area shape="rect" id="node2_1" href="./CpoFunctionNode.html" title="&lt;TABLE&gt;" alt="" coords="17,209,132,233"/>
-<area shape="rect" id="node4_2" href="./CoreArgumentTableModel.html" title="&lt;TABLE&gt;" alt="" coords="149,113,307,137"/>
-<area shape="rect" id="node3_3" href="./CpoArgumentAttributeEditor.html" title="&lt;TABLE&gt;" alt="" coords="179,17,347,41"/>
-<area shape="rect" id="node5_4" href="./jdbc/JdbcArgumentTableModel.html" title="&lt;TABLE&gt;" alt="" coords="177,203,335,239"/>
+<area shape="rect" id="c1105" href="./CpoArgumentAttributeEditor.html" title="&lt;TABLE&gt;" alt="" coords="15,17,187,41"/>
+<area shape="rect" id="c1108" href="./CoreArgumentTableModel.html" title="&lt;TABLE&gt;" alt="" coords="53,113,217,137"/>
+<area shape="rect" id="c1130" href="./CpoFunctionNode.html" title="&lt;TABLE&gt;" alt="" coords="233,209,351,233"/>
+<area shape="rect" id="c1152" href="./jdbc/JdbcArgumentTableModel.html" title="&lt;TABLE&gt;" alt="" coords="25,203,188,239"/>
+<area shape="rect" id="c1111" href="./CpoFunctionPanel.html" title="&lt;TABLE&gt;" alt="" coords="231,17,353,41"/>
 </map>

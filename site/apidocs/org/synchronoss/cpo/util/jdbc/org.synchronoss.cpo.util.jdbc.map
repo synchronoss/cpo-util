@@ -1,12 +1,12 @@
 <map id="G" name="G">
-<area shape="rect" id="node1_0" href="./JdbcProxy.html" title="&lt;TABLE&gt;" alt="" coords="16,17,91,41"/>
-<area shape="rect" id="node2_1" href="./JdbcNewAttributePanel.html" title="&lt;TABLE&gt;" alt="" coords="137,17,279,41"/>
-<area shape="rect" id="node3_2" href="./JdbcFunctionNode.html" title="&lt;TABLE&gt;" alt="" coords="325,17,443,41"/>
-<area shape="rect" id="node4_3" href="./JdbcConnectionPanel.html" title="&lt;TABLE&gt;" alt="" coords="489,17,623,41"/>
-<area shape="rect" id="node5_4" href="./JdbcClassNode.html" title="&lt;TABLE&gt;" alt="" coords="669,17,771,41"/>
-<area shape="rect" id="node6_5" href="./JdbcAttributeTableModel.html" title="&lt;TABLE&gt;" alt="" coords="817,17,967,41"/>
-<area shape="rect" id="node7_6" href="./JdbcAttributeNode.html" title="&lt;TABLE&gt;" alt="" coords="1012,17,1129,41"/>
-<area shape="rect" id="node8_7" href="./JdbcAttributeLabelNode.html" title="&lt;TABLE&gt;" alt="" coords="1175,17,1321,41"/>
-<area shape="rect" id="node9_8" href="./JdbcArgumentTableModel.html" title="&lt;TABLE&gt;" alt="" coords="1367,17,1524,41"/>
-<area shape="rect" id="node10_9" href="./JdbcArgumentNode.html" title="&lt;TABLE&gt;" alt="" coords="1570,17,1694,41"/>
+<area shape="rect" id="c187" href="./JdbcConnectionPanel.html" title="&lt;TABLE&gt;" alt="" coords="15,17,155,41"/>
+<area shape="rect" id="c188" href="./JdbcFunctionNode.html" title="&lt;TABLE&gt;" alt="" coords="199,17,321,41"/>
+<area shape="rect" id="c189" href="./JdbcAttributeTableModel.html" title="&lt;TABLE&gt;" alt="" coords="365,17,520,41"/>
+<area shape="rect" id="c190" href="./JdbcAttributeLabelNode.html" title="&lt;TABLE&gt;" alt="" coords="565,17,715,41"/>
+<area shape="rect" id="c191" href="./JdbcNewAttributePanel.html" title="&lt;TABLE&gt;" alt="" coords="760,17,907,41"/>
+<area shape="rect" id="c192" href="./JdbcArgumentNode.html" title="&lt;TABLE&gt;" alt="" coords="952,17,1080,41"/>
+<area shape="rect" id="c193" href="./JdbcClassNode.html" title="&lt;TABLE&gt;" alt="" coords="1125,17,1230,41"/>
+<area shape="rect" id="c194" href="./JdbcAttributeNode.html" title="&lt;TABLE&gt;" alt="" coords="1275,17,1395,41"/>
+<area shape="rect" id="c195" href="./JdbcArgumentTableModel.html" title="&lt;TABLE&gt;" alt="" coords="1440,17,1603,41"/>
+<area shape="rect" id="c196" href="./JdbcProxy.html" title="&lt;TABLE&gt;" alt="" coords="1647,17,1723,41"/>
 </map>

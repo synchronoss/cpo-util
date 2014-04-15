@@ -1,0 +1,7 @@
+<map id="G" name="G">
+<area shape="rect" id="c3759" href="../AbstractConnectionPanel.html" title="&lt;TABLE&gt;" alt="" coords="33,11,191,47"/>
+<area shape="rect" id="c3789" href="./JdbcConnectionPanel.html" title="&lt;TABLE&gt;" alt="" coords="197,113,337,137"/>
+<area shape="rect" id="c3818" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/core/cpoCoreConfig/CtDataSourceConfig.html" title="&lt;TABLE&gt;" alt="" coords="16,203,208,253"/>
+<area shape="rect" id="c3819" href="http://java.sun.com/j2se/1.4.2/docs/api/org/slf4j/Logger.html" title="&lt;TABLE&gt;" alt="" coords="253,203,333,253"/>
+<area shape="rect" id="c3820" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/jdbc/cpoJdbcConfig/CtJdbcConfig.html" title="&lt;TABLE&gt;" alt="" coords="378,203,569,253"/>
+</map>

@@ -1,6 +1,6 @@
 <map id="G" name="G">
-<area shape="rect" id="node1_0" href="./CpoFunctionPanel.html" title="&lt;TABLE&gt;" alt="" coords="79,17,196,41"/>
-<area shape="rect" id="node2_1" href="./CpoFunctionNode.html" title="&lt;TABLE&gt;" alt="" coords="16,223,131,247"/>
-<area shape="rect" id="node3_2" href="./CoreArgumentTableModel.html" title="&lt;TABLE&gt;" alt="" coords="59,120,216,144"/>
-<area shape="rect" id="node4_3" href="http://java.sun.com/j2se/1.4.2/docs/api/org/slf4j/Logger.html" title="&lt;TABLE&gt;" alt="" coords="261,107,339,157"/>
+<area shape="rect" id="c1326" href="./CoreArgumentTableModel.html" title="&lt;TABLE&gt;" alt="" coords="15,120,179,144"/>
+<area shape="rect" id="c1348" href="./CpoFunctionNode.html" title="&lt;TABLE&gt;" alt="" coords="102,223,221,247"/>
+<area shape="rect" id="c1329" href="./CpoFunctionPanel.html" title="&lt;TABLE&gt;" alt="" coords="166,17,287,41"/>
+<area shape="rect" id="c1391" href="http://java.sun.com/j2se/1.4.2/docs/api/org/slf4j/Logger.html" title="&lt;TABLE&gt;" alt="" coords="275,107,355,157"/>
 </map>
