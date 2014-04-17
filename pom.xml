@@ -55,8 +55,6 @@
     <cpo.version>5.0.5</cpo.version>
     <cpo.assembly.id>dist</cpo.assembly.id>
     <cpo.onejar.filename>${project.build.finalName}.one-jar.jar</cpo.onejar.filename>
-    <cpo.osx.filename>${project.build.finalName}.dmg</cpo.osx.filename>
-    <cpo.osx.bundleName>CpoUtil-${project.version}</cpo.osx.bundleName>
   </properties>
   <ciManagement>
     <system>teamcity</system>
@@ -83,41 +81,6 @@
         <cpo.osx.filename>${project.build.finalName}-${cpo.classifier}.dmg</cpo.osx.filename>
         <cpo.osx.bundleName>CpoUtil-${project.version}-${cpo.classifier}</cpo.osx.bundleName>
       </properties>
-    </profile>
-    <profile>
-      <id>mac</id>
-      <activation>
-        <os>
-          <family>mac</family>
-        </os>
-      </activation>
-      <build>
-        <plugins>
-          <!-- the dmg only gets generated if you build on a mac, and the build-helper plugin fails if the file doesn't exist -->
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <version>1.8</version>
-            <executions>
-              <execution>
-                <id>attach-artifacts</id>
-                <phase>install</phase>
-                <goals>
-                  <goal>attach-artifact</goal>
-                </goals>
-                <configuration>
-                  <artifacts>
-                    <artifact>
-                      <file>${project.build.directory}/${cpo.osx.filename}</file>
-                      <type>dmg</type>
-                    </artifact>
-                  </artifacts>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
     <profile>
       <id>DEPLOY</id>
@@ -356,27 +319,6 @@
             </configuration>
             <goals>
               <goal>one-jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>osxappbundle-maven-plugin</artifactId>
-        <version>1.0-alpha-2</version>
-        <configuration>
-          <mainClass>org.synchronoss.cpo.util.CpoUtil</mainClass>
-          <iconFile>${basedir}/src/main/resources/images/sync-logo-sm.icns</iconFile>
-          <javaApplicationStub>${basedir}/src/assemble/JavaApplicationStub</javaApplicationStub>
-          <bundleName>${cpo.osx.bundleName}</bundleName>
-          <diskImageFile>${project.build.directory}/${cpo.osx.filename}</diskImageFile>
-          <internetEnable>true</internetEnable>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>bundle</goal>
             </goals>
           </execution>
         </executions>
