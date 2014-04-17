@@ -26,7 +26,7 @@
   <groupId>org.synchronoss.cpo</groupId>
   <artifactId>cpoUtil</artifactId>
   <name>cpoUtil</name>
-  <version>5.0.2-SNAPSHOT</version>
+  <version>5.1.0</version>
   <parent>
     <groupId>org.sonatype.oss</groupId>
     <artifactId>oss-parent</artifactId>
@@ -51,7 +51,7 @@
     <currentVersion>${project.version}</currentVersion>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <github.global.server>cpo-github</github.global.server>
-    <cpoutil.bootstrapUrl/>
+    <cpoutil.bootstrapUrl />
     <cpo.version>5.0.5</cpo.version>
     <cpo.assembly.id>dist</cpo.assembly.id>
     <cpo.onejar.filename>${project.build.finalName}.one-jar.jar</cpo.onejar.filename>
@@ -166,6 +166,7 @@
     <connection>scm:git:git@github.com:cpo-org/cpo-util.git</connection>
     <developerConnection>scm:git:git@github.com:cpo-org/cpo-util.git</developerConnection>
     <url>https://github.com/cpo-org/cpo-util</url>
+    <tag>cpoUtil-5.1.0</tag>
   </scm>
   <build>
     <resources>
