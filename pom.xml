@@ -78,8 +78,6 @@
         <cpo.classifier>sncr</cpo.classifier>
         <cpo.assembly.id>dist-${cpo.classifier}</cpo.assembly.id>
         <cpo.onejar.filename>${project.build.finalName}-${cpo.classifier}.one-jar.jar</cpo.onejar.filename>
-        <cpo.osx.filename>${project.build.finalName}-${cpo.classifier}.dmg</cpo.osx.filename>
-        <cpo.osx.bundleName>CpoUtil-${project.version}-${cpo.classifier}</cpo.osx.bundleName>
       </properties>
     </profile>
     <profile>
