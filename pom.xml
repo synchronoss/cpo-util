@@ -52,7 +52,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <github.global.server>cpo-github</github.global.server>
     <cpoutil.bootstrapUrl />
-    <cpo.version>5.0.5</cpo.version>
+    <cpo.version>5.1.2-SNAPSHOT</cpo.version>
     <cpo.assembly.id>dist</cpo.assembly.id>
     <cpo.onejar.filename>${project.build.finalName}.one-jar.jar</cpo.onejar.filename>
   </properties>
@@ -197,8 +197,8 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.1</version>
           <configuration>
-            <source>1.7</source>
-            <target>1.7</target>
+            <source>1.8</source>
+            <target>1.8</target>
           </configuration>
         </plugin>
         <plugin>
@@ -249,10 +249,10 @@
         <configuration>
           <rules>
             <requireMavenVersion>
-              <version>3.0.5</version>
+              <version>3.2.1</version>
             </requireMavenVersion>
             <requireJavaVersion>
-              <version>1.7</version>
+              <version>1.8</version>
             </requireJavaVersion>
             <requirePluginVersions>
               <message>Best Practice is to always define plugin versions!</message>
@@ -489,7 +489,7 @@
         <artifactId>maven-pmd-plugin</artifactId>
         <version>3.0.1</version>
         <configuration>
-          <targetJdk>1.7</targetJdk>
+          <targetJdk>1.8</targetJdk>
         </configuration>
       </plugin>
       <plugin>
@@ -539,7 +539,7 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.9</version>
         <configuration>
-          <source>1.7</source>
+          <source>1.8</source>
           <aggregate>true</aggregate>
           <doclet>gr.spinellis.umlgraph.doclet.UmlGraphDoc</doclet>
           <docletArtifact>

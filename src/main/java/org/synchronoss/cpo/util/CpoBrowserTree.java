@@ -22,6 +22,7 @@ package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
 import org.synchronoss.cpo.CpoException;
+import org.synchronoss.cpo.exporter.*;
 import org.synchronoss.cpo.meta.domain.*;
 
 import javax.swing.*;
@@ -438,29 +439,33 @@ public class CpoBrowserTree extends JTree {
   private void saveClassSource(CpoClassNode cpoClassNode) {
     Proxy proxy = getRoot().getProxy();
 
-    String className = cpoClassNode.getUserObject().getName();
+    CpoInterfaceSourceGenerator interfaceSourceGenerator = proxy.generateInterfaceSourceCode(cpoClassNode);
+    CpoClassSourceGenerator classSourceGenerator = proxy.generateClassSourceCode(cpoClassNode);
 
-    String saveClassName = className;
-    if (className.contains(".")) {
-      saveClassName = className.substring(className.lastIndexOf(".") + 1);
-    }
+    String interfaceName = interfaceSourceGenerator.getInterfaceName();
+    String className = classSourceGenerator.getClassName();
+
     JFileChooser jFile = new JFileChooser();
     if (proxy.getLastDir() != null) {
       jFile.setCurrentDirectory(proxy.getLastDir());
     }
-    jFile.setDialogTitle("Choose a directory to save: " + saveClassName + ".java");
+    jFile.setDialogTitle("Choose a directory to save: " + interfaceName + ".java and " + className + ".java");
     jFile.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
     int result = jFile.showSaveDialog(this.getTopLevelAncestor());
     if (result != JFileChooser.APPROVE_OPTION || jFile.getSelectedFile() == null) {
-      CpoUtil.getInstance().setStatusBarText("Aborted Class Creation: file not saved");
+      CpoUtil.getInstance().setStatusBarText("Aborted Class Creation: files not saved");
       return;
     }
 
     proxy.setLastDir(jFile.getCurrentDirectory());
     try {
-      FileWriter fw = new FileWriter(jFile.getSelectedFile() + File.separator + saveClassName + ".java");
-      fw.write(proxy.generateSourceCode(cpoClassNode));
-      fw.close();
+      FileWriter iw = new FileWriter(jFile.getSelectedFile() + File.separator + interfaceName + ".java");
+      iw.write(interfaceSourceGenerator.getSourceCode());
+      iw.close();
+
+      FileWriter cw = new FileWriter(jFile.getSelectedFile() + File.separator + className + ".java");
+      cw.write(classSourceGenerator.getSourceCode());
+      cw.close();
     } catch (IOException ioe) {
       CpoUtil.showException(ioe);
       CpoUtil.getInstance().setStatusBarText("Class not created: exception caught during save: " + ioe.getMessage());

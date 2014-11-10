@@ -22,9 +22,9 @@ package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
 import org.synchronoss.cpo.*;
-import org.synchronoss.cpo.core.cpoCoreConfig.*;
+import org.synchronoss.cpo.core.cpoCoreConfig.CtDataSourceConfig;
 import org.synchronoss.cpo.core.cpoCoreMeta.StFunctionGroupType;
-import org.synchronoss.cpo.exporter.CpoClassSourceGenerator;
+import org.synchronoss.cpo.exporter.*;
 import org.synchronoss.cpo.meta.CpoMetaDescriptor;
 import org.synchronoss.cpo.meta.domain.*;
 import org.synchronoss.cpo.parser.ExpressionParser;
@@ -744,12 +744,26 @@ public abstract class Proxy {
    * @param node The CpoClassNode to generate source for
    * @return String containing the java source code.
    */
-  public String generateSourceCode(CpoClassNode node) {
+  public CpoInterfaceSourceGenerator generateInterfaceSourceCode(CpoClassNode node) {
+    CpoClass cpoClass = node.getUserObject();
+
+    CpoInterfaceSourceGenerator generator = new CpoInterfaceSourceGenerator(metaDescriptor);
+    cpoClass.acceptMetaDFVisitor(generator);
+    return generator;
+  }
+
+  /**
+   * Generates the java source code for the specified class.
+   *
+   * @param node The CpoClassNode to generate source for
+   * @return String containing the java source code.
+   */
+  public CpoClassSourceGenerator generateClassSourceCode(CpoClassNode node) {
     CpoClass cpoClass = node.getUserObject();
 
     CpoClassSourceGenerator generator = new CpoClassSourceGenerator(metaDescriptor);
     cpoClass.acceptMetaDFVisitor(generator);
-    return generator.getSourceCode();
+    return generator;
   }
 
   /**
