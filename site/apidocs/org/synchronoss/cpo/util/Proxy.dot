@@ -7,132 +7,150 @@
 digraph G {
 	edge [fontname="Helvetica",fontsize=10,labelfontname="Helvetica",labelfontsize=10];
 	node [fontname="Helvetica",fontsize=10,shape=plaintext];
-	// org.synchronoss.cpo.util.CpoBrowserPanel
-	c3317 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="./CpoBrowserPanel.html">
-		<tr><td><table border="0" cellspacing="0" cellpadding="1">
-			<tr><td> CpoBrowserPanel </td></tr>
-		</table></td></tr>
-		</table>>, fontname="Helvetica", fontcolor="black", fontsize=9.0];
 	// org.synchronoss.cpo.util.Proxy
-	c3337 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" bgcolor="lemonChiffon" href="./Proxy.html">
+	c1332 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" bgcolor="lemonChiffon" href="./Proxy.html">
 		<tr><td><table border="0" cellspacing="0" cellpadding="1">
 			<tr><td><font face="Helvetica-Oblique"> Proxy </font></td></tr>
 		</table></td></tr>
 		</table>>, fontname="Helvetica", fontcolor="black", fontsize=9.0];
+	// org.synchronoss.cpo.util.CpoBrowserPanel
+	c1350 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="./CpoBrowserPanel.html">
+		<tr><td><table border="0" cellspacing="0" cellpadding="1">
+			<tr><td> CpoBrowserPanel </td></tr>
+		</table></td></tr>
+		</table>>, fontname="Helvetica", fontcolor="black", fontsize=9.0];
 	// org.synchronoss.cpo.util.cassandra.CassandraProxy
-	c3341 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="./cassandra/CassandraProxy.html">
+	c1363 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="./cassandra/CassandraProxy.html">
 		<tr><td><table border="0" cellspacing="0" cellpadding="1">
 			<tr><td> CassandraProxy </td></tr>
 			<tr><td><font point-size="7.0"> org.synchronoss.cpo.util.cassandra </font></td></tr>
 		</table></td></tr>
 		</table>>, fontname="Helvetica", fontcolor="black", fontsize=9.0];
 	// org.synchronoss.cpo.util.jdbc.JdbcProxy
-	c3352 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="./jdbc/JdbcProxy.html">
+	c1366 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="./jdbc/JdbcProxy.html">
 		<tr><td><table border="0" cellspacing="0" cellpadding="1">
 			<tr><td> JdbcProxy </td></tr>
 			<tr><td><font point-size="7.0"> org.synchronoss.cpo.util.jdbc </font></td></tr>
 		</table></td></tr>
 		</table>>, fontname="Helvetica", fontcolor="black", fontsize=9.0];
 	//org.synchronoss.cpo.util.cassandra.CassandraProxy extends org.synchronoss.cpo.util.Proxy
-	c3337:p -> c3341:p [dir=back,arrowtail=empty];
+	c1332:p -> c1363:p [dir=back,arrowtail=empty];
 	//org.synchronoss.cpo.util.jdbc.JdbcProxy extends org.synchronoss.cpo.util.Proxy
-	c3337:p -> c3352:p [dir=back,arrowtail=empty];
-	// org.synchronoss.cpo.util.CpoBrowserPanel NAVASSOC org.synchronoss.cpo.util.Proxy
-	c3317:p -> c3337:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open];
+	c1332:p -> c1366:p [dir=back,arrowtail=empty];
 	// org.synchronoss.cpo.util.Proxy NAVASSOC org.slf4j.Logger
-	c3337:p -> c3372:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open];
+	c1332:p -> c1394:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open];
 	// org.synchronoss.cpo.util.Proxy NAVASSOC org.synchronoss.cpo.meta.CpoMetaDescriptor
-	c3337:p -> c3373:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open];
+	c1332:p -> c1395:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open];
 	// org.synchronoss.cpo.util.Proxy NAVASSOC org.synchronoss.cpo.CpoAdapter
-	c3337:p -> c3374:p [taillabel="", label="", headlabel="*", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open];
-	// org.synchronoss.cpo.util.Proxy DEPEND org.synchronoss.cpo.CpoAdapter
-	c3337:p -> c3374:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
-	// org.synchronoss.cpo.util.Proxy DEPEND org.synchronoss.cpo.parser.ExpressionParser
-	c3337:p -> c3375:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
-	// org.synchronoss.cpo.util.Proxy DEPEND org.synchronoss.cpo.meta.CpoMetaDescriptor
-	c3337:p -> c3373:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
-	// org.synchronoss.cpo.util.Proxy DEPEND org.synchronoss.cpo.meta.domain.CpoClass
-	c3337:p -> c3376:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
+	c1332:p -> c1397:p [taillabel="", label="", headlabel="*", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open];
+	// org.synchronoss.cpo.util.CpoBrowserPanel NAVASSOC org.synchronoss.cpo.util.Proxy
+	c1350:p -> c1332:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open];
+	// org.synchronoss.cpo.util.Proxy DEPEND org.synchronoss.cpo.exporter.CpoClassSourceGenerator
+	c1332:p -> c1399:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
 	// org.synchronoss.cpo.util.Proxy DEPEND org.synchronoss.cpo.meta.domain.CpoArgument
-	c3337:p -> c3377:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
+	c1332:p -> c1401:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
+	// org.synchronoss.cpo.util.Proxy DEPEND org.synchronoss.cpo.meta.domain.CpoClass
+	c1332:p -> c1402:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
+	// org.synchronoss.cpo.util.Proxy DEPEND org.synchronoss.cpo.parser.ExpressionParser
+	c1332:p -> c1403:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
 	// org.synchronoss.cpo.util.Proxy DEPEND org.synchronoss.cpo.meta.domain.CpoFunction
-	c3337:p -> c3378:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
-	// org.synchronoss.cpo.util.Proxy DEPEND org.synchronoss.cpo.meta.domain.CpoFunctionGroup
-	c3337:p -> c3379:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
+	c1332:p -> c1405:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
+	// org.synchronoss.cpo.util.Proxy DEPEND org.synchronoss.cpo.CpoAdapter
+	c1332:p -> c1397:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
+	// org.synchronoss.cpo.util.Proxy DEPEND org.synchronoss.cpo.exporter.CpoInterfaceSourceGenerator
+	c1332:p -> c1406:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
+	// org.synchronoss.cpo.util.Proxy DEPEND org.synchronoss.cpo.meta.CpoMetaDescriptor
+	c1332:p -> c1395:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
 	// org.synchronoss.cpo.util.Proxy DEPEND org.synchronoss.cpo.meta.domain.CpoAttribute
-	c3337:p -> c3380:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
-	// org.synchronoss.cpo.util.jdbc.JdbcProxy DEPEND org.synchronoss.cpo.meta.domain.CpoClass
-	c3352:p -> c3376:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
-	// org.synchronoss.cpo.util.jdbc.JdbcProxy DEPEND org.synchronoss.cpo.meta.domain.CpoArgument
-	c3352:p -> c3377:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
-	// org.synchronoss.cpo.util.jdbc.JdbcProxy DEPEND org.synchronoss.cpo.meta.domain.CpoAttribute
-	c3352:p -> c3380:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
+	c1332:p -> c1411:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
+	// org.synchronoss.cpo.util.Proxy DEPEND org.synchronoss.cpo.meta.domain.CpoFunctionGroup
+	c1332:p -> c1412:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
 	// org.synchronoss.cpo.util.jdbc.JdbcProxy DEPEND org.synchronoss.cpo.meta.domain.CpoFunction
-	c3352:p -> c3378:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
-	// org.synchronoss.cpo.parser.ExpressionParser
-	c3375 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/parser/ExpressionParser.html">
-		<tr><td><table border="0" cellspacing="0" cellpadding="1">
-			<tr><td> &laquo;interface&raquo; </td></tr>
-			<tr><td> ExpressionParser </td></tr>
-			<tr><td><font point-size="7.0"> org.synchronoss.cpo.parser </font></td></tr>
-		</table></td></tr>
-		</table>>, fontname="Helvetica", fontcolor="black", fontsize=9.0];
+	c1366:p -> c1405:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
+	// org.synchronoss.cpo.util.jdbc.JdbcProxy DEPEND org.synchronoss.cpo.meta.domain.CpoArgument
+	c1366:p -> c1401:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
+	// org.synchronoss.cpo.util.jdbc.JdbcProxy DEPEND org.synchronoss.cpo.meta.domain.CpoClass
+	c1366:p -> c1402:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
+	// org.synchronoss.cpo.util.jdbc.JdbcProxy DEPEND org.synchronoss.cpo.meta.domain.CpoAttribute
+	c1366:p -> c1411:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
 	// org.synchronoss.cpo.meta.domain.CpoClass
-	c3376 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoClass.html">
+	c1402 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoClass.html">
 		<tr><td><table border="0" cellspacing="0" cellpadding="1">
 			<tr><td><font face="Helvetica-Oblique"> CpoClass </font></td></tr>
 			<tr><td><font point-size="7.0"> org.synchronoss.cpo.meta.domain </font></td></tr>
 		</table></td></tr>
 		</table>>, fontname="Helvetica", fontcolor="black", fontsize=9.0];
-	// org.slf4j.Logger
-	c3372 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/slf4j/Logger.html">
+	// org.synchronoss.cpo.exporter.CpoClassSourceGenerator
+	c1399 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/exporter/CpoClassSourceGenerator.html">
 		<tr><td><table border="0" cellspacing="0" cellpadding="1">
-			<tr><td> &laquo;interface&raquo; </td></tr>
-			<tr><td> Logger </td></tr>
-			<tr><td><font point-size="7.0"> org.slf4j </font></td></tr>
+			<tr><td> CpoClassSourceGenerator </td></tr>
+			<tr><td><font point-size="7.0"> org.synchronoss.cpo.exporter </font></td></tr>
 		</table></td></tr>
 		</table>>, fontname="Helvetica", fontcolor="black", fontsize=9.0];
-	// org.synchronoss.cpo.meta.domain.CpoArgument
-	c3377 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoArgument.html">
+	// org.synchronoss.cpo.exporter.CpoInterfaceSourceGenerator
+	c1406 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/exporter/CpoInterfaceSourceGenerator.html">
 		<tr><td><table border="0" cellspacing="0" cellpadding="1">
-			<tr><td> CpoArgument </td></tr>
-			<tr><td><font point-size="7.0"> org.synchronoss.cpo.meta.domain </font></td></tr>
+			<tr><td> CpoInterfaceSourceGenerator </td></tr>
+			<tr><td><font point-size="7.0"> org.synchronoss.cpo.exporter </font></td></tr>
 		</table></td></tr>
 		</table>>, fontname="Helvetica", fontcolor="black", fontsize=9.0];
 	// org.synchronoss.cpo.meta.domain.CpoAttribute
-	c3380 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoAttribute.html">
+	c1411 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoAttribute.html">
 		<tr><td><table border="0" cellspacing="0" cellpadding="1">
 			<tr><td> CpoAttribute </td></tr>
 			<tr><td><font point-size="7.0"> org.synchronoss.cpo.meta.domain </font></td></tr>
 		</table></td></tr>
 		</table>>, fontname="Helvetica", fontcolor="black", fontsize=9.0];
-	// org.synchronoss.cpo.meta.domain.CpoFunction
-	c3378 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoFunction.html">
-		<tr><td><table border="0" cellspacing="0" cellpadding="1">
-			<tr><td> CpoFunction </td></tr>
-			<tr><td><font point-size="7.0"> org.synchronoss.cpo.meta.domain </font></td></tr>
-		</table></td></tr>
-		</table>>, fontname="Helvetica", fontcolor="black", fontsize=9.0];
 	// org.synchronoss.cpo.CpoAdapter
-	c3374 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/CpoAdapter.html">
+	c1397 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/CpoAdapter.html">
 		<tr><td><table border="0" cellspacing="0" cellpadding="1">
 			<tr><td> &laquo;interface&raquo; </td></tr>
 			<tr><td> CpoAdapter </td></tr>
 			<tr><td><font point-size="7.0"> org.synchronoss.cpo </font></td></tr>
 		</table></td></tr>
 		</table>>, fontname="Helvetica", fontcolor="black", fontsize=9.0];
+	// org.synchronoss.cpo.meta.domain.CpoFunction
+	c1405 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoFunction.html">
+		<tr><td><table border="0" cellspacing="0" cellpadding="1">
+			<tr><td> CpoFunction </td></tr>
+			<tr><td><font point-size="7.0"> org.synchronoss.cpo.meta.domain </font></td></tr>
+		</table></td></tr>
+		</table>>, fontname="Helvetica", fontcolor="black", fontsize=9.0];
+	// org.synchronoss.cpo.meta.domain.CpoArgument
+	c1401 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoArgument.html">
+		<tr><td><table border="0" cellspacing="0" cellpadding="1">
+			<tr><td> CpoArgument </td></tr>
+			<tr><td><font point-size="7.0"> org.synchronoss.cpo.meta.domain </font></td></tr>
+		</table></td></tr>
+		</table>>, fontname="Helvetica", fontcolor="black", fontsize=9.0];
+	// org.slf4j.Logger
+	c1394 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/slf4j/Logger.html">
+		<tr><td><table border="0" cellspacing="0" cellpadding="1">
+			<tr><td> &laquo;interface&raquo; </td></tr>
+			<tr><td> Logger </td></tr>
+			<tr><td><font point-size="7.0"> org.slf4j </font></td></tr>
+		</table></td></tr>
+		</table>>, fontname="Helvetica", fontcolor="black", fontsize=9.0];
 	// org.synchronoss.cpo.meta.domain.CpoFunctionGroup
-	c3379 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoFunctionGroup.html">
+	c1412 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoFunctionGroup.html">
 		<tr><td><table border="0" cellspacing="0" cellpadding="1">
 			<tr><td> CpoFunctionGroup </td></tr>
 			<tr><td><font point-size="7.0"> org.synchronoss.cpo.meta.domain </font></td></tr>
 		</table></td></tr>
 		</table>>, fontname="Helvetica", fontcolor="black", fontsize=9.0];
 	// org.synchronoss.cpo.meta.CpoMetaDescriptor
-	c3373 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/CpoMetaDescriptor.html">
+	c1395 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/CpoMetaDescriptor.html">
 		<tr><td><table border="0" cellspacing="0" cellpadding="1">
 			<tr><td> CpoMetaDescriptor </td></tr>
 			<tr><td><font point-size="7.0"> org.synchronoss.cpo.meta </font></td></tr>
+		</table></td></tr>
+		</table>>, fontname="Helvetica", fontcolor="black", fontsize=9.0];
+	// org.synchronoss.cpo.parser.ExpressionParser
+	c1403 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/parser/ExpressionParser.html">
+		<tr><td><table border="0" cellspacing="0" cellpadding="1">
+			<tr><td> &laquo;interface&raquo; </td></tr>
+			<tr><td> ExpressionParser </td></tr>
+			<tr><td><font point-size="7.0"> org.synchronoss.cpo.parser </font></td></tr>
 		</table></td></tr>
 		</table>>, fontname="Helvetica", fontcolor="black", fontsize=9.0];
 }

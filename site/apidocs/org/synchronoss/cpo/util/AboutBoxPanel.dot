@@ -8,7 +8,7 @@ digraph G {
 	edge [fontname="Helvetica",fontsize=10,labelfontname="Helvetica",labelfontsize=10];
 	node [fontname="Helvetica",fontsize=10,shape=plaintext];
 	// org.synchronoss.cpo.util.AboutBoxPanel
-	c2669 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" bgcolor="lemonChiffon" href="./AboutBoxPanel.html">
+	c3572 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" bgcolor="lemonChiffon" href="./AboutBoxPanel.html">
 		<tr><td><table border="0" cellspacing="0" cellpadding="1">
 			<tr><td> AboutBoxPanel </td></tr>
 		</table></td></tr>

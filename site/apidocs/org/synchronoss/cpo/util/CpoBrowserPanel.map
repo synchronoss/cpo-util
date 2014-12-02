@@ -1,5 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="c1846" href="./CpoBrowserTree.html" title="&lt;TABLE&gt;" alt="" coords="16,113,128,137"/>
-<area shape="rect" id="c1860" href="./CpoBrowserPanel.html" title="&lt;TABLE&gt;" alt="" coords="75,17,194,41"/>
-<area shape="rect" id="c1880" href="./Proxy.html" title="&lt;TABLE&gt;" alt="" coords="174,113,223,137"/>
+<area shape="rect" id="node1_0" href="./Proxy.html" title="&lt;TABLE&gt;" alt="" coords="17,114,65,137"/>
+<area shape="rect" id="node2_1" href="./CpoBrowserTree.html" title="&lt;TABLE&gt;" alt="" coords="112,114,219,137"/>
+<area shape="rect" id="node3_2" href="./CpoBrowserPanel.html" title="&lt;TABLE&gt;" alt="" coords="46,18,159,41"/>
 </map>
