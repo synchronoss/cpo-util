@@ -74,7 +74,7 @@
         <activeByDefault>false</activeByDefault>
       </activation>
       <properties>
-        <cpoutil.bootstrapUrl>http://wiki.synchronoss.net/~components/sncrcpo/cpo5-bootstrap.properties</cpoutil.bootstrapUrl>
+        <cpoutil.bootstrapUrl>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/sites/components/sncrcpo/cpo5-bootstrap.properties</cpoutil.bootstrapUrl>
         <cpo.classifier>sncr</cpo.classifier>
         <cpo.assembly.id>dist-${cpo.classifier}</cpo.assembly.id>
         <cpo.onejar.filename>${project.build.finalName}-${cpo.classifier}.one-jar.jar</cpo.onejar.filename>
