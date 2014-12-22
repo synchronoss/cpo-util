@@ -183,10 +183,26 @@ public class CpoBrowserTree extends JTree {
         JMenuItem jMenuGenerateClass = new JMenuItem("Generate Class Source");
         jMenuGenerateClass.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae) {
-            generateClassSource(cpoClassNode);
+            generateLegacyClassSource(cpoClassNode);
           }
         });
         menu.add(jMenuGenerateClass);
+
+        JMenuItem jMenuGenerateInterface = new JMenuItem("Generate Interface Source");
+        jMenuGenerateInterface.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent ae) {
+            generateInterfaceSource(cpoClassNode);
+          }
+        });
+        menu.add(jMenuGenerateInterface);
+
+        JMenuItem jMenuGenerateInterfaceClass = new JMenuItem("Generate Interface and Class Source");
+        jMenuGenerateInterfaceClass.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent ae) {
+            generateClassSource(cpoClassNode);
+          }
+        });
+        menu.add(jMenuGenerateInterfaceClass);
       } else if (menuNode instanceof CpoFunctionGroupLabelNode) {
         JMenuItem jMenuAddGroup = new JMenuItem("Add Function Group to Class");
         jMenuAddGroup.addActionListener(new ActionListener() {
@@ -378,7 +394,7 @@ public class CpoBrowserTree extends JTree {
       }
     }
 
-    createNewClass(className, attributes, false);
+    createNewClass(className, attributes);
   }
 
   private void createNewCpoClass() {
@@ -388,7 +404,6 @@ public class CpoBrowserTree extends JTree {
 
     String className = null;
     List<CpoAttribute> attributes = new ArrayList<CpoAttribute>();
-    boolean generateClassSource = false;
 
     boolean happy = false;
     while (!happy) {
@@ -398,7 +413,6 @@ public class CpoBrowserTree extends JTree {
         try {
           className = cncp.getClassName();
           attributes = proxy.createAttributesFromExpression(cncp.getConnection(), cncp.getExpression());
-          generateClassSource = cncp.isGenerateSource();
           happy = true;
         } catch (Exception pe) {
           CpoUtil.showException(pe);
@@ -412,18 +426,14 @@ public class CpoBrowserTree extends JTree {
       }
     }
 
-    createNewClass(className, attributes, generateClassSource);
+    createNewClass(className, attributes);
   }
 
-  private void createNewClass(String className, List<CpoAttribute> attributes, boolean generateClassSource) {
+  private void createNewClass(String className, List<CpoAttribute> attributes) {
     try {
       Proxy proxy = getRoot().getProxy();
       CpoClassNode cpoClassNode = proxy.addClass(className);
       proxy.addAttributes(cpoClassNode, attributes);
-
-      if (generateClassSource) {
-        saveClassSource(cpoClassNode);
-      }
 
       // try to expand and select the node
       DefaultTreeModel model = getModel();
@@ -436,42 +446,118 @@ public class CpoBrowserTree extends JTree {
     }
   }
 
-  private void saveClassSource(CpoClassNode cpoClassNode) {
-    Proxy proxy = getRoot().getProxy();
-
-    CpoInterfaceSourceGenerator interfaceSourceGenerator = proxy.generateInterfaceSourceCode(cpoClassNode);
-    CpoClassSourceGenerator classSourceGenerator = proxy.generateClassSourceCode(cpoClassNode);
-
-    String interfaceName = interfaceSourceGenerator.getInterfaceName();
-    String className = classSourceGenerator.getClassName();
-
-    JFileChooser jFile = new JFileChooser();
-    if (proxy.getLastDir() != null) {
-      jFile.setCurrentDirectory(proxy.getLastDir());
-    }
-    jFile.setDialogTitle("Choose a directory to save: " + interfaceName + ".java and " + className + ".java");
-    jFile.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-    int result = jFile.showSaveDialog(this.getTopLevelAncestor());
-    if (result != JFileChooser.APPROVE_OPTION || jFile.getSelectedFile() == null) {
-      CpoUtil.getInstance().setStatusBarText("Aborted Class Creation: files not saved");
-      return;
-    }
-
-    proxy.setLastDir(jFile.getCurrentDirectory());
+  private void generateLegacyClassSource(CpoClassNode cpoClassNode) {
     try {
-      FileWriter iw = new FileWriter(jFile.getSelectedFile() + File.separator + interfaceName + ".java");
-      iw.write(interfaceSourceGenerator.getSourceCode());
-      iw.close();
+      Proxy proxy = getRoot().getProxy();
 
-      FileWriter cw = new FileWriter(jFile.getSelectedFile() + File.separator + className + ".java");
-      cw.write(classSourceGenerator.getSourceCode());
-      cw.close();
-    } catch (IOException ioe) {
-      CpoUtil.showException(ioe);
-      CpoUtil.getInstance().setStatusBarText("Class not created: exception caught during save: " + ioe.getMessage());
-      return;
+      CpoClassSourceGenerator classSourceGenerator = proxy.generateLegacyClassSourceCode(cpoClassNode);
+
+      String className = classSourceGenerator.getClassName();
+
+      JFileChooser jFile = new JFileChooser();
+      if (proxy.getLastDir() != null) {
+        jFile.setCurrentDirectory(proxy.getLastDir());
+      }
+      jFile.setDialogTitle("Choose a directory to save: " + className + ".java");
+      jFile.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+      int result = jFile.showSaveDialog(this.getTopLevelAncestor());
+      if (result != JFileChooser.APPROVE_OPTION || jFile.getSelectedFile() == null) {
+        CpoUtil.getInstance().setStatusBarText("Aborted Class Creation: files not saved");
+        return;
+      }
+
+      proxy.setLastDir(jFile.getCurrentDirectory());
+      try {
+        FileWriter cw = new FileWriter(jFile.getSelectedFile() + File.separator + className + ".java");
+        cw.write(classSourceGenerator.getSourceCode());
+        cw.close();
+      } catch (IOException ioe) {
+        CpoUtil.showException(ioe);
+        CpoUtil.getInstance().setStatusBarText("Class not created: exception caught during save: " + ioe.getMessage());
+        return;
+      }
+      CpoUtil.getInstance().setStatusBarText("Class (" + className + ") successfully saved");
+    } catch (Exception e) {
+      CpoUtil.showException(e);
     }
-    CpoUtil.getInstance().setStatusBarText("Class (" + className + ") successfully saved");
+  }
+
+  private void generateInterfaceSource(CpoClassNode cpoClassNode) {
+    try {
+      Proxy proxy = getRoot().getProxy();
+
+      CpoInterfaceSourceGenerator interfaceSourceGenerator = proxy.generateInterfaceSourceCode(cpoClassNode);
+
+      String interfaceName = interfaceSourceGenerator.getInterfaceName();
+
+      JFileChooser jFile = new JFileChooser();
+      if (proxy.getLastDir() != null) {
+        jFile.setCurrentDirectory(proxy.getLastDir());
+      }
+      jFile.setDialogTitle("Choose a directory to save: " + interfaceName + ".java");
+      jFile.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+      int result = jFile.showSaveDialog(this.getTopLevelAncestor());
+      if (result != JFileChooser.APPROVE_OPTION || jFile.getSelectedFile() == null) {
+        CpoUtil.getInstance().setStatusBarText("Aborted Class Creation: files not saved");
+        return;
+      }
+
+      proxy.setLastDir(jFile.getCurrentDirectory());
+      try {
+        FileWriter iw = new FileWriter(jFile.getSelectedFile() + File.separator + interfaceName + ".java");
+        iw.write(interfaceSourceGenerator.getSourceCode());
+        iw.close();
+      } catch (IOException ioe) {
+        CpoUtil.showException(ioe);
+        CpoUtil.getInstance().setStatusBarText("Class not created: exception caught during save: " + ioe.getMessage());
+        return;
+      }
+      CpoUtil.getInstance().setStatusBarText("Interface (" + interfaceName + ") successfully saved");
+    } catch (Exception e) {
+      CpoUtil.showException(e);
+    }
+  }
+
+  private void generateClassSource(CpoClassNode cpoClassNode) {
+    try {
+      Proxy proxy = getRoot().getProxy();
+
+      CpoInterfaceSourceGenerator interfaceSourceGenerator = proxy.generateInterfaceSourceCode(cpoClassNode);
+      CpoClassSourceGenerator classSourceGenerator = proxy.generateClassSourceCode(cpoClassNode);
+
+      String interfaceName = interfaceSourceGenerator.getInterfaceName();
+      String className = classSourceGenerator.getClassName();
+
+      JFileChooser jFile = new JFileChooser();
+      if (proxy.getLastDir() != null) {
+        jFile.setCurrentDirectory(proxy.getLastDir());
+      }
+      jFile.setDialogTitle("Choose a directory to save: " + interfaceName + ".java and " + className + ".java");
+      jFile.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+      int result = jFile.showSaveDialog(this.getTopLevelAncestor());
+      if (result != JFileChooser.APPROVE_OPTION || jFile.getSelectedFile() == null) {
+        CpoUtil.getInstance().setStatusBarText("Aborted Class Creation: files not saved");
+        return;
+      }
+
+      proxy.setLastDir(jFile.getCurrentDirectory());
+      try {
+        FileWriter iw = new FileWriter(jFile.getSelectedFile() + File.separator + interfaceName + ".java");
+        iw.write(interfaceSourceGenerator.getSourceCode());
+        iw.close();
+
+        FileWriter cw = new FileWriter(jFile.getSelectedFile() + File.separator + className + ".java");
+        cw.write(classSourceGenerator.getSourceCode());
+        cw.close();
+      } catch (IOException ioe) {
+        CpoUtil.showException(ioe);
+        CpoUtil.getInstance().setStatusBarText("Class not created: exception caught during save: " + ioe.getMessage());
+        return;
+      }
+      CpoUtil.getInstance().setStatusBarText("Class (" + className + ") successfully saved");
+    } catch (Exception e) {
+      CpoUtil.showException(e);
+    }
   }
 
   private void renameFunctionGroup(CpoFunctionGroupNode cpoFunctionGroupNode) {
@@ -531,14 +617,6 @@ public class CpoBrowserTree extends JTree {
     }
     cpoClassNode.setClassName(result);
     CpoUtil.getInstance().setStatusBarText("Changed Class Name to: " + result);
-  }
-
-  private void generateClassSource(CpoClassNode cpoClassNode) {
-    try {
-      this.saveClassSource(cpoClassNode);
-    } catch (Exception e) {
-      CpoUtil.showException(e);
-    }
   }
 
   private void moveFunctionUp(CpoFunctionNode functionNode) {
