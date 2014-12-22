@@ -32,9 +32,8 @@ public class CpoNewClassPanel extends JPanel {
   // Version Id for this class
   private static final long serialVersionUID = 1L;
   private JTextField jTextClassName = new JTextField();
-  private JCheckBox genSrcCheckBox = new JCheckBox();
   private JTextArea jTextAreaExpression = new JTextArea();
-  private JComboBox connectionComboBox = new JComboBox();
+  private JComboBox<String> connectionComboBox = new JComboBox<>();
 
   public CpoNewClassPanel(Proxy proxy) {
     this(proxy, null);
@@ -42,7 +41,7 @@ public class CpoNewClassPanel extends JPanel {
 
   public CpoNewClassPanel(Proxy proxy, String className) {
     try {
-      connectionComboBox.setModel(new DefaultComboBoxModel(proxy.getConnectionList()));
+      connectionComboBox.setModel(new DefaultComboBoxModel<>(proxy.getConnectionList()));
       jbInit();
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
@@ -65,32 +64,23 @@ public class CpoNewClassPanel extends JPanel {
     jTextClassName.setPreferredSize(new Dimension(300, 20));
     this.add(jTextClassName, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
-    JLabel jLabGenerateSource = new JLabel("Generate Source:");
-    this.add(jLabGenerateSource, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
-
-    this.add(genSrcCheckBox, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
-
     JLabel jLabConnection = new JLabel("Connection:");
-    this.add(jLabConnection, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
+    this.add(jLabConnection, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
-    this.add(connectionComboBox, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
+    this.add(connectionComboBox, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
 
     JLabel jLabExpression = new JLabel("Initialization Expression:");
-    this.add(jLabExpression, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHEAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
+    this.add(jLabExpression, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHEAST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
 
     jTextAreaExpression.setLineWrap(true);
     JScrollPane jScrollPane = new JScrollPane();
     jScrollPane.getViewport().add(jTextAreaExpression, null);
     jScrollPane.setPreferredSize(new Dimension(300, 200));
-    this.add(jScrollPane, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
+    this.add(jScrollPane, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
   }
 
   public String getClassName() {
     return jTextClassName.getText();
-  }
-
-  public boolean isGenerateSource() {
-    return genSrcCheckBox.isSelected();
   }
 
   public String getExpression() {

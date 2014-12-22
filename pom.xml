@@ -52,7 +52,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <github.global.server>cpo-github</github.global.server>
     <cpoutil.bootstrapUrl />
-    <cpo.version>5.1.2-SNAPSHOT</cpo.version>
+    <cpo.version>5.2.0</cpo.version>
     <cpo.assembly.id>dist</cpo.assembly.id>
     <cpo.onejar.filename>${project.build.finalName}.one-jar.jar</cpo.onejar.filename>
   </properties>

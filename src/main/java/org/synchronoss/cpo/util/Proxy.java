@@ -758,6 +758,20 @@ public abstract class Proxy {
    * @param node The CpoClassNode to generate source for
    * @return String containing the java source code.
    */
+  public CpoClassSourceGenerator generateLegacyClassSourceCode(CpoClassNode node) {
+    CpoClass cpoClass = node.getUserObject();
+
+    CpoClassSourceGenerator generator = new CpoLegacyClassSourceGenerator(metaDescriptor);
+    cpoClass.acceptMetaDFVisitor(generator);
+    return generator;
+  }
+
+  /**
+   * Generates the java source code for the specified class.
+   *
+   * @param node The CpoClassNode to generate source for
+   * @return String containing the java source code.
+   */
   public CpoClassSourceGenerator generateClassSourceCode(CpoClassNode node) {
     CpoClass cpoClass = node.getUserObject();
 
