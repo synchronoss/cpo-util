@@ -1,12 +1,12 @@
 <map id="G" name="G">
-<area shape="rect" id="node1_0" href="./JdbcProxy.html" title="&lt;TABLE&gt;" alt="" coords="16,18,89,41"/>
-<area shape="rect" id="node2_1" href="./JdbcNewAttributePanel.html" title="&lt;TABLE&gt;" alt="" coords="135,18,277,41"/>
-<area shape="rect" id="node3_2" href="./JdbcFunctionNode.html" title="&lt;TABLE&gt;" alt="" coords="322,18,439,41"/>
-<area shape="rect" id="node4_3" href="./JdbcConnectionPanel.html" title="&lt;TABLE&gt;" alt="" coords="485,18,618,41"/>
-<area shape="rect" id="node5_4" href="./JdbcClassNode.html" title="&lt;TABLE&gt;" alt="" coords="663,18,765,41"/>
-<area shape="rect" id="node6_5" href="./JdbcAttributeTableModel.html" title="&lt;TABLE&gt;" alt="" coords="811,18,959,41"/>
-<area shape="rect" id="node7_6" href="./JdbcAttributeNode.html" title="&lt;TABLE&gt;" alt="" coords="1004,18,1120,41"/>
-<area shape="rect" id="node8_7" href="./JdbcAttributeLabelNode.html" title="&lt;TABLE&gt;" alt="" coords="1165,18,1311,41"/>
-<area shape="rect" id="node9_8" href="./JdbcArgumentTableModel.html" title="&lt;TABLE&gt;" alt="" coords="1356,18,1512,41"/>
-<area shape="rect" id="node10_9" href="./JdbcArgumentNode.html" title="&lt;TABLE&gt;" alt="" coords="1558,18,1681,41"/>
+<area shape="rect" id="node1_0" href="./JdbcProxy.html" title="org.synchronoss.cpo.util.jdbc.JdbcProxy" alt="" coords="16,18,89,41"/>
+<area shape="rect" id="node2_1" href="./JdbcNewAttributePanel.html" title="org.synchronoss.cpo.util.jdbc.JdbcNewAttributePanel" alt="" coords="135,18,277,41"/>
+<area shape="rect" id="node3_2" href="./JdbcFunctionNode.html" title="org.synchronoss.cpo.util.jdbc.JdbcFunctionNode" alt="" coords="322,18,439,41"/>
+<area shape="rect" id="node4_3" href="./JdbcConnectionPanel.html" title="org.synchronoss.cpo.util.jdbc.JdbcConnectionPanel" alt="" coords="485,18,618,41"/>
+<area shape="rect" id="node5_4" href="./JdbcClassNode.html" title="org.synchronoss.cpo.util.jdbc.JdbcClassNode" alt="" coords="663,18,765,41"/>
+<area shape="rect" id="node6_5" href="./JdbcAttributeTableModel.html" title="org.synchronoss.cpo.util.jdbc.JdbcAttributeTableModel" alt="" coords="811,18,959,41"/>
+<area shape="rect" id="node7_6" href="./JdbcAttributeNode.html" title="org.synchronoss.cpo.util.jdbc.JdbcAttributeNode" alt="" coords="1004,18,1120,41"/>
+<area shape="rect" id="node8_7" href="./JdbcAttributeLabelNode.html" title="org.synchronoss.cpo.util.jdbc.JdbcAttributeLabelNode" alt="" coords="1165,18,1311,41"/>
+<area shape="rect" id="node9_8" href="./JdbcArgumentTableModel.html" title="org.synchronoss.cpo.util.jdbc.JdbcArgumentTableModel" alt="" coords="1356,18,1512,41"/>
+<area shape="rect" id="node10_9" href="./JdbcArgumentNode.html" title="org.synchronoss.cpo.util.jdbc.JdbcArgumentNode" alt="" coords="1558,18,1681,41"/>
 </map>

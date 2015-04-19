@@ -1,4 +1,4 @@
 <map id="G" name="G">
-<area shape="rect" id="node1_0" href="../CpoFunctionNode.html" title="&lt;TABLE&gt;" alt="" coords="17,12,133,47"/>
-<area shape="rect" id="node2_1" href="./JdbcFunctionNode.html" title="&lt;TABLE&gt;" alt="" coords="16,114,133,137"/>
+<area shape="rect" id="node1_0" href="../CpoFunctionNode.html" title="org.synchronoss.cpo.util.CpoFunctionNode" alt="" coords="17,12,133,47"/>
+<area shape="rect" id="node2_1" href="./JdbcFunctionNode.html" title="org.synchronoss.cpo.util.jdbc.JdbcFunctionNode" alt="" coords="16,114,133,137"/>
 </map>

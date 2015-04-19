@@ -1,11 +1,11 @@
 <map id="G" name="G">
-<area shape="rect" id="node1_0" href="../Proxy.html" title="&lt;TABLE&gt;" alt="" coords="353,12,469,47"/>
-<area shape="rect" id="node5_1" href="./JdbcProxy.html" title="&lt;TABLE&gt;" alt="" coords="374,114,447,137"/>
-<area shape="rect" id="node6_2" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoArgument.html" title="&lt;TABLE&gt;" alt="" coords="224,300,381,335"/>
-<area shape="rect" id="node7_3" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoClass.html" title="&lt;TABLE&gt;" alt="" coords="729,204,887,239"/>
-<area shape="rect" id="node8_4" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoFunction.html" title="&lt;TABLE&gt;" alt="" coords="16,300,173,335"/>
-<area shape="rect" id="node9_5" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoAttribute.html" title="&lt;TABLE&gt;" alt="" coords="493,300,651,335"/>
-<area shape="rect" id="node2_6" href="../CpoFunctionNode.html" title="&lt;TABLE&gt;" alt="" coords="37,204,153,239"/>
-<area shape="rect" id="node3_7" href="../CpoAttributeNode.html" title="&lt;TABLE&gt;" alt="" coords="567,204,683,239"/>
-<area shape="rect" id="node4_8" href="../CpoArgumentNode.html" title="&lt;TABLE&gt;" alt="" coords="351,204,471,239"/>
+<area shape="rect" id="node1_0" href="../Proxy.html" title="org.synchronoss.cpo.util.Proxy" alt="" coords="353,12,469,47"/>
+<area shape="rect" id="node5_1" href="./JdbcProxy.html" title="org.synchronoss.cpo.util.jdbc.JdbcProxy" alt="" coords="374,114,447,137"/>
+<area shape="rect" id="node6_2" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoFunction.html" title="org.synchronoss.cpo.meta.domain.CpoFunction" alt="" coords="16,300,173,335"/>
+<area shape="rect" id="node7_3" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoAttribute.html" title="org.synchronoss.cpo.meta.domain.CpoAttribute" alt="" coords="493,300,651,335"/>
+<area shape="rect" id="node8_4" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoArgument.html" title="org.synchronoss.cpo.meta.domain.CpoArgument" alt="" coords="224,300,381,335"/>
+<area shape="rect" id="node9_5" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoClass.html" title="org.synchronoss.cpo.meta.domain.CpoClass" alt="" coords="729,204,887,239"/>
+<area shape="rect" id="node2_6" href="../CpoFunctionNode.html" title="org.synchronoss.cpo.util.CpoFunctionNode" alt="" coords="37,204,153,239"/>
+<area shape="rect" id="node3_7" href="../CpoAttributeNode.html" title="org.synchronoss.cpo.util.CpoAttributeNode" alt="" coords="567,204,683,239"/>
+<area shape="rect" id="node4_8" href="../CpoArgumentNode.html" title="org.synchronoss.cpo.util.CpoArgumentNode" alt="" coords="351,204,471,239"/>
 </map>

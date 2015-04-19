@@ -1,7 +1,7 @@
 <map id="G" name="G">
-<area shape="rect" id="node1_0" href="./CpoFunctionPanel.html" title="&lt;TABLE&gt;" alt="" coords="16,18,132,41"/>
-<area shape="rect" id="node2_1" href="./CpoFunctionNode.html" title="&lt;TABLE&gt;" alt="" coords="17,210,131,233"/>
-<area shape="rect" id="node4_2" href="./CoreArgumentTableModel.html" title="&lt;TABLE&gt;" alt="" coords="149,114,305,137"/>
-<area shape="rect" id="node3_3" href="./CpoArgumentAttributeEditor.html" title="&lt;TABLE&gt;" alt="" coords="177,18,344,41"/>
-<area shape="rect" id="node5_4" href="./jdbc/JdbcArgumentTableModel.html" title="&lt;TABLE&gt;" alt="" coords="176,204,332,239"/>
+<area shape="rect" id="node1_0" href="./CpoFunctionPanel.html" title="org.synchronoss.cpo.util.CpoFunctionPanel" alt="" coords="16,18,132,41"/>
+<area shape="rect" id="node2_1" href="./CpoFunctionNode.html" title="org.synchronoss.cpo.util.CpoFunctionNode" alt="" coords="17,210,131,233"/>
+<area shape="rect" id="node4_2" href="./CoreArgumentTableModel.html" title="org.synchronoss.cpo.util.CoreArgumentTableModel" alt="" coords="149,114,305,137"/>
+<area shape="rect" id="node3_3" href="./CpoArgumentAttributeEditor.html" title="org.synchronoss.cpo.util.CpoArgumentAttributeEditor" alt="" coords="177,18,344,41"/>
+<area shape="rect" id="node5_4" href="./jdbc/JdbcArgumentTableModel.html" title="org.synchronoss.cpo.util.jdbc.JdbcArgumentTableModel" alt="" coords="176,204,332,239"/>
 </map>

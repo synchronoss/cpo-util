@@ -1,17 +1,17 @@
 <map id="G" name="G">
-<area shape="rect" id="node1_0" href="./Proxy.html" title="&lt;TABLE&gt;" alt="" coords="773,114,821,137"/>
-<area shape="rect" id="node3_1" href="./cassandra/CassandraProxy.html" title="&lt;TABLE&gt;" alt="" coords="22,210,183,245"/>
-<area shape="rect" id="node4_2" href="./jdbc/JdbcProxy.html" title="&lt;TABLE&gt;" alt="" coords="331,210,467,245"/>
-<area shape="rect" id="node5_3" href="http://java.sun.com/j2se/1.4.2/docs/api/org/slf4j/Logger.html" title="&lt;TABLE&gt;" alt="" coords="614,203,690,252"/>
-<area shape="rect" id="node6_4" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/CpoMetaDescriptor.html" title="&lt;TABLE&gt;" alt="" coords="735,210,859,245"/>
-<area shape="rect" id="node7_5" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/CpoAdapter.html" title="&lt;TABLE&gt;" alt="" coords="905,203,1007,252"/>
-<area shape="rect" id="node8_6" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/exporter/CpoClassSourceGenerator.html" title="&lt;TABLE&gt;" alt="" coords="1053,210,1214,245"/>
-<area shape="rect" id="node9_7" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoArgument.html" title="&lt;TABLE&gt;" alt="" coords="16,312,173,347"/>
-<area shape="rect" id="node10_8" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoClass.html" title="&lt;TABLE&gt;" alt="" coords="219,312,376,347"/>
-<area shape="rect" id="node11_9" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/parser/ExpressionParser.html" title="&lt;TABLE&gt;" alt="" coords="1260,203,1391,252"/>
-<area shape="rect" id="node12_10" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoFunction.html" title="&lt;TABLE&gt;" alt="" coords="421,312,579,347"/>
-<area shape="rect" id="node13_11" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/exporter/CpoInterfaceSourceGenerator.html" title="&lt;TABLE&gt;" alt="" coords="1437,210,1614,245"/>
-<area shape="rect" id="node14_12" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoAttribute.html" title="&lt;TABLE&gt;" alt="" coords="624,312,781,347"/>
-<area shape="rect" id="node15_13" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoFunctionGroup.html" title="&lt;TABLE&gt;" alt="" coords="1660,210,1817,245"/>
-<area shape="rect" id="node2_14" href="./CpoBrowserPanel.html" title="&lt;TABLE&gt;" alt="" coords="741,18,854,41"/>
+<area shape="rect" id="node1_0" href="./Proxy.html" title="org.synchronoss.cpo.util.Proxy" alt="" coords="773,114,821,137"/>
+<area shape="rect" id="node3_1" href="./cassandra/CassandraProxy.html" title="org.synchronoss.cpo.util.cassandra.CassandraProxy" alt="" coords="22,210,183,245"/>
+<area shape="rect" id="node4_2" href="./jdbc/JdbcProxy.html" title="org.synchronoss.cpo.util.jdbc.JdbcProxy" alt="" coords="331,210,467,245"/>
+<area shape="rect" id="node5_3" href="http://java.sun.com/j2se/1.4.2/docs/api/org/slf4j/Logger.html" title="org.slf4j.Logger" alt="" coords="614,203,690,252"/>
+<area shape="rect" id="node6_4" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/CpoMetaDescriptor.html" title="org.synchronoss.cpo.meta.CpoMetaDescriptor" alt="" coords="735,210,859,245"/>
+<area shape="rect" id="node7_5" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/CpoAdapter.html" title="org.synchronoss.cpo.CpoAdapter" alt="" coords="905,203,1007,252"/>
+<area shape="rect" id="node8_6" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoFunction.html" title="org.synchronoss.cpo.meta.domain.CpoFunction" alt="" coords="16,312,173,347"/>
+<area shape="rect" id="node9_7" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoFunctionGroup.html" title="org.synchronoss.cpo.meta.domain.CpoFunctionGroup" alt="" coords="1052,210,1209,245"/>
+<area shape="rect" id="node10_8" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoAttribute.html" title="org.synchronoss.cpo.meta.domain.CpoAttribute" alt="" coords="219,312,376,347"/>
+<area shape="rect" id="node11_9" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoArgument.html" title="org.synchronoss.cpo.meta.domain.CpoArgument" alt="" coords="421,312,579,347"/>
+<area shape="rect" id="node12_10" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/parser/ExpressionParser.html" title="org.synchronoss.cpo.parser.ExpressionParser" alt="" coords="1255,203,1385,252"/>
+<area shape="rect" id="node13_11" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoClass.html" title="org.synchronoss.cpo.meta.domain.CpoClass" alt="" coords="624,312,781,347"/>
+<area shape="rect" id="node14_12" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/exporter/CpoInterfaceSourceGenerator.html" title="org.synchronoss.cpo.exporter.CpoInterfaceSourceGenerator" alt="" coords="1431,210,1609,245"/>
+<area shape="rect" id="node15_13" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/exporter/CpoClassSourceGenerator.html" title="org.synchronoss.cpo.exporter.CpoClassSourceGenerator" alt="" coords="1654,210,1815,245"/>
+<area shape="rect" id="node2_14" href="./CpoBrowserPanel.html" title="org.synchronoss.cpo.util.CpoBrowserPanel" alt="" coords="741,18,854,41"/>
 </map>

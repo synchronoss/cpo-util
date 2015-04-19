@@ -1,4 +1,4 @@
 <map id="G" name="G">
-<area shape="rect" id="node1_0" href="../Proxy.html" title="&lt;TABLE&gt;" alt="" coords="16,12,132,47"/>
-<area shape="rect" id="node2_1" href="./CassandraProxy.html" title="&lt;TABLE&gt;" alt="" coords="21,114,127,137"/>
+<area shape="rect" id="node1_0" href="../Proxy.html" title="org.synchronoss.cpo.util.Proxy" alt="" coords="16,12,132,47"/>
+<area shape="rect" id="node2_1" href="./CassandraProxy.html" title="org.synchronoss.cpo.util.cassandra.CassandraProxy" alt="" coords="21,114,127,137"/>
 </map>

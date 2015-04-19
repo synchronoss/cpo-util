@@ -1,5 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="node1_0" href="./TesterPanel.html" title="&lt;TABLE&gt;" alt="" coords="90,18,170,41"/>
-<area shape="rect" id="node2_1" href="./CpoClassNode.html" title="&lt;TABLE&gt;" alt="" coords="16,120,113,143"/>
-<area shape="rect" id="node3_2" href="http://java.sun.com/j2se/1.4.2/docs/api/org/slf4j/Logger.html" title="&lt;TABLE&gt;" alt="" coords="159,107,235,156"/>
+<area shape="rect" id="node1_0" href="./TesterPanel.html" title="org.synchronoss.cpo.util.TesterPanel" alt="" coords="90,18,170,41"/>
+<area shape="rect" id="node2_1" href="./CpoClassNode.html" title="org.synchronoss.cpo.util.CpoClassNode" alt="" coords="16,120,113,143"/>
+<area shape="rect" id="node3_2" href="http://java.sun.com/j2se/1.4.2/docs/api/org/slf4j/Logger.html" title="org.slf4j.Logger" alt="" coords="159,107,235,156"/>
 </map>

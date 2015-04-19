@@ -1,9 +1,9 @@
 <map id="G" name="G">
-<area shape="rect" id="node1_0" href="./TesterResultsModel.html" title="&lt;TABLE&gt;" alt="" coords="16,162,137,185"/>
-<area shape="rect" id="node4_1" href="./CpoClassNode.html" title="&lt;TABLE&gt;" alt="" coords="297,258,395,281"/>
-<area shape="rect" id="node2_2" href="./TesterPanel.html" title="&lt;TABLE&gt;" alt="" coords="183,162,263,185"/>
-<area shape="rect" id="node3_3" href="./JTreeMetaVisitor.html" title="&lt;TABLE&gt;" alt="" coords="466,162,573,185"/>
-<area shape="rect" id="node7_4" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoClass.html" title="&lt;TABLE&gt;" alt="" coords="441,348,598,383"/>
-<area shape="rect" id="node6_5" href="./jdbc/JdbcClassNode.html" title="&lt;TABLE&gt;" alt="" coords="259,348,395,383"/>
-<area shape="rect" id="node5_6" href="./AbstractCpoNode.html" title="&lt;TABLE&gt;" alt="" coords="309,162,420,185"/>
+<area shape="rect" id="node1_0" href="./TesterResultsModel.html" title="org.synchronoss.cpo.util.TesterResultsModel" alt="" coords="16,162,137,185"/>
+<area shape="rect" id="node4_1" href="./CpoClassNode.html" title="org.synchronoss.cpo.util.CpoClassNode" alt="" coords="297,258,395,281"/>
+<area shape="rect" id="node2_2" href="./TesterPanel.html" title="org.synchronoss.cpo.util.TesterPanel" alt="" coords="183,162,263,185"/>
+<area shape="rect" id="node3_3" href="./JTreeMetaVisitor.html" title="org.synchronoss.cpo.util.JTreeMetaVisitor" alt="" coords="466,162,573,185"/>
+<area shape="rect" id="node7_4" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoClass.html" title="org.synchronoss.cpo.meta.domain.CpoClass" alt="" coords="441,348,598,383"/>
+<area shape="rect" id="node6_5" href="./jdbc/JdbcClassNode.html" title="org.synchronoss.cpo.util.jdbc.JdbcClassNode" alt="" coords="259,348,395,383"/>
+<area shape="rect" id="node5_6" href="./AbstractCpoNode.html" title="org.synchronoss.cpo.util.AbstractCpoNode" alt="" coords="309,162,420,185"/>
 </map>

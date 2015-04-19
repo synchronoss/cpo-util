@@ -1,7 +1,7 @@
 <map id="G" name="G">
-<area shape="rect" id="node1_0" href="./CpoAttributeNode.html" title="&lt;TABLE&gt;" alt="" coords="83,258,195,281"/>
-<area shape="rect" id="node4_1" href="./jdbc/JdbcAttributeNode.html" title="&lt;TABLE&gt;" alt="" coords="16,348,152,383"/>
-<area shape="rect" id="node5_2" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoAttribute.html" title="&lt;TABLE&gt;" alt="" coords="197,348,355,383"/>
-<area shape="rect" id="node2_3" href="./AbstractCpoNode.html" title="&lt;TABLE&gt;" alt="" coords="51,162,162,185"/>
-<area shape="rect" id="node3_4" href="./jdbc/JdbcProxy.html" title="&lt;TABLE&gt;" alt="" coords="208,156,344,191"/>
+<area shape="rect" id="node1_0" href="./CpoAttributeNode.html" title="org.synchronoss.cpo.util.CpoAttributeNode" alt="" coords="83,258,195,281"/>
+<area shape="rect" id="node4_1" href="./jdbc/JdbcAttributeNode.html" title="org.synchronoss.cpo.util.jdbc.JdbcAttributeNode" alt="" coords="16,348,152,383"/>
+<area shape="rect" id="node5_2" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoAttribute.html" title="org.synchronoss.cpo.meta.domain.CpoAttribute" alt="" coords="197,348,355,383"/>
+<area shape="rect" id="node2_3" href="./AbstractCpoNode.html" title="org.synchronoss.cpo.util.AbstractCpoNode" alt="" coords="51,162,162,185"/>
+<area shape="rect" id="node3_4" href="./jdbc/JdbcProxy.html" title="org.synchronoss.cpo.util.jdbc.JdbcProxy" alt="" coords="208,156,344,191"/>
 </map>

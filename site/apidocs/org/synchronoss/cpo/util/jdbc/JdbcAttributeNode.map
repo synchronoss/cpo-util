@@ -1,5 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="node1_0" href="../CpoAttributeNode.html" title="&lt;TABLE&gt;" alt="" coords="19,12,135,47"/>
-<area shape="rect" id="node2_1" href="./JdbcAttributeNode.html" title="&lt;TABLE&gt;" alt="" coords="19,114,135,137"/>
-<area shape="rect" id="node3_2" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/jdbc/JdbcCpoAttribute.html" title="&lt;TABLE&gt;" alt="" coords="16,204,137,239"/>
+<area shape="rect" id="node1_0" href="../CpoAttributeNode.html" title="org.synchronoss.cpo.util.CpoAttributeNode" alt="" coords="19,12,135,47"/>
+<area shape="rect" id="node2_1" href="./JdbcAttributeNode.html" title="org.synchronoss.cpo.util.jdbc.JdbcAttributeNode" alt="" coords="19,114,135,137"/>
+<area shape="rect" id="node3_2" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/jdbc/JdbcCpoAttribute.html" title="org.synchronoss.cpo.jdbc.JdbcCpoAttribute" alt="" coords="16,204,137,239"/>
 </map>

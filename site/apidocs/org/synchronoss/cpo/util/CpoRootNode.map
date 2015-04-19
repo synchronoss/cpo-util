@@ -1,5 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="node1_0" href="./JTreeMetaVisitor.html" title="&lt;TABLE&gt;" alt="" coords="16,162,123,185"/>
-<area shape="rect" id="node2_1" href="./CpoRootNode.html" title="&lt;TABLE&gt;" alt="" coords="100,258,193,281"/>
-<area shape="rect" id="node3_2" href="./AbstractCpoNode.html" title="&lt;TABLE&gt;" alt="" coords="169,162,279,185"/>
+<area shape="rect" id="node1_0" href="./JTreeMetaVisitor.html" title="org.synchronoss.cpo.util.JTreeMetaVisitor" alt="" coords="16,162,123,185"/>
+<area shape="rect" id="node2_1" href="./CpoRootNode.html" title="org.synchronoss.cpo.util.CpoRootNode" alt="" coords="100,258,193,281"/>
+<area shape="rect" id="node3_2" href="./AbstractCpoNode.html" title="org.synchronoss.cpo.util.AbstractCpoNode" alt="" coords="169,162,279,185"/>
 </map>

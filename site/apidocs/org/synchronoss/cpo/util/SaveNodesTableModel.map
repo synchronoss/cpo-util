@@ -1,5 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="node1_0" href="./SaveNodesTableModel.html" title="&lt;TABLE&gt;" alt="" coords="16,114,156,137"/>
-<area shape="rect" id="node3_1" href="./AbstractCpoNode.html" title="&lt;TABLE&gt;" alt="" coords="31,210,141,233"/>
-<area shape="rect" id="node2_2" href="./SaveNodesPanel.html" title="&lt;TABLE&gt;" alt="" coords="31,18,141,41"/>
+<area shape="rect" id="node1_0" href="./SaveNodesTableModel.html" title="org.synchronoss.cpo.util.SaveNodesTableModel" alt="" coords="16,114,156,137"/>
+<area shape="rect" id="node3_1" href="./AbstractCpoNode.html" title="org.synchronoss.cpo.util.AbstractCpoNode" alt="" coords="31,210,141,233"/>
+<area shape="rect" id="node2_2" href="./SaveNodesPanel.html" title="org.synchronoss.cpo.util.SaveNodesPanel" alt="" coords="31,18,141,41"/>
 </map>

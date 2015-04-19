@@ -1,6 +1,6 @@
 <map id="G" name="G">
-<area shape="rect" id="node1_0" href="./CpoAttributePanel.html" title="&lt;TABLE&gt;" alt="" coords="91,18,205,41"/>
-<area shape="rect" id="node2_1" href="./CpoAttributeLabelNode.html" title="&lt;TABLE&gt;" alt="" coords="16,210,157,233"/>
-<area shape="rect" id="node3_2" href="./CoreAttributeTableModel.html" title="&lt;TABLE&gt;" alt="" coords="135,114,284,137"/>
-<area shape="rect" id="node4_3" href="./jdbc/JdbcAttributeTableModel.html" title="&lt;TABLE&gt;" alt="" coords="203,204,351,239"/>
+<area shape="rect" id="node1_0" href="./CpoAttributePanel.html" title="org.synchronoss.cpo.util.CpoAttributePanel" alt="" coords="91,18,205,41"/>
+<area shape="rect" id="node2_1" href="./CpoAttributeLabelNode.html" title="org.synchronoss.cpo.util.CpoAttributeLabelNode" alt="" coords="16,210,157,233"/>
+<area shape="rect" id="node3_2" href="./CoreAttributeTableModel.html" title="org.synchronoss.cpo.util.CoreAttributeTableModel" alt="" coords="135,114,284,137"/>
+<area shape="rect" id="node4_3" href="./jdbc/JdbcAttributeTableModel.html" title="org.synchronoss.cpo.util.jdbc.JdbcAttributeTableModel" alt="" coords="203,204,351,239"/>
 </map>

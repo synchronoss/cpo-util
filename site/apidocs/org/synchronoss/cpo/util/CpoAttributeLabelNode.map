@@ -1,8 +1,8 @@
 <map id="G" name="G">
-<area shape="rect" id="node1_0" href="./CpoNewAttributePanel.html" title="&lt;TABLE&gt;" alt="" coords="16,162,155,185"/>
-<area shape="rect" id="node3_1" href="./CpoAttributeLabelNode.html" title="&lt;TABLE&gt;" alt="" coords="193,258,335,281"/>
-<area shape="rect" id="node2_2" href="./CpoAttributePanel.html" title="&lt;TABLE&gt;" alt="" coords="207,66,321,89"/>
-<area shape="rect" id="node4_3" href="./CoreAttributeTableModel.html" title="&lt;TABLE&gt;" alt="" coords="251,162,400,185"/>
-<area shape="rect" id="node6_4" href="./jdbc/JdbcAttributeLabelNode.html" title="&lt;TABLE&gt;" alt="" coords="191,348,337,383"/>
-<area shape="rect" id="node5_5" href="./AbstractCpoNode.html" title="&lt;TABLE&gt;" alt="" coords="446,162,557,185"/>
+<area shape="rect" id="node1_0" href="./CpoNewAttributePanel.html" title="org.synchronoss.cpo.util.CpoNewAttributePanel" alt="" coords="16,162,155,185"/>
+<area shape="rect" id="node3_1" href="./CpoAttributeLabelNode.html" title="org.synchronoss.cpo.util.CpoAttributeLabelNode" alt="" coords="193,258,335,281"/>
+<area shape="rect" id="node2_2" href="./CpoAttributePanel.html" title="org.synchronoss.cpo.util.CpoAttributePanel" alt="" coords="207,66,321,89"/>
+<area shape="rect" id="node4_3" href="./CoreAttributeTableModel.html" title="org.synchronoss.cpo.util.CoreAttributeTableModel" alt="" coords="251,162,400,185"/>
+<area shape="rect" id="node6_4" href="./jdbc/JdbcAttributeLabelNode.html" title="org.synchronoss.cpo.util.jdbc.JdbcAttributeLabelNode" alt="" coords="191,348,337,383"/>
+<area shape="rect" id="node5_5" href="./AbstractCpoNode.html" title="org.synchronoss.cpo.util.AbstractCpoNode" alt="" coords="446,162,557,185"/>
 </map>

@@ -1,7 +1,7 @@
 <map id="G" name="G">
-<area shape="rect" id="node1_0" href="./CpoNewAttributePanel.html" title="&lt;TABLE&gt;" alt="" coords="281,18,420,41"/>
-<area shape="rect" id="node2_1" href="./CpoAttributeLabelNode.html" title="&lt;TABLE&gt;" alt="" coords="16,120,157,143"/>
-<area shape="rect" id="node3_2" href="./jdbc/JdbcNewAttributePanel.html" title="&lt;TABLE&gt;" alt="" coords="203,114,344,149"/>
-<area shape="rect" id="node4_3" href="http://java.sun.com/j2se/1.4.2/docs/api/org/slf4j/Logger.html" title="&lt;TABLE&gt;" alt="" coords="390,107,466,156"/>
-<area shape="rect" id="node5_4" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoAttribute.html" title="&lt;TABLE&gt;" alt="" coords="512,114,669,149"/>
+<area shape="rect" id="node1_0" href="./CpoNewAttributePanel.html" title="org.synchronoss.cpo.util.CpoNewAttributePanel" alt="" coords="281,18,420,41"/>
+<area shape="rect" id="node2_1" href="./CpoAttributeLabelNode.html" title="org.synchronoss.cpo.util.CpoAttributeLabelNode" alt="" coords="16,120,157,143"/>
+<area shape="rect" id="node3_2" href="./jdbc/JdbcNewAttributePanel.html" title="org.synchronoss.cpo.util.jdbc.JdbcNewAttributePanel" alt="" coords="203,114,344,149"/>
+<area shape="rect" id="node4_3" href="http://java.sun.com/j2se/1.4.2/docs/api/org/slf4j/Logger.html" title="org.slf4j.Logger" alt="" coords="390,107,466,156"/>
+<area shape="rect" id="node5_4" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoAttribute.html" title="org.synchronoss.cpo.meta.domain.CpoAttribute" alt="" coords="512,114,669,149"/>
 </map>
