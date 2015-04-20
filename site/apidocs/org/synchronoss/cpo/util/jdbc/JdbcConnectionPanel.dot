@@ -30,10 +30,10 @@ digraph G {
 	c4091:p -> c4117:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open];
 	// org.synchronoss.cpo.util.AbstractConnectionPanel DEPEND org.synchronoss.cpo.core.cpoCoreConfig.CtDataSourceConfig
 	c4083:p -> c4116:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
-	// org.synchronoss.cpo.util.jdbc.JdbcConnectionPanel DEPEND org.synchronoss.cpo.jdbc.cpoJdbcConfig.CtJdbcConfig
-	c4091:p -> c4118:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
 	// org.synchronoss.cpo.util.jdbc.JdbcConnectionPanel DEPEND org.synchronoss.cpo.core.cpoCoreConfig.CtDataSourceConfig
 	c4091:p -> c4116:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
+	// org.synchronoss.cpo.util.jdbc.JdbcConnectionPanel DEPEND org.synchronoss.cpo.jdbc.cpoJdbcConfig.CtJdbcConfig
+	c4091:p -> c4118:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
 	// org.synchronoss.cpo.jdbc.cpoJdbcConfig.CtJdbcConfig
 	c4118 [label=<<table title="org.synchronoss.cpo.jdbc.cpoJdbcConfig.CtJdbcConfig" border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/jdbc/cpoJdbcConfig/CtJdbcConfig.html">
 		<tr><td><table border="0" cellspacing="0" cellpadding="1">

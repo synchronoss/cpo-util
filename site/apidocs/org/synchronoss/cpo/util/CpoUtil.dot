@@ -25,19 +25,19 @@ digraph G {
 		</table>>, fontname="Helvetica", fontcolor="black", fontsize=9.0];
 	// org.synchronoss.cpo.util.CpoUtil NAVASSOC org.synchronoss.cpo.util.cpoUtilConfig.CtCpoUtilConfig
 	c1799:p -> c1845:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open];
-	// org.synchronoss.cpo.util.CpoUtil DEPEND org.synchronoss.cpo.meta.domain.CpoClass
-	c1799:p -> c1857:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
 	// org.synchronoss.cpo.util.CpoUtil DEPEND org.synchronoss.cpo.core.cpoCoreConfig.CtDataSourceConfig
+	c1799:p -> c1857:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
+	// org.synchronoss.cpo.util.CpoUtil DEPEND org.synchronoss.cpo.meta.domain.CpoClass
 	c1799:p -> c1858:p [taillabel="", label="", headlabel="", fontname="Helvetica", fontcolor="black", fontsize=10.0, color="black", arrowhead=open, style=dashed];
 	// org.synchronoss.cpo.meta.domain.CpoClass
-	c1857 [label=<<table title="org.synchronoss.cpo.meta.domain.CpoClass" border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoClass.html">
+	c1858 [label=<<table title="org.synchronoss.cpo.meta.domain.CpoClass" border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/meta/domain/CpoClass.html">
 		<tr><td><table border="0" cellspacing="0" cellpadding="1">
 <tr><td align="center" balign="center"><font face="Helvetica-Oblique"> CpoClass </font></td></tr>
 <tr><td align="center" balign="center"><font point-size="7.0"> org.synchronoss.cpo.meta.domain </font></td></tr>
 		</table></td></tr>
 		</table>>, fontname="Helvetica", fontcolor="black", fontsize=9.0];
 	// org.synchronoss.cpo.core.cpoCoreConfig.CtDataSourceConfig
-	c1858 [label=<<table title="org.synchronoss.cpo.core.cpoCoreConfig.CtDataSourceConfig" border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/core/cpoCoreConfig/CtDataSourceConfig.html">
+	c1857 [label=<<table title="org.synchronoss.cpo.core.cpoCoreConfig.CtDataSourceConfig" border="0" cellborder="1" cellspacing="0" cellpadding="2" port="p" href="http://java.sun.com/j2se/1.4.2/docs/api/org/synchronoss/cpo/core/cpoCoreConfig/CtDataSourceConfig.html">
 		<tr><td><table border="0" cellspacing="0" cellpadding="1">
 <tr><td align="center" balign="center"> &#171;interface&#187; </td></tr>
 <tr><td align="center" balign="center"> CtDataSourceConfig </td></tr>
