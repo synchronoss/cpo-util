@@ -797,7 +797,7 @@ public abstract class Proxy {
     // swap the meta descriptor in
     dataSourceConfig.setMetaDescriptorName(metaDescriptor.getName());
 
-    CpoAdapter cpoAdapter = CpoAdapterFactory.makeCpoAdapter(dataSourceConfig);
+    CpoAdapter cpoAdapter = CpoAdapterFactoryManager.makeCpoAdapterFactory(dataSourceConfig).getCpoAdapter();
     adapterCache.put(connectionName, cpoAdapter);
     return cpoAdapter;
   }

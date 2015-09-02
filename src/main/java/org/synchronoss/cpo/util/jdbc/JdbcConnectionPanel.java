@@ -172,7 +172,7 @@ public class JdbcConnectionPanel extends AbstractConnectionPanel {
   private void testConnectionButtonActionPerformed() {
     try {
       CtDataSourceConfig dataSourceConfig = createDataSourceConfig();
-      CpoAdapter cpoAdapter = CpoAdapterFactory.makeCpoAdapter(dataSourceConfig);
+      CpoAdapter cpoAdapter = CpoAdapterFactoryManager.makeCpoAdapterFactory(dataSourceConfig).getCpoAdapter();
       if (cpoAdapter != null) {
         JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "Connection successful", "Test Connection", JOptionPane.INFORMATION_MESSAGE);
       }
