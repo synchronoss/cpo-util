@@ -20,15 +20,21 @@
  */
 package org.synchronoss.cpo.util.cassandra;
 
-import org.slf4j.*;
-import org.synchronoss.cpo.*;
-import org.synchronoss.cpo.cassandra.cpoCassandraConfig.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.synchronoss.cpo.CpoAdapter;
+import org.synchronoss.cpo.CpoAdapterFactory;
+import org.synchronoss.cpo.CpoException;
+import org.synchronoss.cpo.cassandra.cpoCassandraConfig.CtCassandraConfig;
+import org.synchronoss.cpo.cassandra.cpoCassandraConfig.CtCassandraReadWriteConfig;
 import org.synchronoss.cpo.core.cpoCoreConfig.CtDataSourceConfig;
-import org.synchronoss.cpo.util.*;
+import org.synchronoss.cpo.util.AbstractConnectionPanel;
+import org.synchronoss.cpo.util.CpoUtil;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * JPanel for creating and editing Cassandra connections
@@ -184,7 +190,7 @@ public class CassandraConnectionPanel extends AbstractConnectionPanel {
     // FIXME - need to add username/password support
     //rwc.setUser(userName);
     //rwc.setPassword(password);
-    rwc.setContactPointArray(0, host);
+    rwc.addContactPoint(host);
     rwc.setKeySpace(keyspace);
 
     return cassandraConfig;
