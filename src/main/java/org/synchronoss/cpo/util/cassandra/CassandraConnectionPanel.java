@@ -23,7 +23,7 @@ package org.synchronoss.cpo.util.cassandra;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.synchronoss.cpo.CpoAdapter;
-import org.synchronoss.cpo.CpoAdapterFactory;
+import org.synchronoss.cpo.CpoAdapterFactoryManager;
 import org.synchronoss.cpo.CpoException;
 import org.synchronoss.cpo.cassandra.cpoCassandraConfig.CtCassandraConfig;
 import org.synchronoss.cpo.cassandra.cpoCassandraConfig.CtCassandraReadWriteConfig;
