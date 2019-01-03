@@ -52,7 +52,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <github.global.server>cpo-github</github.global.server>
     <cpoutil.bootstrapUrl />
-    <cpo.version>5.2.1-SNAPSHOT</cpo.version>
+    <cpo.version>5.2.2-SNAPSHOT</cpo.version>
     <cpo.assembly.id>dist</cpo.assembly.id>
     <cpo.onejar.filename>${project.build.finalName}.one-jar.jar</cpo.onejar.filename>
   </properties>
@@ -332,7 +332,7 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.dstovall</groupId>
+        <groupId>com.jolira</groupId>
         <artifactId>onejar-maven-plugin</artifactId>
         <version>1.4.4</version>
         <executions>

@@ -904,7 +904,8 @@ public class CpoUtil extends JFrame {
 
   protected List<File> getRecentFiles() {
     List<File> recentFiles = new ArrayList<File>();
-    if (cpoUtilConfig.isSetRecentFiles()) {
+    //todo: fix: not sure why this is missing
+    /**if (cpoUtilConfig.isSetRecentFiles()) {
       CtRecentFiles ctRecentFiles = cpoUtilConfig.getRecentFiles();
       for (String fileName : ctRecentFiles.getFileArray()) {
         File file = new File(fileName);
@@ -912,7 +913,7 @@ public class CpoUtil extends JFrame {
           recentFiles.add(file);
         }
       }
-    }
+    }*/
     return recentFiles;
   }
 
