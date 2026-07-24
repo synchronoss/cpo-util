@@ -845,7 +845,8 @@ public class CpoUtil extends JFrame {
       List<File> classpathEntries = cpp.getClasspathEntries();
 
       // remove everything
-      cpoUtilConfig.unsetCustomClasspath();
+      if (cpoUtilConfig.isSetCustomClasspath())
+        cpoUtilConfig.unsetCustomClasspath();
 
       // if entries exist, add them
       if (!classpathEntries.isEmpty()) {
