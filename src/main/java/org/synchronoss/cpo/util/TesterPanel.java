@@ -21,8 +21,8 @@
 package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
-import org.synchronoss.cpo.*;
-import org.synchronoss.cpo.core.cpoCoreMeta.StFunctionGroupType;
+import org.synchronoss.cpo.core.*;
+import org.synchronoss.cpo.cpometa.StFunctionGroupType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -243,7 +243,7 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
     if (param.equalsIgnoreCase("null") || param.equals("")) {
       return null;
     } else if (param.equalsIgnoreCase("guid")) {
-      return GUID.getGUID();
+      return UUID.randomUUID().toString();
     }
     try {
       if (cls == String.class) {
@@ -373,7 +373,7 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
     JMenuItem jMenuSetNewGuid = new JMenuItem("Set New Guid");
     jMenuSetNewGuid.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent ae) {
-        insertValueAt(GUID.getGUID());
+        insertValueAt(UUID.randomUUID().toString());
       }
     });
     menu.add(jMenuSetNewGuid);

@@ -21,19 +21,21 @@
 package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
-import org.synchronoss.cpo.*;
-import org.synchronoss.cpo.core.cpoCoreConfig.CtDataSourceConfig;
-import org.synchronoss.cpo.core.cpoCoreMeta.StFunctionGroupType;
-import org.synchronoss.cpo.exporter.*;
-import org.synchronoss.cpo.meta.CpoMetaDescriptor;
-import org.synchronoss.cpo.meta.domain.*;
-import org.synchronoss.cpo.parser.ExpressionParser;
+import org.synchronoss.cpo.core.*;
+import org.synchronoss.cpo.cpoconfig.CtDataSourceConfig;
+import org.synchronoss.cpo.cpometa.StFunctionGroupType;
+import org.synchronoss.cpo.core.exporter.*;
+import org.synchronoss.cpo.core.meta.CpoMetaDescriptor;
+import org.synchronoss.cpo.core.meta.domain.*;
+import org.synchronoss.cpo.core.parser.ExpressionParser;
 
 import javax.swing.tree.*;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Proxy object that handles most of the GUI to domain logic
@@ -529,7 +531,7 @@ public abstract class Proxy {
           Enumeration argumentNodes = functionNode.children();
           while (argumentNodes.hasMoreElements()) {
             CpoArgumentNode argumentNode = (CpoArgumentNode)argumentNodes.nextElement();
-            if (argumentNode.getUserObject().getAttributeName().equals(cpoAttributeNode.getUserObject().getJavaName())) {
+            if (argumentNode.getUserObject().getName().equals(cpoAttributeNode.getUserObject().getJavaName())) {
               functionGroups.add(functionGroup);
             }
           }
@@ -812,25 +814,27 @@ public abstract class Proxy {
     Object resultObj = null;
     if (cpoFGnode.getType().equals(StFunctionGroupType.CREATE.toString())) {
       //insert
-      resultObj = cpoAdapter.insertObject(cpoFGnode.getName(), obj);
+      resultObj = cpoAdapter.insertBean(cpoFGnode.getName(), obj);
     } else if (cpoFGnode.getType().equals(StFunctionGroupType.DELETE.toString())) {
-      cpoAdapter.deleteObject(cpoFGnode.getName(), obj);
+      cpoAdapter.deleteBean(cpoFGnode.getName(), obj);
       // retrieve from cpo, so we can verify deletion
       resultObj = cpoAdapter.retrieveBean(cpoFGnode.getName(), obj);
     } else if (cpoFGnode.getType().equals(StFunctionGroupType.LIST.toString())) {
-      result = cpoAdapter.retrieveBeans(cpoFGnode.getName(), obj, objReturnType);
+      try (Stream<Object> stream = cpoAdapter.retrieveBeans(cpoFGnode.getName(), obj, objReturnType)) {
+        result = stream.collect(Collectors.toList());
+      }
     } else if (cpoFGnode.getType().equals(StFunctionGroupType.RETRIEVE.toString())) {
       resultObj = cpoAdapter.retrieveBean(cpoFGnode.getName(), obj);
     } else if (cpoFGnode.getType().equals(StFunctionGroupType.UPDATE.toString())) {
-      cpoAdapter.updateObject(cpoFGnode.getName(), obj);
+      cpoAdapter.updateBean(cpoFGnode.getName(), obj);
       // retrieve from cpo, so we can verify update
       resultObj = cpoAdapter.retrieveBean(cpoFGnode.getName(), obj);
     } else if (cpoFGnode.getType().equals(StFunctionGroupType.EXIST.toString()) && persist) {
-      cpoAdapter.persistObject(cpoFGnode.getName(), obj);
+      cpoAdapter.upsertBean(cpoFGnode.getName(), obj);
       // retrieve from cpo, so we can verify update
       resultObj = cpoAdapter.retrieveBean(cpoFGnode.getName(), obj);
     } else if (cpoFGnode.getType().equals(StFunctionGroupType.EXIST.toString())) {
-      resultObj = cpoAdapter.existsObject(cpoFGnode.getName(), obj);
+      resultObj = cpoAdapter.existsBean(cpoFGnode.getName(), obj);
     }
 
     // always return a list, even if it's empty

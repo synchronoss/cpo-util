@@ -21,8 +21,8 @@
 package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
-import org.synchronoss.cpo.CpoException;
-import org.synchronoss.cpo.meta.domain.*;
+import org.synchronoss.cpo.core.CpoException;
+import org.synchronoss.cpo.core.meta.domain.*;
 
 import javax.swing.*;
 import java.awt.*;

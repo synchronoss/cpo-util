@@ -20,11 +20,10 @@
  */
 package org.synchronoss.cpo.util.jdbc;
 
-import org.synchronoss.cpo.CpoException;
+import org.synchronoss.cpo.core.CpoException;
 import org.synchronoss.cpo.jdbc.*;
-import org.synchronoss.cpo.jdbc.cpoJdbcMeta.CtJdbcArgument;
-import org.synchronoss.cpo.meta.CpoMetaDescriptor;
-import org.synchronoss.cpo.meta.domain.*;
+import org.synchronoss.cpo.core.meta.CpoMetaDescriptor;
+import org.synchronoss.cpo.core.meta.domain.*;
 import org.synchronoss.cpo.util.*;
 
 import java.io.File;
@@ -52,7 +51,7 @@ public class JdbcProxy extends Proxy {
     JdbcCpoArgument cpoArgument = (JdbcCpoArgument)metaDescriptor.createCpoArgument();
 
     // default the scope to in
-    cpoArgument.setScope(CtJdbcArgument.Scope.IN.toString());
+    cpoArgument.setScope("IN");
 
     return cpoArgument;
   }

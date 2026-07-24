@@ -21,7 +21,7 @@
 package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
-import org.synchronoss.cpo.meta.domain.CpoAttribute;
+import org.synchronoss.cpo.core.meta.domain.CpoAttribute;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.*;
@@ -43,9 +43,9 @@ public class TesterParamModel extends AbstractTableModel {
   @Override
   public int getRowCount() {
     int rowCount = 0;
-    Enumeration<CpoFunctionNode> enumQueries = cpoFGnode.children();
+    Enumeration enumQueries = cpoFGnode.children();
     while (enumQueries.hasMoreElements()) {
-      CpoFunctionNode node = enumQueries.nextElement();
+      CpoFunctionNode node = (CpoFunctionNode)enumQueries.nextElement();
       rowCount = rowCount + node.getChildCount();
     }
     return rowCount;
@@ -74,12 +74,12 @@ public class TesterParamModel extends AbstractTableModel {
   @Override
   public Object getValueAt(int rowIndex, int columnIndex) {
     int rowCount = 0;
-    Enumeration<CpoFunctionNode> enumQueries = cpoFGnode.children();
+    Enumeration enumQueries = cpoFGnode.children();
     while (enumQueries.hasMoreElements()) {
-      CpoFunctionNode node = enumQueries.nextElement();
-      Enumeration<CpoArgumentNode> enumArguments = node.children();
+      CpoFunctionNode node = (CpoFunctionNode)enumQueries.nextElement();
+      Enumeration enumArguments = node.children();
       while (enumArguments.hasMoreElements()) {
-        CpoArgumentNode argumentNode = enumArguments.nextElement();
+        CpoArgumentNode argumentNode = (CpoArgumentNode)enumArguments.nextElement();
         if (rowCount == rowIndex) {
           if (columnIndex == 0) {
             return node.getSeqNo();

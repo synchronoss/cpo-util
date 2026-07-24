@@ -20,15 +20,16 @@
  */
 package org.synchronoss.cpo.util;
 
-import org.apache.xmlbeans.*;
 import org.slf4j.*;
-import org.synchronoss.cpo.CpoException;
-import org.synchronoss.cpo.core.cpoCoreConfig.CtDataSourceConfig;
-import org.synchronoss.cpo.helper.XmlBeansHelper;
-import org.synchronoss.cpo.meta.domain.CpoClass;
+import org.synchronoss.cpo.core.CpoException;
+import org.synchronoss.cpo.core.helper.XmlHelper;
+import org.synchronoss.cpo.cpoconfig.CtDataSourceConfig;
+import org.synchronoss.cpo.core.meta.domain.CpoClass;
 import org.synchronoss.cpo.util.conversion.ConvertCpoUtilLocalProperties;
-import org.synchronoss.cpo.util.cpoUtilConfig.*;
+import org.synchronoss.cpo.util.cpoutilconfig.*;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
@@ -54,6 +55,7 @@ public class CpoUtil extends JFrame {
   private static final String CPOUTIL_CONFIG_FILE = "CpoUtilConfig.xml";
   private static final File configFile = new File(CPOUTIL_CONFIG_DIR, CPOUTIL_CONFIG_FILE);
   private static final String CPOUTIL_PROPERTIES_FILE = "cpoutil.properties";
+  private static final String CPOUTIL_CONFIG_XSD = "xsd/CpoUtilConfig.xsd";
 
   private static final String BOOTSTRAP_URL_PROP = "cpoutil.bootstrapUrl";
   private static final String PROTECTED_CLASS_PROP = "cpoutil.protectedClasses";
@@ -484,11 +486,10 @@ public class CpoUtil extends JFrame {
         if (result == JOptionPane.OK_OPTION) {
           try {
             CtDataSourceConfig dataSourceConfig = panel.createDataSourceConfig();
-            if (!cpoUtilConfig.isSetDataConfigs()) {
-              cpoUtilConfig.addNewDataConfigs();
+            if (cpoUtilConfig.getDataConfigs() == null) {
+              cpoUtilConfig.setDataConfigs(new CtDataConfig());
             }
-            CtDataSourceConfig dsc = cpoUtilConfig.getDataConfigs().addNewDataConfig();
-            dsc.set(dataSourceConfig);
+            cpoUtilConfig.getDataConfigs().getDataConfig().add(dataSourceConfig);
             saveConfig();
             complete = true;
           } catch (CpoException ex) {
@@ -525,10 +526,12 @@ public class CpoUtil extends JFrame {
         if (result == JOptionPane.OK_OPTION) {
           try {
             CtDataSourceConfig panelDsc = panel.createDataSourceConfig();
-            for (CtDataSourceConfig dsc : cpoUtilConfig.getDataConfigs().getDataConfigArray()) {
+            ListIterator<CtDataSourceConfig> dscIterator = cpoUtilConfig.getDataConfigs().getDataConfig().listIterator();
+            while (dscIterator.hasNext()) {
+              CtDataSourceConfig dsc = dscIterator.next();
               // lookup based on the old name, so if it changed, we replace it
               if (dsc.getName().equals(dataSourceConfig.getName())) {
-                dsc.set(panelDsc);
+                dscIterator.set(panelDsc);
                 complete = true;
                 saveConfig();
               }
@@ -589,10 +592,8 @@ public class CpoUtil extends JFrame {
   protected void loadConfig() {
     try {
       // user config
-      CpoUtilConfigDocument cpoUtilConfigDocument;
       if (!configFile.exists()) {
         // file doesn't exist, let's make one
-        cpoUtilConfigDocument = CpoUtilConfigDocument.Factory.newInstance();
 
         // first, try to convert if they have the old style file
         try {
@@ -603,12 +604,22 @@ public class CpoUtil extends JFrame {
 
         // if null here, then it couldn't be converted for some reason, so just make a fresh one
         if (cpoUtilConfig == null)  {
-          cpoUtilConfig = cpoUtilConfigDocument.addNewCpoUtilConfig();
+          cpoUtilConfig = new CtCpoUtilConfig();
         }
         saveConfig();
       } else {
-        cpoUtilConfigDocument = CpoUtilConfigDocument.Factory.parse(configFile);
-        cpoUtilConfig = cpoUtilConfigDocument.getCpoUtilConfig();
+        StringBuilder errors = new StringBuilder();
+        cpoUtilConfig = XmlHelper.unmarshalXmlObject(CPOUTIL_CONFIG_XSD, configFile.getAbsolutePath(), CtCpoUtilConfig.class, errors);
+        if (cpoUtilConfig == null) {
+          throw new IOException("Could not load " + configFile.getAbsolutePath() + ":\n" + errors);
+        }
+        if (errors.length() > 0) {
+          // the file parsed, but didn't fully validate against the current schema (e.g. it's in
+          // an older format) - some of its contents may not have loaded. Warn now, before any
+          // action that calls saveConfig() overwrites the file with the incomplete result.
+          showErrorMessage("Warning: " + configFile.getAbsolutePath() + " did not fully validate "
+              + "against the current schema - some settings may not have loaded:\n" + errors);
+        }
       }
 
       // read default props
@@ -645,9 +656,6 @@ public class CpoUtil extends JFrame {
     } catch (IOException ex) {
       showException(ex);
       System.exit(1);
-    } catch (XmlException ex) {
-      showException(ex);
-      System.exit(1);
     }
   }
 
@@ -661,12 +669,11 @@ public class CpoUtil extends JFrame {
       CPOUTIL_CONFIG_DIR.mkdir();
     }
 
-    CpoUtilConfigDocument doc = CpoUtilConfigDocument.Factory.newInstance();
-    CtCpoUtilConfig config = doc.addNewCpoUtilConfig();
-    config.set(cpoUtilConfig);
-
     try {
-      doc.save(configFile, XmlBeansHelper.getXmlOptions());
+      JAXBContext jaxbContext = JAXBContext.newInstance(CtCpoUtilConfig.class);
+      Marshaller marshaller = jaxbContext.createMarshaller();
+      XmlHelper.setMarshallerProperties(marshaller);
+      marshaller.marshal(new ObjectFactory().createCpoUtilConfig(cpoUtilConfig), configFile);
     } catch (Exception ex) {
       showException(ex);
     }
@@ -745,8 +752,8 @@ public class CpoUtil extends JFrame {
     } else {
       // if the set was null, it couldn't be read, so use the local copy
       logger.debug("Couldn't connect to url, so loading local copy");
-      if (cpoUtilConfig.isSetProtectedClasses()) {
-        protectedClasses.addAll(Arrays.asList(cpoUtilConfig.getProtectedClasses().getProtectedClassArray()));
+      if (cpoUtilConfig.getProtectedClasses() != null) {
+        protectedClasses.addAll(cpoUtilConfig.getProtectedClasses().getProtectedClass());
       }
     }
   }
@@ -805,14 +812,9 @@ public class CpoUtil extends JFrame {
       return;
     }
 
-    if (cpoUtilConfig.isSetProtectedClasses()) {
-      cpoUtilConfig.unsetProtectedClasses();
-    }
-    cpoUtilConfig.addNewProtectedClasses();
-
-    for (String pc : protectedClasses) {
-      cpoUtilConfig.getProtectedClasses().addProtectedClass(pc);
-    }
+    CtProtectedClasses ctProtectedClasses = new CtProtectedClasses();
+    ctProtectedClasses.getProtectedClass().addAll(protectedClasses);
+    cpoUtilConfig.setProtectedClasses(ctProtectedClasses);
 
     // always save
     saveConfig();
@@ -824,8 +826,8 @@ public class CpoUtil extends JFrame {
   protected List<File> getCustomClasspathEntries() {
     // Custom classpath
     List<File> files = new ArrayList<File>();
-    if (cpoUtilConfig.isSetCustomClasspath()) {
-      for (String classpathEntry : cpoUtilConfig.getCustomClasspath().getClasspathEntryArray()) {
+    if (cpoUtilConfig.getCustomClasspath() != null) {
+      for (String classpathEntry : cpoUtilConfig.getCustomClasspath().getClasspathEntry()) {
         files.add(new File(classpathEntry));
       }
     }
@@ -845,16 +847,15 @@ public class CpoUtil extends JFrame {
       List<File> classpathEntries = cpp.getClasspathEntries();
 
       // remove everything
-      if (cpoUtilConfig.isSetCustomClasspath())
-        cpoUtilConfig.unsetCustomClasspath();
+      cpoUtilConfig.setCustomClasspath(null);
 
       // if entries exist, add them
       if (!classpathEntries.isEmpty()) {
-        cpoUtilConfig.addNewCustomClasspath();
-
+        CtCustomClasspath ctCustomClasspath = new CtCustomClasspath();
         for (File f : classpathEntries) {
-          cpoUtilConfig.getCustomClasspath().addClasspathEntry(f.getAbsolutePath());
+          ctCustomClasspath.getClasspathEntry().add(f.getAbsolutePath());
         }
+        cpoUtilConfig.setCustomClasspath(ctCustomClasspath);
       }
 
       // always save
@@ -870,8 +871,8 @@ public class CpoUtil extends JFrame {
    */
   public List<CtDataSourceConfig> getDataSourceConfigs() {
     List<CtDataSourceConfig> result = new ArrayList<CtDataSourceConfig>();
-    if (cpoUtilConfig.isSetDataConfigs()) {
-      result.addAll(Arrays.asList(cpoUtilConfig.getDataConfigs().getDataConfigArray()));
+    if (cpoUtilConfig.getDataConfigs() != null) {
+      result.addAll(cpoUtilConfig.getDataConfigs().getDataConfig());
     }
     return result;
   }
@@ -880,8 +881,8 @@ public class CpoUtil extends JFrame {
    * @return CtDataSourceConfig object with the given name, null if none exists
    */
   public CtDataSourceConfig getDataSourceConfig(String name) {
-    if (cpoUtilConfig.isSetDataConfigs()) {
-      for (CtDataSourceConfig dataSourceConfig : cpoUtilConfig.getDataConfigs().getDataConfigArray()) {
+    if (cpoUtilConfig.getDataConfigs() != null) {
+      for (CtDataSourceConfig dataSourceConfig : cpoUtilConfig.getDataConfigs().getDataConfig()) {
         if (dataSourceConfig.getName().equals(name)) {
           return dataSourceConfig;
         }
@@ -905,9 +906,8 @@ public class CpoUtil extends JFrame {
 
   protected List<File> getRecentFiles() {
     List<File> recentFiles = new ArrayList<File>();
-    if (cpoUtilConfig.isSetRecentFiles()) {
-      CtRecentFiles ctRecentFiles = cpoUtilConfig.getRecentFiles();
-      for (String fileName : ctRecentFiles.getFileArray()) {
+    if (cpoUtilConfig.getRecentFiles() != null) {
+      for (String fileName : cpoUtilConfig.getRecentFiles().getFile()) {
         File file = new File(fileName);
         if (file.exists() && file.canRead()) {
           recentFiles.add(file);
@@ -932,13 +932,11 @@ public class CpoUtil extends JFrame {
       recentFiles.remove(recentFiles.size() - 1);
     }
 
-    if (cpoUtilConfig.isSetRecentFiles()) {
-      cpoUtilConfig.unsetRecentFiles();
-    }
-    CtRecentFiles ctRecentFiles = cpoUtilConfig.addNewRecentFiles();
+    CtRecentFiles ctRecentFiles = new CtRecentFiles();
     for (File recentFile : recentFiles) {
-      ctRecentFiles.addFile(recentFile.getAbsolutePath());
+      ctRecentFiles.getFile().add(recentFile.getAbsolutePath());
     }
+    cpoUtilConfig.setRecentFiles(ctRecentFiles);
 
     // save the config
     saveConfig();
@@ -965,11 +963,10 @@ public class CpoUtil extends JFrame {
    * @param dataSourceConfig The connection to add
    */
   protected void addConnection(CtDataSourceConfig dataSourceConfig) {
-    if (!cpoUtilConfig.isSetDataConfigs()) {
-      cpoUtilConfig.addNewDataConfigs();
+    if (cpoUtilConfig.getDataConfigs() == null) {
+      cpoUtilConfig.setDataConfigs(new CtDataConfig());
     }
-    CtDataSourceConfig cdsc = cpoUtilConfig.getDataConfigs().addNewDataConfig();
-    cdsc.set(dataSourceConfig);
+    cpoUtilConfig.getDataConfigs().getDataConfig().add(dataSourceConfig);
     saveConfig();
   }
 
@@ -979,16 +976,17 @@ public class CpoUtil extends JFrame {
    * @param connectionName The connection to delete
    */
   protected void removeConnection(String connectionName) {
+    List<CtDataSourceConfig> dataConfigs = cpoUtilConfig.getDataConfigs().getDataConfig();
     int index = 0;
     int connectionNameIndex = -1;
 
-    for (CtDataSourceConfig dataSourceConfig : cpoUtilConfig.getDataConfigs().getDataConfigArray()) {
+    for (CtDataSourceConfig dataSourceConfig : dataConfigs) {
       if (dataSourceConfig.getName().equals(connectionName)) {
         connectionNameIndex = index;
       }
       index++;
     }
-    cpoUtilConfig.getDataConfigs().removeDataConfig(connectionNameIndex);
+    dataConfigs.remove(connectionNameIndex);
     saveConfig();
   }
 

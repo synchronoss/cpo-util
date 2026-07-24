@@ -21,13 +21,13 @@
 package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
-import org.synchronoss.cpo.CpoException;
-import org.synchronoss.cpo.cassandra.cpoCassandraConfig.CtCassandraConfig;
+import org.synchronoss.cpo.core.CpoException;
+import org.synchronoss.cpo.cpoconfig.CtCassandraConfig;
 import org.synchronoss.cpo.cassandra.meta.CassandraCpoMetaDescriptor;
-import org.synchronoss.cpo.core.cpoCoreConfig.CtDataSourceConfig;
-import org.synchronoss.cpo.jdbc.cpoJdbcConfig.CtJdbcConfig;
+import org.synchronoss.cpo.cpoconfig.CtDataSourceConfig;
+import org.synchronoss.cpo.cpoconfig.CtJdbcConfig;
 import org.synchronoss.cpo.jdbc.meta.JdbcCpoMetaDescriptor;
-import org.synchronoss.cpo.meta.CpoMetaDescriptor;
+import org.synchronoss.cpo.core.meta.CpoMetaDescriptor;
 import org.synchronoss.cpo.util.cassandra.*;
 import org.synchronoss.cpo.util.jdbc.*;
 

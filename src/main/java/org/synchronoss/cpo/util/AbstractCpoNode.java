@@ -20,7 +20,7 @@
  */
 package org.synchronoss.cpo.util;
 
-import org.synchronoss.cpo.CpoException;
+import org.synchronoss.cpo.core.CpoException;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;

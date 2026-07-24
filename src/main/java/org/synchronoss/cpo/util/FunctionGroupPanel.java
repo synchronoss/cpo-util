@@ -21,7 +21,7 @@
 package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
-import org.synchronoss.cpo.core.cpoCoreMeta.StFunctionGroupType;
+import org.synchronoss.cpo.cpometa.StFunctionGroupType;
 
 import javax.swing.*;
 import java.awt.*;

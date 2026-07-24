@@ -21,10 +21,9 @@
 package org.synchronoss.cpo.util.conversion;
 
 import org.slf4j.*;
-import org.synchronoss.cpo.CpoException;
-import org.synchronoss.cpo.core.cpoCoreConfig.*;
-import org.synchronoss.cpo.jdbc.cpoJdbcConfig.*;
-import org.synchronoss.cpo.util.cpoUtilConfig.*;
+import org.synchronoss.cpo.core.CpoException;
+import org.synchronoss.cpo.cpoconfig.*;
+import org.synchronoss.cpo.util.cpoutilconfig.*;
 
 import java.io.*;
 import java.util.*;
@@ -93,22 +92,24 @@ public class ConvertCpoUtilLocalProperties {
     }
 
     // create the document
-    CtCpoUtilConfig cpoUtilConfig = CtCpoUtilConfig.Factory.newInstance();
+    CtCpoUtilConfig cpoUtilConfig = new CtCpoUtilConfig();
 
     // custom classpath entries
     String customClasspath = oldProps.getProperty(CUSTOM_CLASSPATH);
     if (customClasspath != null && !customClasspath.isEmpty()) {
-      CtCustomClasspath ctCustomClasspath = cpoUtilConfig.addNewCustomClasspath();
+      CtCustomClasspath ctCustomClasspath = new CtCustomClasspath();
       StringTokenizer st = new StringTokenizer(customClasspath, File.pathSeparator);
       while (st.hasMoreTokens()) {
         String entry = st.nextToken();
-        ctCustomClasspath.addClasspathEntry(entry);
+        ctCustomClasspath.getClasspathEntry().add(entry);
       }
+      cpoUtilConfig.setCustomClasspath(ctCustomClasspath);
     }
 
     // if any servers exist
     if (!servers.isEmpty()) {
-      CtDataConfig dataConfig = cpoUtilConfig.addNewDataConfigs();
+      CtDataConfig dataConfig = new CtDataConfig();
+      cpoUtilConfig.setDataConfigs(dataConfig);
 
       for (String server : servers) {
         logger.info("Converting " + server);
@@ -144,16 +145,17 @@ public class ConvertCpoUtilLocalProperties {
             }
           }
 
-          CtJdbcConfig jdbcConfig = CtJdbcConfig.Factory.newInstance();
+          CtJdbcConfig jdbcConfig = new CtJdbcConfig();
           jdbcConfig.setName(server);
           jdbcConfig.setCpoConfigProcessor(JDBC_CONFIG_PROCESSOR);
           jdbcConfig.setMetaDescriptorName(DEFAULT_META_DESCRIPTOR);
 
-          CtJdbcReadWriteConfig rwc = jdbcConfig.addNewReadWriteConfig();
+          CtJdbcReadWriteConfig rwc = new CtJdbcReadWriteConfig();
           rwc.setUser(userName);
           rwc.setPassword(password);
           rwc.setUrl(url);
           rwc.setDriverClassName(driver);
+          jdbcConfig.setReadWriteConfig(rwc);
 
           if (params != null && !params.isEmpty()) {
             StringTokenizer st = new StringTokenizer(params, PARAM_DELIM);
@@ -168,14 +170,14 @@ public class ConvertCpoUtilLocalProperties {
                 value = stNameValue.nextToken();
               }
 
-              CtProperty prop = rwc.addNewProperty();
+              CtProperty prop = new CtProperty();
               prop.setName(name);
               prop.setValue(value);
+              rwc.getProperty().add(prop);
             }
           }
 
-          CtDataSourceConfig dataSourceConfig = dataConfig.addNewDataConfig();
-          dataSourceConfig.set(jdbcConfig);
+          dataConfig.getDataConfig().add(jdbcConfig);
         }
       }
     }

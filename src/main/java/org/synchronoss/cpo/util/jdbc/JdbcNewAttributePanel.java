@@ -20,7 +20,7 @@
  */
 package org.synchronoss.cpo.util.jdbc;
 
-import org.synchronoss.cpo.CpoException;
+import org.synchronoss.cpo.core.CpoException;
 import org.synchronoss.cpo.jdbc.JdbcCpoAttribute;
 import org.synchronoss.cpo.util.CpoNewAttributePanel;
 

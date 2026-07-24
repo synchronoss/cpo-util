@@ -52,9 +52,18 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <github.global.server>cpo-github</github.global.server>
     <cpoutil.bootstrapUrl />
-    <cpo.version>5.2.2-SNAPSHOT</cpo.version>
+    <cpo.version>6.1.1-SNAPSHOT</cpo.version>
     <cpo.assembly.id>dist</cpo.assembly.id>
     <cpo.onejar.filename>${project.build.finalName}.one-jar</cpo.onejar.filename>
+    <!-- versions matched to cpo-api's own pom (slf4j/logback) and to what cpo-jdbc's own test
+         matrix validates against (the JDBC drivers) -->
+    <slf4jVersion>2.0.17</slf4jVersion>
+    <logbackVersion>1.5.20</logbackVersion>
+    <oracleVersion>23.26.0.0.0</oracleVersion>
+    <postgresVersion>42.7.13</postgresVersion>
+    <mysqlVersion>9.7.0</mysqlVersion>
+    <h2Version>2.4.240</h2Version>
+    <guavaVersion>33.6.0-jre</guavaVersion>
   </properties>
   <ciManagement>
     <system>teamcity</system>
@@ -133,7 +142,18 @@
     <resources>
       <resource>
         <directory>src/main/resources</directory>
+        <excludes>
+          <exclude>images/**</exclude>
+        </excludes>
         <filtering>true</filtering>
+      </resource>
+      <resource>
+        <!-- binary icons (gif/ico/icns/xpm/png) - must not go through property filtering -->
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>images/**</include>
+        </includes>
+        <filtering>false</filtering>
       </resource>
       <resource>
         <directory>src/assemble</directory>
@@ -155,27 +175,27 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-clean-plugin</artifactId>
-          <version>3.1.0</version>
+          <version>3.5.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-install-plugin</artifactId>
-          <version>2.5.2</version>
+          <version>3.1.4</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.1.2</version>
+          <version>3.9.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>3.3.0</version>
+          <version>3.7.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>3.2.0</version>
+          <version>3.4.2</version>
         </plugin>
 				<plugin>
 					<artifactId>maven-javadoc-plugin</artifactId>
@@ -201,36 +221,30 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
-          <version>2.8.2</version>
+          <version>3.1.4</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>3.1.0</version>
+          <version>3.3.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
-          <version>2.5.3</version>
+          <version>3.2.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.8.1</version>
+          <version>3.14.1</version>
           <configuration>
-            <source>1.8</source>
-            <target>1.8</target>
+            <release>21</release>
           </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>xmlbeans-maven-plugin</artifactId>
-          <version>2.3.3</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>3.9.0</version>
+          <version>3.21.0</version>
           <configuration>
             <skipDeploy>true</skipDeploy>
           </configuration>
@@ -238,7 +252,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.22.2</version>
+          <version>3.5.4</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -278,7 +292,7 @@
               <version>3.2.1</version>
             </requireMavenVersion>
             <requireJavaVersion>
-              <version>1.8</version>
+              <version>21</version>
             </requireJavaVersion>
             <requirePluginVersions>
               <message>Best Practice is to always define plugin versions!</message>
@@ -297,27 +311,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.2</version>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>xmlbeans-maven-plugin</artifactId>
-        <version>2.3.3</version>
-        <executions>
-          <execution>
-            <id>Build-XMLBeans</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>xmlbeans</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <memoryInitialSize>128m</memoryInitialSize>
-          <memoryMaximumSize>256m</memoryMaximumSize>
-          <schemaDirectory>src/main/xsd</schemaDirectory>
-          <javaSource>1.8</javaSource>
-        </configuration>
+        <version>3.5.4</version>
       </plugin>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
@@ -419,43 +413,43 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13</version>
+      <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.7.30</version>
+      <version>${slf4jVersion}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.7.30</version>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${logbackVersion}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.17</version>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-core</artifactId>
+      <version>${logbackVersion}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>com.oracle.ojdbc</groupId>
-      <artifactId>ojdbc8</artifactId>
-      <version>19.3.0.0</version>
+      <groupId>com.oracle.database.jdbc</groupId>
+      <artifactId>ojdbc11</artifactId>
+      <version>${oracleVersion}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.2.14</version>
+      <version>${postgresVersion}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>8.0.20</version>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <version>${mysqlVersion}</version>
       <scope>compile</scope>
     </dependency>
 <!--    <dependency>-->
@@ -467,7 +461,7 @@
     <dependency>
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
-        <version>1.4.200</version>
+        <version>${h2Version}</version>
       <scope>compile</scope>
     </dependency>
 <!--    <dependency>-->
@@ -494,7 +488,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>21.0</version>
+      <version>${guavaVersion}</version>
     </dependency>
   </dependencies>
   <reporting>

@@ -20,7 +20,7 @@
  */
 package org.synchronoss.cpo.util.jdbc;
 
-import org.synchronoss.cpo.meta.domain.CpoClass;
+import org.synchronoss.cpo.core.meta.domain.CpoClass;
 import org.synchronoss.cpo.util.*;
 
 public class JdbcClassNode extends CpoClassNode {

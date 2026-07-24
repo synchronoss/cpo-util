@@ -22,12 +22,12 @@ package org.synchronoss.cpo.util.cassandra;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.synchronoss.cpo.CpoAdapter;
-import org.synchronoss.cpo.CpoAdapterFactoryManager;
-import org.synchronoss.cpo.CpoException;
-import org.synchronoss.cpo.cassandra.cpoCassandraConfig.CtCassandraConfig;
-import org.synchronoss.cpo.cassandra.cpoCassandraConfig.CtCassandraReadWriteConfig;
-import org.synchronoss.cpo.core.cpoCoreConfig.CtDataSourceConfig;
+import org.synchronoss.cpo.core.CpoAdapter;
+import org.synchronoss.cpo.core.CpoAdapterFactoryManager;
+import org.synchronoss.cpo.core.CpoException;
+import org.synchronoss.cpo.cpoconfig.CtCassandraConfig;
+import org.synchronoss.cpo.cpoconfig.CtCassandraReadWriteConfig;
+import org.synchronoss.cpo.cpoconfig.CtDataSourceConfig;
 import org.synchronoss.cpo.util.AbstractConnectionPanel;
 import org.synchronoss.cpo.util.CpoUtil;
 
@@ -75,7 +75,7 @@ public class CassandraConnectionPanel extends AbstractConnectionPanel {
 
   @Override
   public CtCassandraConfig newDataSourceConfig() {
-    return CtCassandraConfig.Factory.newInstance();
+    return new CtCassandraConfig();
   }
 
   private void jbInit() throws Exception {
@@ -186,12 +186,13 @@ public class CassandraConnectionPanel extends AbstractConnectionPanel {
 
     cassandraConfig.setCpoConfigProcessor(this.getConfigProcessor());
 
-    CtCassandraReadWriteConfig rwc = cassandraConfig.addNewReadWriteConfig();
+    CtCassandraReadWriteConfig rwc = new CtCassandraReadWriteConfig();
     // FIXME - need to add username/password support
     //rwc.setUser(userName);
     //rwc.setPassword(password);
-    rwc.addContactPoint(host);
+    rwc.getContactPoint().add(host);
     rwc.setKeySpace(keyspace);
+    cassandraConfig.setReadWriteConfig(rwc);
 
     return cassandraConfig;
   }

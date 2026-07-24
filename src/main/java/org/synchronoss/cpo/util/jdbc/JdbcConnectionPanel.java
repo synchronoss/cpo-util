@@ -21,9 +21,8 @@
 package org.synchronoss.cpo.util.jdbc;
 
 import org.slf4j.*;
-import org.synchronoss.cpo.*;
-import org.synchronoss.cpo.core.cpoCoreConfig.*;
-import org.synchronoss.cpo.jdbc.cpoJdbcConfig.*;
+import org.synchronoss.cpo.core.*;
+import org.synchronoss.cpo.cpoconfig.*;
 import org.synchronoss.cpo.util.*;
 
 import javax.swing.*;
@@ -64,7 +63,7 @@ public class JdbcConnectionPanel extends AbstractConnectionPanel {
 
   @Override
   public CtJdbcConfig newDataSourceConfig() {
-    return CtJdbcConfig.Factory.newInstance();
+    return new CtJdbcConfig();
   }
 
   @Override
@@ -188,18 +187,18 @@ public class JdbcConnectionPanel extends AbstractConnectionPanel {
     CtJdbcConfig jdbcConfig = (CtJdbcConfig)dataSourceConfig;
 
     jTextName.setText(jdbcConfig.getName());
-    if (jdbcConfig.isSetReadWriteConfig()) {
+    if (jdbcConfig.getReadWriteConfig() != null) {
       CtJdbcReadWriteConfig rwc = jdbcConfig.getReadWriteConfig();
 
       jTextUserName.setText(rwc.getUser());
       jTextPassword.setText(rwc.getPassword());
       jTextUrl.setText(rwc.getUrl());
-      if (rwc.isSetDriverClassName()) {
+      if (rwc.getDriverClassName() != null) {
         jTextDriver.setText(rwc.getDriverClassName());
       }
 
       StringBuilder params = new StringBuilder();
-      for (CtProperty prop : rwc.getPropertyArray()) {
+      for (CtProperty prop : rwc.getProperty()) {
         params.append(prop.getName());
         params.append(PARAM_ASSIGNMENT);
         params.append(prop.getValue());
@@ -259,11 +258,12 @@ public class JdbcConnectionPanel extends AbstractConnectionPanel {
 
     jdbcConfig.setCpoConfigProcessor(this.getConfigProcessor());
 
-    CtJdbcReadWriteConfig rwc = jdbcConfig.addNewReadWriteConfig();
+    CtJdbcReadWriteConfig rwc = new CtJdbcReadWriteConfig();
     rwc.setUser(userName);
     rwc.setPassword(password);
     rwc.setUrl(url);
     rwc.setDriverClassName(driver);
+    jdbcConfig.setReadWriteConfig(rwc);
 
     if (params != null && !params.isEmpty()) {
       StringTokenizer st = new StringTokenizer(params, PARAM_DELIM);
@@ -278,9 +278,10 @@ public class JdbcConnectionPanel extends AbstractConnectionPanel {
           value = stNameValue.nextToken();
         }
 
-        CtProperty prop = rwc.addNewProperty();
+        CtProperty prop = new CtProperty();
         prop.setName(name);
         prop.setValue(value);
+        rwc.getProperty().add(prop);
       }
     }
 
