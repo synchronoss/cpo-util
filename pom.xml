@@ -26,7 +26,7 @@
   <groupId>org.synchronoss.cpo</groupId>
   <artifactId>cpoUtil</artifactId>
   <name>cpoUtil</name>
-  <version>6.1.1-SNAPSHOT</version>
+  <version>6.1.1</version>
   <parent>
     <groupId>org.sonatype.oss</groupId>
     <artifactId>oss-parent</artifactId>
@@ -130,7 +130,7 @@
     <connection>scm:git:git@github.com:synchronoss/cpo-util.git</connection>
     <developerConnection>scm:git:git@github.com:synchronoss/cpo-util.git</developerConnection>
     <url>https://github.com/synchronoss/cpo-util</url>
-    <tag>HEAD</tag>
+    <tag>cpoUtil-6.1.1</tag>
   </scm>
   <build>
     <resources>
