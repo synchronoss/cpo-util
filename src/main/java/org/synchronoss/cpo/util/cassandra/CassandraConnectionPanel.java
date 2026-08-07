@@ -30,6 +30,7 @@ import org.synchronoss.cpo.cpoconfig.CtCassandraReadWriteConfig;
 import org.synchronoss.cpo.cpoconfig.CtDataSourceConfig;
 import org.synchronoss.cpo.util.AbstractConnectionPanel;
 import org.synchronoss.cpo.util.CpoUtil;
+import org.synchronoss.cpo.util.CpoUtilClassLoader;
 
 import javax.swing.*;
 import java.awt.*;
@@ -126,6 +127,12 @@ public class CassandraConnectionPanel extends AbstractConnectionPanel {
 
 
   private void testConnectionButtonActionPerformed() {
+    // driver/datasource classes not on the app's own classpath are resolved via the thread
+    // context classloader (see CpoClassLoader.forName in cpo-core) - route it through
+    // CpoUtilClassLoader so jars added to the custom classpath are visible.
+    Thread currentThread = Thread.currentThread();
+    ClassLoader previousLoader = currentThread.getContextClassLoader();
+    currentThread.setContextClassLoader(CpoUtilClassLoader.getInstance(previousLoader));
     try {
       CtDataSourceConfig dataSourceConfig = createDataSourceConfig();
       CpoAdapter cpoAdapter = CpoAdapterFactoryManager.makeCpoAdapterFactory(dataSourceConfig).getCpoAdapter();
@@ -134,6 +141,8 @@ public class CassandraConnectionPanel extends AbstractConnectionPanel {
       }
     } catch (CpoException ex) {
       CpoUtil.showErrorMessage(ex.getMessage());
+    } finally {
+      currentThread.setContextClassLoader(previousLoader);
     }
   }
 

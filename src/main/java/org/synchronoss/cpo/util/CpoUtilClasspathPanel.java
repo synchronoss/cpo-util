@@ -57,9 +57,9 @@ public class CpoUtilClasspathPanel extends JPanel {
     jListClasspath.setListData(classpathEntries);
     JScrollPane jScroll = new JScrollPane();
     jScroll.getViewport().add(jListClasspath);
-    this.add(jScroll, new GridBagConstraints(0, 1, 1, 2, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+    this.add(jScroll, new GridBagConstraints(0, 1, 1, 3, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 
-    JButton jButAddClasspath = new JButton("Add");
+    JButton jButAddClasspath = new JButton("Add Jar(s)...");
     jButAddClasspath.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         addFile();
@@ -67,21 +67,44 @@ public class CpoUtilClasspathPanel extends JPanel {
     });
     this.add(jButAddClasspath, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 
+    JButton jButAddDirectory = new JButton("Add Directory...");
+    jButAddDirectory.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        addDirectory();
+      }
+    });
+    this.add(jButAddDirectory, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+
     JButton jButRemove = new JButton("Remove");
     jButRemove.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         removeFile();
       }
     });
-    this.add(jButRemove, new GridBagConstraints(1, 2, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+    this.add(jButRemove, new GridBagConstraints(1, 3, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
   }
 
   private void addFile() {
+    // FILES_ONLY (not FILES_AND_DIRECTORIES): on macOS's Aqua look-and-feel, mixed file+directory
+    // selection has a long-standing bug where a directory can't actually be selected (clicking it
+    // just navigates in) - see addDirectory() for the dedicated directory picker.
     JFileChooser jFile = new JFileChooser();
     jFile.setMultiSelectionEnabled(true);
-    jFile.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+    jFile.setFileSelectionMode(JFileChooser.FILES_ONLY);
     int result = jFile.showOpenDialog(this);
-    if (result == 1) {
+    if (result != JFileChooser.APPROVE_OPTION) {
+      return;
+    }
+    classpathEntries.addAll(Arrays.asList(jFile.getSelectedFiles()));
+    this.jListClasspath.setListData(classpathEntries);
+  }
+
+  private void addDirectory() {
+    JFileChooser jFile = new JFileChooser();
+    jFile.setMultiSelectionEnabled(true);
+    jFile.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+    int result = jFile.showOpenDialog(this);
+    if (result != JFileChooser.APPROVE_OPTION) {
       return;
     }
     classpathEntries.addAll(Arrays.asList(jFile.getSelectedFiles()));

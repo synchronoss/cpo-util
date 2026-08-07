@@ -169,6 +169,12 @@ public class JdbcConnectionPanel extends AbstractConnectionPanel {
   }
 
   private void testConnectionButtonActionPerformed() {
+    // driver/datasource classes not on the app's own classpath are resolved via the thread
+    // context classloader (see CpoClassLoader.forName in cpo-core) - route it through
+    // CpoUtilClassLoader so jars added to the custom classpath (e.g. a JDBC driver) are visible.
+    Thread currentThread = Thread.currentThread();
+    ClassLoader previousLoader = currentThread.getContextClassLoader();
+    currentThread.setContextClassLoader(CpoUtilClassLoader.getInstance(previousLoader));
     try {
       CtDataSourceConfig dataSourceConfig = createDataSourceConfig();
       CpoAdapter cpoAdapter = CpoAdapterFactoryManager.makeCpoAdapterFactory(dataSourceConfig).getCpoAdapter();
@@ -177,6 +183,8 @@ public class JdbcConnectionPanel extends AbstractConnectionPanel {
       }
     } catch (CpoException ex) {
       CpoUtil.showErrorMessage(ex.getMessage());
+    } finally {
+      currentThread.setContextClassLoader(previousLoader);
     }
   }
 
@@ -232,10 +240,6 @@ public class JdbcConnectionPanel extends AbstractConnectionPanel {
 
     if (userName == null || userName.isEmpty()) {
       throw new CpoException("A user name must be provided");
-    }
-
-    if (password.isEmpty()) {
-      throw new CpoException("A password must be provided");
     }
 
     if (url == null || url.isEmpty()) {

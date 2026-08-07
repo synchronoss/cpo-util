@@ -50,12 +50,29 @@ public class CpoUtil extends JFrame {
   private static URL mainIcon = CpoBrowserTree.class.getResource("/images/sync-logo-sm.gif");
   private static ImageIcon closeIcon = new ImageIcon(CpoBrowserTree.class.getResource("/images/close.png"));
 
-  private static final String CPOUTIL_CONFIG_DIRNAME = ".cpoutil";
-  private static final File CPOUTIL_CONFIG_DIR = new File(System.getProperties().getProperty("user.home"), CPOUTIL_CONFIG_DIRNAME);
+  private static final String CPOUTIL_CONFIG_DIRNAME = "cpoutil";
+  private static final File CPOUTIL_CONFIG_DIR = resolveConfigDir();
   private static final String CPOUTIL_CONFIG_FILE = "CpoUtilConfig.xml";
   private static final File configFile = new File(CPOUTIL_CONFIG_DIR, CPOUTIL_CONFIG_FILE);
   private static final String CPOUTIL_PROPERTIES_FILE = "cpoutil.properties";
   private static final String CPOUTIL_CONFIG_XSD = "xsd/CpoUtilConfig.xsd";
+
+  // pre-XDG config location (~/.cpoutil/CpoUtilConfig.xml). Read once on startup to migrate
+  // existing installs forward to CPOUTIL_CONFIG_DIR; never written to again.
+  private static final File LEGACY_CPOUTIL_CONFIG_DIR = new File(System.getProperty("user.home"), ".cpoutil");
+  private static final File legacyConfigFile = new File(LEGACY_CPOUTIL_CONFIG_DIR, CPOUTIL_CONFIG_FILE);
+
+  /**
+   * Resolves the config directory per the XDG Base Directory spec: $XDG_CONFIG_HOME/cpoutil,
+   * falling back to ~/.config/cpoutil when XDG_CONFIG_HOME isn't set.
+   */
+  private static File resolveConfigDir() {
+    String xdgConfigHome = System.getenv("XDG_CONFIG_HOME");
+    File configHome = (xdgConfigHome != null && !xdgConfigHome.isEmpty())
+        ? new File(xdgConfigHome)
+        : new File(System.getProperty("user.home"), ".config");
+    return new File(configHome, CPOUTIL_CONFIG_DIRNAME);
+  }
 
   private static final String BOOTSTRAP_URL_PROP = "cpoutil.bootstrapUrl";
   private static final String PROTECTED_CLASS_PROP = "cpoutil.protectedClasses";
@@ -592,10 +609,14 @@ public class CpoUtil extends JFrame {
   protected void loadConfig() {
     try {
       // user config
-      if (!configFile.exists()) {
-        // file doesn't exist, let's make one
-
-        // first, try to convert if they have the old style file
+      if (configFile.exists()) {
+        cpoUtilConfig = loadCpoUtilConfig(configFile);
+      } else if (legacyConfigFile.exists()) {
+        // migrate forward from the pre-XDG ~/.cpoutil/ location
+        cpoUtilConfig = loadCpoUtilConfig(legacyConfigFile);
+        saveConfig();
+      } else {
+        // no config anywhere yet - first, try to convert if they have the old .properties-style file
         try {
           cpoUtilConfig = ConvertCpoUtilLocalProperties.convert();
         } catch (CpoException ex) {
@@ -607,19 +628,6 @@ public class CpoUtil extends JFrame {
           cpoUtilConfig = new CtCpoUtilConfig();
         }
         saveConfig();
-      } else {
-        StringBuilder errors = new StringBuilder();
-        cpoUtilConfig = XmlHelper.unmarshalXmlObject(CPOUTIL_CONFIG_XSD, configFile.getAbsolutePath(), CtCpoUtilConfig.class, errors);
-        if (cpoUtilConfig == null) {
-          throw new IOException("Could not load " + configFile.getAbsolutePath() + ":\n" + errors);
-        }
-        if (errors.length() > 0) {
-          // the file parsed, but didn't fully validate against the current schema (e.g. it's in
-          // an older format) - some of its contents may not have loaded. Warn now, before any
-          // action that calls saveConfig() overwrites the file with the incomplete result.
-          showErrorMessage("Warning: " + configFile.getAbsolutePath() + " did not fully validate "
-              + "against the current schema - some settings may not have loaded:\n" + errors);
-        }
       }
 
       // read default props
@@ -660,13 +668,32 @@ public class CpoUtil extends JFrame {
   }
 
   /**
+   * Loads and schema-validates a CpoUtilConfig.xml file. Warns (but does not fail) if the file
+   * parses but doesn't fully validate against the current schema - e.g. it's in an older format
+   * and some of its contents didn't load - since the next saveConfig() would otherwise silently
+   * overwrite it with the incomplete result.
+   */
+  private CtCpoUtilConfig loadCpoUtilConfig(File file) throws IOException {
+    StringBuilder errors = new StringBuilder();
+    CtCpoUtilConfig config = XmlHelper.unmarshalXmlObject(CPOUTIL_CONFIG_XSD, file.getAbsolutePath(), CtCpoUtilConfig.class, errors);
+    if (config == null) {
+      throw new IOException("Could not load " + file.getAbsolutePath() + ":\n" + errors);
+    }
+    if (errors.length() > 0) {
+      showErrorMessage("Warning: " + file.getAbsolutePath() + " did not fully validate "
+          + "against the current schema - some settings may not have loaded:\n" + errors);
+    }
+    return config;
+  }
+
+  /**
    * Saves the config data
    */
   private void saveConfig() {
 
-    // if the .cpoutil folder isn't there, make it
+    // if the config folder isn't there yet, make it (and any missing parents, e.g. ~/.config)
     if (!CPOUTIL_CONFIG_DIR.exists()) {
-      CPOUTIL_CONFIG_DIR.mkdir();
+      CPOUTIL_CONFIG_DIR.mkdirs();
     }
 
     try {

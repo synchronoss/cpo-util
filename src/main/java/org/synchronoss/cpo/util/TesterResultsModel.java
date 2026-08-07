@@ -48,7 +48,9 @@ public class TesterResultsModel extends AbstractTableModel {
 
   @Override
   public int getColumnCount() {
-    return cpoClassNode.getChildCount();
+    // cpoClassNode's own direct children are just the two label/grouping nodes (attributes,
+    // function groups) - the actual per-attribute columns are one level further down.
+    return cpoClassNode.getAttributeLabelNode().getChildCount();
   }
 
   @Override
