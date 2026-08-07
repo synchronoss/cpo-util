@@ -27,11 +27,6 @@
   <artifactId>cpoUtil</artifactId>
   <name>cpoUtil</name>
   <version>6.1.1-SNAPSHOT</version>
-  <parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>7</version>
-  </parent>
   <description>cpoUtil is the utility that configures the metadata for cpo</description>
   <packaging>jar</packaging>
   <url>http://synchronoss.github.io/cpo-util/</url>
@@ -82,26 +77,6 @@
         <cpo.assembly.id>dist-${cpo.classifier}</cpo.assembly.id>
         <cpo.onejar.filename>${project.build.finalName}-${cpo.classifier}.one-jar.jar</cpo.onejar.filename>
       </properties>
-    </profile>
-    <profile>
-      <id>DEPLOY</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.12.0</version>
-            <executions>
-              <execution>
-                <id>attach-javadocs</id>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
   </profiles>
   <issueManagement>
@@ -299,17 +274,62 @@
         <version>3.5.4</version>
       </plugin>
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.8</version>
+        <!-- oss.sonatype.org (legacy OSSRH) was decommissioned in 2024; publish through
+             the Central Publishing Portal instead, matching cpo-api's setup. -->
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <version>0.9.0</version>
         <extensions>true</extensions>
-        <inherited>false</inherited>
         <configuration>
-          <serverId>sonatype-nexus-staging</serverId>
-          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-          <stagingProfileId>b2828f5f73ba8</stagingProfileId>
-          <autoReleaseAfterClose>true</autoReleaseAfterClose>
+          <publishingServerId>central</publishingServerId>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.3.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <!-- Central requires a sources jar per published artifact. -->
+            <phase>package</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>3.2.8</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+            <configuration>
+              <keyname>${gpg.keyname}</keyname>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <!-- Central requires a javadoc jar per published artifact; pluginManagement above
+                 only configures the plugin, it doesn't bind an execution to the build. -->
+            <phase>package</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
