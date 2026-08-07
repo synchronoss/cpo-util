@@ -45,7 +45,7 @@ public abstract class AbstractCpoNode extends DefaultMutableTreeNode {
   }
 
   /**
-   * @see DefaultMutableTreeNode#DefaultMutableTreeNode(Object userObject);
+   * @see DefaultMutableTreeNode#DefaultMutableTreeNode(Object userObject)
    */
   public AbstractCpoNode(Object userObject) {
     super(userObject);
