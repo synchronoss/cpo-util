@@ -21,9 +21,10 @@
 package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
-import org.synchronoss.cpo.CpoException;
-import org.synchronoss.cpo.exporter.*;
-import org.synchronoss.cpo.meta.domain.*;
+import org.synchronoss.cpo.core.CpoException;
+import org.synchronoss.cpo.core.enums.Crud;
+import org.synchronoss.cpo.core.exporter.*;
+import org.synchronoss.cpo.core.meta.domain.*;
 
 import javax.swing.*;
 import javax.swing.tree.*;
@@ -274,7 +275,7 @@ public class CpoBrowserTree extends JTree {
         String groupName = fgp.getGroupName().equals("") ? null : fgp.getGroupName();
 
         // don't allow dupes
-        if (functionGroupLabelNode.getParent().getUserObject().existsFunctionGroup(fgp.getGroupType(), groupName)) {
+        if (functionGroupLabelNode.getParent().getUserObject().existsFunctionGroup(Crud.valueOf(fgp.getGroupType()), groupName)) {
           CpoUtil.showErrorMessage("A function group with that type and name already exists for this class: " + fgp.getGroupType() + " - " + groupName);
           return;
         }

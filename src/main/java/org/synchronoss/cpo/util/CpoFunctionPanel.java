@@ -21,9 +21,9 @@
 package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
-import org.synchronoss.cpo.CpoException;
-import org.synchronoss.cpo.meta.domain.CpoAttribute;
-import org.synchronoss.cpo.parser.ExpressionParser;
+import org.synchronoss.cpo.core.CpoException;
+import org.synchronoss.cpo.core.meta.domain.CpoAttribute;
+import org.synchronoss.cpo.core.parser.ExpressionParser;
 
 import javax.swing.*;
 import java.awt.*;
@@ -233,10 +233,10 @@ public class CpoFunctionPanel extends JPanel {
   }
 
   private void insertSQLparams() {
-    Enumeration<CpoArgumentNode> queryEnum = cpoFunctionNode.children();
+    Enumeration queryEnum = cpoFunctionNode.children();
     StringBuilder sbParams = new StringBuilder();
     while (queryEnum.hasMoreElements()) {
-      CpoArgumentNode node = queryEnum.nextElement();
+      CpoArgumentNode node = (CpoArgumentNode)queryEnum.nextElement();
       sbParams.append(node.getCpoAttribute().getDataName());
       sbParams.append(",");
     }

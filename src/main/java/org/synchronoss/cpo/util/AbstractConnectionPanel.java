@@ -20,8 +20,8 @@
  */
 package org.synchronoss.cpo.util;
 
-import org.synchronoss.cpo.CpoException;
-import org.synchronoss.cpo.core.cpoCoreConfig.CtDataSourceConfig;
+import org.synchronoss.cpo.core.CpoException;
+import org.synchronoss.cpo.cpoconfig.CtDataSourceConfig;
 
 import javax.swing.*;
 

@@ -20,7 +20,7 @@
  */
 package org.synchronoss.cpo.util.jdbc;
 
-import org.synchronoss.cpo.meta.domain.CpoFunction;
+import org.synchronoss.cpo.core.meta.domain.CpoFunction;
 import org.synchronoss.cpo.util.CpoFunctionPanel;
 import org.synchronoss.cpo.util.CpoFunctionNode;
 

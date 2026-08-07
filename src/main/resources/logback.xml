@@ -21,19 +21,16 @@
     http://www.gnu.org/licenses/lgpl.txt
 
 -->
-<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
-
-<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
-  <appender name="ConsoleAppender" class="org.apache.log4j.ConsoleAppender">
-    <layout class="org.apache.log4j.PatternLayout">
-      <param name="ConversionPattern" value="%d{ABSOLUTE} %-5p %c{2} %x - %m%n"/>
-    </layout>
+<configuration>
+  <appender name="ConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} %-5level %logger{2} - %msg%n</pattern>
+    </encoder>
   </appender>
-  <logger name="org.synchronoss">
-    <level value="ERROR"/>
-  </logger>
-  <root>
-    <priority value="ERROR"/>
+
+  <logger name="org.synchronoss" level="ERROR"/>
+
+  <root level="ERROR">
     <appender-ref ref="ConsoleAppender"/>
   </root>
-</log4j:configuration>
+</configuration>

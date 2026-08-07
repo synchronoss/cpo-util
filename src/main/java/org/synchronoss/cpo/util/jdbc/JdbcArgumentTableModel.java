@@ -21,7 +21,6 @@
 package org.synchronoss.cpo.util.jdbc;
 
 import org.synchronoss.cpo.jdbc.*;
-import org.synchronoss.cpo.jdbc.cpoJdbcMeta.CtJdbcArgument;
 import org.synchronoss.cpo.util.*;
 
 import javax.swing.*;
@@ -39,9 +38,9 @@ public class JdbcArgumentTableModel extends CoreArgumentTableModel {
     super.initTableEditors(table);
 
     JComboBox jIOTypeBox = new JComboBox();
-    jIOTypeBox.addItem(CtJdbcArgument.Scope.IN.toString());
-    jIOTypeBox.addItem(CtJdbcArgument.Scope.OUT.toString());
-    jIOTypeBox.addItem(CtJdbcArgument.Scope.BOTH.toString());
+    jIOTypeBox.addItem("IN");
+    jIOTypeBox.addItem("OUT");
+    jIOTypeBox.addItem("BOTH");
 
     TableCellEditor editor = new DefaultCellEditor(jIOTypeBox);
     table.setDefaultEditor(JComboBox.class, editor);

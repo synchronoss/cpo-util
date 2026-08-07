@@ -21,8 +21,8 @@
 package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
-import org.synchronoss.cpo.*;
-import org.synchronoss.cpo.core.cpoCoreMeta.StFunctionGroupType;
+import org.synchronoss.cpo.core.*;
+import org.synchronoss.cpo.cpometa.StFunctionGroupType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -186,8 +186,9 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
     }
     try {
       Class<?> cpoClass = CpoUtilClassLoader.getInstance(this.getClass().getClassLoader()).loadClass(cpoClassName);
-      Object cpoObject = cpoClass.newInstance();
-      Object cpoObjectReturnType = CpoUtilClassLoader.getInstance(this.getClass().getClassLoader()).loadClass(cpoClassNameReturnType).newInstance();
+      Object cpoObject = instantiateCpoClass(cpoClass);
+      Object cpoObjectReturnType = instantiateCpoClass(
+          CpoUtilClassLoader.getInstance(this.getClass().getClassLoader()).loadClass(cpoClassNameReturnType));
       Method[] methods = cpoClass.getMethods();
       TesterParamModel ctpm = (TesterParamModel)jTableParam.getModel();
 
@@ -232,6 +233,21 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
     }
   }
 
+  /**
+   * Instantiates the given CPO meta class. cpo-plugin's default generation mode emits an
+   * interface (the name declared on {@code <cpoClass>}) plus a separate concrete "<Name>Bean"
+   * implementation class - the interface itself can't be instantiated, so fall back to the Bean
+   * class in that case.
+   */
+  private Object instantiateCpoClass(Class<?> cpoClass) throws Exception {
+    if (cpoClass.isInterface()) {
+      Class<?> beanClass = CpoUtilClassLoader.getInstance(this.getClass().getClassLoader())
+          .loadClass(cpoClass.getName() + "Bean");
+      return beanClass.getDeclaredConstructor().newInstance();
+    }
+    return cpoClass.getDeclaredConstructor().newInstance();
+  }
+
   private void setColumnSizes(int columnSize) {
     this.jTableResults.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     for (int i = 0; i < this.jTableResults.getColumnCount(); i++) {
@@ -243,7 +259,7 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
     if (param.equalsIgnoreCase("null") || param.equals("")) {
       return null;
     } else if (param.equalsIgnoreCase("guid")) {
-      return GUID.getGUID();
+      return UUID.randomUUID().toString();
     }
     try {
       if (cls == String.class) {
@@ -252,10 +268,32 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
         return Integer.valueOf(param);
       } else if (cls == Integer.class) {
         return Integer.valueOf(param);
+      } else if (cls == short.class) {
+        return Short.valueOf(param);
+      } else if (cls == Short.class) {
+        return Short.valueOf(param);
+      } else if (cls == long.class) {
+        return Long.valueOf(param);
+      } else if (cls == Long.class) {
+        return Long.valueOf(param);
+      } else if (cls == byte.class) {
+        return Byte.valueOf(param);
+      } else if (cls == Byte.class) {
+        return Byte.valueOf(param);
       } else if (cls == float.class) {
         return Float.valueOf(param);
       } else if (cls == Float.class) {
         return Float.valueOf(param);
+      } else if (cls == double.class) {
+        return Double.valueOf(param);
+      } else if (cls == Double.class) {
+        return Double.valueOf(param);
+      } else if (cls == boolean.class) {
+        return Boolean.valueOf(param);
+      } else if (cls == Boolean.class) {
+        return Boolean.valueOf(param);
+      } else if (cls == char.class || cls == Character.class) {
+        return param.charAt(0);
       } else if (cls == BigDecimal.class) {
         return new BigDecimal(param);
       } else if (cls == BigInteger.class) {
@@ -278,6 +316,12 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
           return new java.sql.Date(sdfDateOnly.parse(param).getTime());
         }
         return new java.sql.Date(sdf.parse(param).getTime());
+      } else if (cls == java.sql.Time.class) {
+        logger.debug("Found type sql Time");
+        if (param.equalsIgnoreCase("sysdate")) {
+          return new java.sql.Time(new Date().getTime());
+        }
+        return new java.sql.Time(sdf.parse(param).getTime());
       } else if (cls == Timestamp.class) {
         logger.debug("Found type Timestamp");
         if (param.equalsIgnoreCase("sysdate")) {
@@ -373,7 +417,7 @@ public class TesterPanel extends JPanel implements ClipboardOwner {
     JMenuItem jMenuSetNewGuid = new JMenuItem("Set New Guid");
     jMenuSetNewGuid.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent ae) {
-        insertValueAt(GUID.getGUID());
+        insertValueAt(UUID.randomUUID().toString());
       }
     });
     menu.add(jMenuSetNewGuid);

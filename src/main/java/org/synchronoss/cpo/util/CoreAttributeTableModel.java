@@ -20,7 +20,7 @@
  */
 package org.synchronoss.cpo.util;
 
-import org.synchronoss.cpo.meta.domain.CpoAttribute;
+import org.synchronoss.cpo.core.meta.domain.CpoAttribute;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.*;

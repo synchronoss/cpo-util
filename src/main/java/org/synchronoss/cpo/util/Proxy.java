@@ -21,19 +21,21 @@
 package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
-import org.synchronoss.cpo.*;
-import org.synchronoss.cpo.core.cpoCoreConfig.CtDataSourceConfig;
-import org.synchronoss.cpo.core.cpoCoreMeta.StFunctionGroupType;
-import org.synchronoss.cpo.exporter.*;
-import org.synchronoss.cpo.meta.CpoMetaDescriptor;
-import org.synchronoss.cpo.meta.domain.*;
-import org.synchronoss.cpo.parser.ExpressionParser;
+import org.synchronoss.cpo.core.*;
+import org.synchronoss.cpo.cpoconfig.CtDataSourceConfig;
+import org.synchronoss.cpo.cpometa.StFunctionGroupType;
+import org.synchronoss.cpo.core.exporter.*;
+import org.synchronoss.cpo.core.meta.CpoMetaDescriptor;
+import org.synchronoss.cpo.core.meta.domain.*;
+import org.synchronoss.cpo.core.parser.ExpressionParser;
 
 import javax.swing.tree.*;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Proxy object that handles most of the GUI to domain logic
@@ -529,7 +531,7 @@ public abstract class Proxy {
           Enumeration argumentNodes = functionNode.children();
           while (argumentNodes.hasMoreElements()) {
             CpoArgumentNode argumentNode = (CpoArgumentNode)argumentNodes.nextElement();
-            if (argumentNode.getUserObject().getAttributeName().equals(cpoAttributeNode.getUserObject().getJavaName())) {
+            if (argumentNode.getUserObject().getName().equals(cpoAttributeNode.getUserObject().getJavaName())) {
               functionGroups.add(functionGroup);
             }
           }
@@ -797,7 +799,18 @@ public abstract class Proxy {
     // swap the meta descriptor in
     dataSourceConfig.setMetaDescriptorName(metaDescriptor.getName());
 
-    CpoAdapter cpoAdapter = CpoAdapterFactoryManager.makeCpoAdapterFactory(dataSourceConfig).getCpoAdapter();
+    // driver/datasource classes not on the app's own classpath are resolved via the thread
+    // context classloader (see CpoClassLoader.forName in cpo-core) - route it through
+    // CpoUtilClassLoader so jars added to the custom classpath (e.g. a JDBC driver) are visible.
+    Thread currentThread = Thread.currentThread();
+    ClassLoader previousLoader = currentThread.getContextClassLoader();
+    currentThread.setContextClassLoader(CpoUtilClassLoader.getInstance(previousLoader));
+    CpoAdapter cpoAdapter;
+    try {
+      cpoAdapter = CpoAdapterFactoryManager.makeCpoAdapterFactory(dataSourceConfig).getCpoAdapter();
+    } finally {
+      currentThread.setContextClassLoader(previousLoader);
+    }
     adapterCache.put(connectionName, cpoAdapter);
     return cpoAdapter;
   }
@@ -808,42 +821,59 @@ public abstract class Proxy {
   public Collection<?> executeFunctionGroup(String connectionName, Object obj, Object objReturnType, CpoFunctionGroup cpoFGnode, boolean persist) throws CpoException {
     CpoAdapter cpoAdapter = getCpoAdapter(connectionName);
 
-    List<Object> result = new ArrayList<Object>();
-    Object resultObj = null;
-    if (cpoFGnode.getType().equals(StFunctionGroupType.CREATE.toString())) {
-      //insert
-      resultObj = cpoAdapter.insertObject(cpoFGnode.getName(), obj);
-    } else if (cpoFGnode.getType().equals(StFunctionGroupType.DELETE.toString())) {
-      cpoAdapter.deleteObject(cpoFGnode.getName(), obj);
-      // retrieve from cpo, so we can verify deletion
-      resultObj = cpoAdapter.retrieveBean(cpoFGnode.getName(), obj);
-    } else if (cpoFGnode.getType().equals(StFunctionGroupType.LIST.toString())) {
-      result = cpoAdapter.retrieveBeans(cpoFGnode.getName(), obj, objReturnType);
-    } else if (cpoFGnode.getType().equals(StFunctionGroupType.RETRIEVE.toString())) {
-      resultObj = cpoAdapter.retrieveBean(cpoFGnode.getName(), obj);
-    } else if (cpoFGnode.getType().equals(StFunctionGroupType.UPDATE.toString())) {
-      cpoAdapter.updateObject(cpoFGnode.getName(), obj);
-      // retrieve from cpo, so we can verify update
-      resultObj = cpoAdapter.retrieveBean(cpoFGnode.getName(), obj);
-    } else if (cpoFGnode.getType().equals(StFunctionGroupType.EXIST.toString()) && persist) {
-      cpoAdapter.persistObject(cpoFGnode.getName(), obj);
-      // retrieve from cpo, so we can verify update
-      resultObj = cpoAdapter.retrieveBean(cpoFGnode.getName(), obj);
-    } else if (cpoFGnode.getType().equals(StFunctionGroupType.EXIST.toString())) {
-      resultObj = cpoAdapter.existsObject(cpoFGnode.getName(), obj);
-    }
+    // the bean class named in the meta descriptor is resolved lazily, the first time it's
+    // actually needed (here) rather than when the adapter was created - CpoClassLoader.forName
+    // (cpo-core) falls back to the thread context classloader when the class isn't on the app's
+    // own classpath, so route it through CpoUtilClassLoader for the whole call, not just adapter
+    // creation (getCpoAdapter already does this for creation, but that classloader is restored
+    // before this method runs).
+    Thread currentThread = Thread.currentThread();
+    ClassLoader previousLoader = currentThread.getContextClassLoader();
+    currentThread.setContextClassLoader(CpoUtilClassLoader.getInstance(previousLoader));
+    try {
+      List<Object> result = new ArrayList<Object>();
+      Object resultObj = null;
+      if (cpoFGnode.getType().equals(StFunctionGroupType.CREATE.toString())) {
+        cpoAdapter.insertBean(cpoFGnode.getName(), obj);
+        // insertBean returns the row count, not the bean - retrieve it so the tester panel
+        // can display the actual persisted values instead of the count
+        resultObj = cpoAdapter.retrieveBean(cpoFGnode.getName(), obj);
+      } else if (cpoFGnode.getType().equals(StFunctionGroupType.DELETE.toString())) {
+        cpoAdapter.deleteBean(cpoFGnode.getName(), obj);
+        // retrieve from cpo, so we can verify deletion
+        resultObj = cpoAdapter.retrieveBean(cpoFGnode.getName(), obj);
+      } else if (cpoFGnode.getType().equals(StFunctionGroupType.LIST.toString())) {
+        try (Stream<Object> stream = cpoAdapter.retrieveBeans(cpoFGnode.getName(), obj, objReturnType)) {
+          result = stream.collect(Collectors.toList());
+        }
+      } else if (cpoFGnode.getType().equals(StFunctionGroupType.RETRIEVE.toString())) {
+        resultObj = cpoAdapter.retrieveBean(cpoFGnode.getName(), obj);
+      } else if (cpoFGnode.getType().equals(StFunctionGroupType.UPDATE.toString())) {
+        cpoAdapter.updateBean(cpoFGnode.getName(), obj);
+        // retrieve from cpo, so we can verify update
+        resultObj = cpoAdapter.retrieveBean(cpoFGnode.getName(), obj);
+      } else if (cpoFGnode.getType().equals(StFunctionGroupType.EXIST.toString()) && persist) {
+        cpoAdapter.upsertBean(cpoFGnode.getName(), obj);
+        // retrieve from cpo, so we can verify update
+        resultObj = cpoAdapter.retrieveBean(cpoFGnode.getName(), obj);
+      } else if (cpoFGnode.getType().equals(StFunctionGroupType.EXIST.toString())) {
+        resultObj = cpoAdapter.existsBean(cpoFGnode.getName(), obj);
+      }
 
-    // always return a list, even if it's empty
-    if (result == null) {
-      return new ArrayList<Object>();
-    }
+      // always return a list, even if it's empty
+      if (result == null) {
+        return new ArrayList<Object>();
+      }
 
-    // if there was a result object, add it to the list
-    if (resultObj != null) {
-      result.add(resultObj);
-    }
+      // if there was a result object, add it to the list
+      if (resultObj != null) {
+        result.add(resultObj);
+      }
 
-    return result;
+      return result;
+    } finally {
+      currentThread.setContextClassLoader(previousLoader);
+    }
   }
 
   /**

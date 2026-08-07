@@ -67,7 +67,12 @@ public class CpoUtilClassLoader extends ClassLoader {
         logger.debug("loaded class: " + name);
       }
     } catch (IOException e) {
-      logger.error(e.getMessage(), e);
+      // a class not being found via this classloader is routine - many libraries (e.g. H2
+      // probing for the optional ICU4J collator) treat ClassNotFoundException as an expected
+      // "not present" signal, not an error, so this shouldn't be logged as one.
+      if (logger.isDebugEnabled()) {
+        logger.debug(e.getMessage(), e);
+      }
       throw new ClassNotFoundException("Error reading class: " + name, e);
     }
     return c;
@@ -78,47 +83,41 @@ public class CpoUtilClassLoader extends ClassLoader {
       if (file.isFile()) {
         if (file.getName().toLowerCase().endsWith(".jar")) {
           String filename = name.replace('.', '/') + ".class";
-          JarFile jf = new JarFile(file);
-          Enumeration<JarEntry> e = jf.entries();
-          while (e.hasMoreElements()) {
-            ZipEntry entry = e.nextElement();
-            if (filename.equals(entry.getName())) {
-              InputStream is = jf.getInputStream(entry);
-              int l = (int)entry.getSize();
-              byte[] buff = new byte[l];
-              int read = 0;
-              while (read < l) {
-                int incr = is.read(buff, read, l - read);
-                read += incr;
+          try (JarFile jf = new JarFile(file)) {
+            Enumeration<JarEntry> e = jf.entries();
+            while (e.hasMoreElements()) {
+              ZipEntry entry = e.nextElement();
+              if (filename.equals(entry.getName())) {
+                try (InputStream is = jf.getInputStream(entry)) {
+                  int l = (int)entry.getSize();
+                  byte[] buff = new byte[l];
+                  int read = 0;
+                  while (read < l) {
+                    int incr = is.read(buff, read, l - read);
+                    read += incr;
+                  }
+                  return buff;
+                }
               }
-              return buff;
             }
           }
         }
+        // not a jar, or class not found in this jar - keep searching the remaining entries
       } else if (file.isDirectory()) {
         String filename = name.replace('.', File.separatorChar) + ".class";
         File f = new File(file, filename);
 
-        // Get size of class file
-        int size = (int)f.length();
-
-        // Reserve space to read
-        byte[] buff = new byte[size];
-
-        // Get stream to read from
-        FileInputStream fis = new FileInputStream(f);
-        DataInputStream dis = new DataInputStream(fis);
-
-        // Read in data
-        dis.readFully(buff);
-
-        // close stream
-        dis.close();
-
-        // return data
-        return buff;
+        // class not in this directory - keep searching the remaining entries, rather than
+        // letting FileNotFoundException abort the whole search
+        if (f.isFile()) {
+          try (DataInputStream dis = new DataInputStream(new FileInputStream(f))) {
+            byte[] buff = new byte[(int)f.length()];
+            dis.readFully(buff);
+            return buff;
+          }
+        }
       }
     }
-    throw new IOException("Could not find class");
+    throw new IOException("Could not find class: " + name);
   }
 }

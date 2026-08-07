@@ -20,8 +20,8 @@
  */
 package org.synchronoss.cpo.util;
 
-import org.synchronoss.cpo.CpoException;
-import org.synchronoss.cpo.meta.domain.CpoClass;
+import org.synchronoss.cpo.core.CpoException;
+import org.synchronoss.cpo.core.meta.domain.CpoClass;
 
 import javax.swing.*;
 import java.util.Enumeration;

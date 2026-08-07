@@ -26,7 +26,7 @@
   <groupId>org.synchronoss.cpo</groupId>
   <artifactId>cpoUtil</artifactId>
   <name>cpoUtil</name>
-  <version>5.2.1-SNAPSHOT</version>
+  <version>6.1.1-SNAPSHOT</version>
   <parent>
     <groupId>org.sonatype.oss</groupId>
     <artifactId>oss-parent</artifactId>
@@ -52,9 +52,12 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <github.global.server>cpo-github</github.global.server>
     <cpoutil.bootstrapUrl />
-    <cpo.version>5.2.2-SNAPSHOT</cpo.version>
+    <cpo.version>6.1.1</cpo.version>
     <cpo.assembly.id>dist</cpo.assembly.id>
-    <cpo.onejar.filename>${project.build.finalName}.one-jar.jar</cpo.onejar.filename>
+    <cpo.onejar.filename>${project.build.finalName}.one-jar</cpo.onejar.filename>
+    <!-- versions matched to cpo-api's own pom -->
+    <slf4jVersion>2.0.18</slf4jVersion>
+    <logbackVersion>1.6.1</logbackVersion>
   </properties>
   <ciManagement>
     <system>teamcity</system>
@@ -87,7 +90,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.9</version>
+            <version>3.2.0</version>
             <executions>
               <execution>
                 <id>attach-javadocs</id>
@@ -133,7 +136,18 @@
     <resources>
       <resource>
         <directory>src/main/resources</directory>
+        <excludes>
+          <exclude>images/**</exclude>
+        </excludes>
         <filtering>true</filtering>
+      </resource>
+      <resource>
+        <!-- binary icons (gif/ico/icns/xpm/png) - must not go through property filtering -->
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>images/**</include>
+        </includes>
+        <filtering>false</filtering>
       </resource>
       <resource>
         <directory>src/assemble</directory>
@@ -147,7 +161,7 @@
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh</artifactId>
-        <version>2.2</version>
+        <version>3.4.1</version>
       </extension>
     </extensions>
     <pluginManagement>
@@ -155,27 +169,27 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-clean-plugin</artifactId>
-          <version>2.4.1</version>
+          <version>3.5.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-install-plugin</artifactId>
-          <version>2.3.1</version>
+          <version>3.1.4</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.8</version>
+          <version>3.9.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.4</version>
+          <version>3.7.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>2.4</version>
+          <version>3.4.2</version>
         </plugin>
 				<plugin>
 					<artifactId>maven-javadoc-plugin</artifactId>
@@ -201,36 +215,30 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
-          <version>2.7</version>
+          <version>3.1.4</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>2.6</version>
+          <version>3.3.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
-          <version>2.5</version>
+          <version>3.2.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.1</version>
+          <version>3.14.1</version>
           <configuration>
-            <source>1.8</source>
-            <target>1.8</target>
+            <release>21</release>
           </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>xmlbeans-maven-plugin</artifactId>
-          <version>2.3.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>3.3</version>
+          <version>3.21.0</version>
           <configuration>
             <skipDeploy>true</skipDeploy>
           </configuration>
@@ -238,7 +246,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.17</version>
+          <version>3.5.4</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -271,14 +279,14 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.3.1</version>
+        <version>1.4.1</version>
         <configuration>
           <rules>
             <requireMavenVersion>
               <version>3.2.1</version>
             </requireMavenVersion>
             <requireJavaVersion>
-              <version>1.8</version>
+              <version>21</version>
             </requireJavaVersion>
             <requirePluginVersions>
               <message>Best Practice is to always define plugin versions!</message>
@@ -297,31 +305,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.17</version>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>xmlbeans-maven-plugin</artifactId>
-        <version>2.3.3</version>
-        <executions>
-          <execution>
-            <id>Build-XMLBeans</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>xmlbeans</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <memoryInitialSize>128m</memoryInitialSize>
-          <memoryMaximumSize>256m</memoryMaximumSize>
-          <schemaDirectory>src/main/xsd</schemaDirectory>
-        </configuration>
+        <version>3.5.4</version>
       </plugin>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.1</version>
+        <version>1.6.8</version>
         <extensions>true</extensions>
         <inherited>false</inherited>
         <configuration>
@@ -332,20 +321,23 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>com.jolira</groupId>
-        <artifactId>onejar-maven-plugin</artifactId>
-        <version>1.4.4</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.3</version>
         <executions>
           <execution>
             <phase>package</phase>
-            <configuration>
-              <onejarVersion>0.97</onejarVersion>
-              <filename>${cpo.onejar.filename}</filename>
-              <attachToBuild>true</attachToBuild>
-            </configuration>
             <goals>
-              <goal>one-jar</goal>
+              <goal>shade</goal>
             </goals>
+            <configuration>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>org.synchronoss.cpo.util.CpoUtil</mainClass>
+                </transformer>
+              </transformers>
+              <finalName>${cpo.onejar.filename}</finalName>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -362,7 +354,7 @@
             <id>dist</id>
             <phase>package</phase>
             <goals>
-              <goal>attached</goal>
+              <goal>single</goal>
             </goals>
           </execution>
         </executions>
@@ -370,7 +362,7 @@
       <plugin>
         <groupId>com.mycila</groupId>
         <artifactId>license-maven-plugin</artifactId>
-				<version>2.6</version>
+				<version>3.0</version>
         <configuration>
           <header>src/main/resources/license.txt</header>
           <strictCheck>true</strictCheck>
@@ -392,7 +384,7 @@
       <plugin>
         <groupId>com.github.github</groupId>
         <artifactId>site-maven-plugin</artifactId>
-        <version>0.10</version>
+        <version>0.12</version>
         <configuration>
           <message>Creating site for ${project.artifactId}, ${project.version}</message>
           <!-- this does the trick to place every module in the correct subfolder -->
@@ -413,63 +405,21 @@
   </build>
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.7.7</version>
+      <version>${slf4jVersion}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.7.7</version>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${logbackVersion}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.16</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.oracle</groupId>
-      <artifactId>ojdbc6</artifactId>
-      <version>11.2.0.2.0</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache-extras.cassandra-jdbc</groupId>
-      <artifactId>cassandra-jdbc</artifactId>
-      <version>1.1.0</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.j2ee</groupId>
-      <artifactId>j2ee</artifactId>
-      <version>1.3.1</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>8.3-603.jdbc3</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>5.0.4</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hsqldb</groupId>
-      <artifactId>hsqldb</artifactId>
-      <version>2.2.8</version>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-core</artifactId>
+      <version>${logbackVersion}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -487,17 +437,12 @@
       <artifactId>cpo-cassandra</artifactId>
       <version>${cpo.version}</version>
     </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>18.0</version>
-    </dependency>
   </dependencies>
   <reporting>
     <plugins>
       <plugin>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.7</version>
+        <version>3.1.0</version>
         <reportSets>
           <reportSet>
             <reports>
@@ -518,7 +463,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
-        <version>3.3</version>
+        <version>3.13.0</version>
         <configuration>
           <targetJdk>1.8</targetJdk>
         </configuration>
@@ -526,12 +471,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>
-        <version>3.1</version>
+        <version>3.6.0</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>2.17</version>
+        <version>2.22.2</version>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -563,7 +508,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.9.1</version>
+        <version>2.10.1</version>
         <configuration>
           <source>1.8</source>
           <aggregate>true</aggregate>

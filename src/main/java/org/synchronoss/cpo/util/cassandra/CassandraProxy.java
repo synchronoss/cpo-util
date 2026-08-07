@@ -20,8 +20,8 @@
  */
 package org.synchronoss.cpo.util.cassandra;
 
-import org.synchronoss.cpo.*;
-import org.synchronoss.cpo.meta.CpoMetaDescriptor;
+import org.synchronoss.cpo.core.*;
+import org.synchronoss.cpo.core.meta.CpoMetaDescriptor;
 import org.synchronoss.cpo.util.Proxy;
 
 import java.io.File;

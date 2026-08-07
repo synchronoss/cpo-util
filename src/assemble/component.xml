@@ -25,15 +25,11 @@
   <dependencySets>
     <dependencySet>
       <includes>
-        <include>log4j:log4j</include>
+        <include>ch.qos.logback:logback-classic</include>
+        <include>ch.qos.logback:logback-core</include>
         <include>org.slf4j:slf4j-api</include>
-        <include>org.slf4j:slf4j-log4j12</include>
-        <include>org.synchronoss:cpo</include>
-        <include>org.synchronoss:cpo-meta</include>
-        <include>com.oracle:ojdbc6</include>
-        <include>mysql:mysql-connector-java</include>
-        <include>postgresql:postgresql</include>
-        <include>hsqldb:hsqldb</include>
+        <include>org.synchronoss.cpo:cpo-jdbc</include>
+        <include>org.synchronoss.cpo:cpo-core</include>
       </includes>
     </dependencySet>
   </dependencySets>

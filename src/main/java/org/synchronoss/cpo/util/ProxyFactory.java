@@ -21,10 +21,14 @@
 package org.synchronoss.cpo.util;
 
 import org.slf4j.*;
-import org.synchronoss.cpo.CpoException;
-import org.synchronoss.cpo.core.cpoCoreMeta.*;
-import org.synchronoss.cpo.meta.CpoMetaDescriptor;
+import org.synchronoss.cpo.core.CpoException;
+import org.synchronoss.cpo.core.helper.XmlHelper;
+import org.synchronoss.cpo.core.meta.CpoMetaDescriptor;
+import org.synchronoss.cpo.cpometa.CtCpoMetaData;
+import org.synchronoss.cpo.cpometa.ObjectFactory;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
 import java.io.File;
 
 /**
@@ -75,12 +79,14 @@ public class ProxyFactory {
   public Proxy newProxy(File cpoMetaXml, SupportedType type) throws CpoException {
     try {
       // create a new document
-      CpoMetaDataDocument cpoMetaDataDocument = CpoMetaDataDocument.Factory.newInstance();
-      CtCpoMetaData ctCpoMetaData = cpoMetaDataDocument.addNewCpoMetaData();
+      CtCpoMetaData ctCpoMetaData = new CtCpoMetaData();
       ctCpoMetaData.setMetaDescriptor(type.getMetaDescriptorClass().getName());
 
       // save the document so we can use it
-      cpoMetaDataDocument.save(cpoMetaXml);
+      JAXBContext jaxbContext = JAXBContext.newInstance(CtCpoMetaData.class);
+      Marshaller marshaller = jaxbContext.createMarshaller();
+      XmlHelper.setMarshallerProperties(marshaller);
+      marshaller.marshal(new ObjectFactory().createCpoMetaData(ctCpoMetaData), cpoMetaXml);
 
       return getProxy(cpoMetaXml);
     } catch (Exception ex) {
